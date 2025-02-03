@@ -1,5 +1,5 @@
 import express from "express";
-import { protect } from "../middleware/auth.middleware.js";
+import { protect, requireVerification } from "../middleware/auth.middleware.js";
 import {
   updateProfile,
   followUser,
@@ -15,15 +15,31 @@ import { upload } from "../config/cloudinary.js";
 const router = express.Router();
 
 // Profile routes
-router.get("/profile", protect, getProfile); // Get logged in user's profile
-router.get("/profile/:id", protect, getUserProfile); // Get other user's profile
-router.put("/profile", protect, upload.single("profilePic"), updateProfile);
+router.get("/profile", protect, getProfile); // No verification needed to view own profile
+router.get("/profile/:id", protect, getUserProfile); // No verification needed to view others profile
+router.put(
+  "/profile",
+  protect,
+  requireVerification,
+  upload.single("profilePic"),
+  updateProfile
+);
 
-// Social routes
-router.post("/follow/:id", protect, followUser);
-router.post("/unfollow/:id", protect, unfollowUser);
-router.post("/friend-request/:id", protect, sendFriendRequest);
-router.post("/accept-request/:id", protect, acceptFriendRequest);
-router.get("/friends", protect, getFriends);
+// Social routes - All require verification
+router.post("/follow/:id", protect, requireVerification, followUser);
+router.post("/unfollow/:id", protect, requireVerification, unfollowUser);
+router.post(
+  "/friend-request/:id",
+  protect,
+  requireVerification,
+  sendFriendRequest
+);
+router.post(
+  "/accept-request/:id",
+  protect,
+  requireVerification,
+  acceptFriendRequest
+);
+router.get("/friends", protect, requireVerification, getFriends);
 
 export default router;

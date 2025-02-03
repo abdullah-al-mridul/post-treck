@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.model.js";
+import { sendVerificationEmail } from "../config/nodemailer.js";
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -14,6 +15,11 @@ const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
   sameSite: "strict",
+};
+
+// Generate verification code
+const generateVerificationCode = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
 // Register User
@@ -226,6 +232,98 @@ export const refreshToken = async (req, res) => {
     res.status(401).json({
       success: false,
       message: "Invalid token",
+    });
+  }
+};
+
+// Send Verification Code
+export const sendVerificationCode = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (user.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "User is already verified",
+      });
+    }
+
+    // Generate and save verification code
+    const verificationCode = generateVerificationCode();
+    user.verificationCode = verificationCode;
+    user.verificationCodeExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    await user.save();
+
+    // Send verification email
+    await sendVerificationEmail(user.email, verificationCode);
+
+    res.status(200).json({
+      success: true,
+      message: "Verification code sent to your email",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Verify Email
+export const verifyEmail = async (req, res) => {
+  try {
+    const { code } = req.body;
+
+    if (!code) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide verification code",
+      });
+    }
+
+    const user = await User.findById(req.user._id).select(
+      "+verificationCode +verificationCodeExpires"
+    );
+
+    if (user.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "User is already verified",
+      });
+    }
+
+    if (
+      !user.verificationCode ||
+      !user.verificationCodeExpires ||
+      user.verificationCodeExpires < Date.now()
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Verification code has expired",
+      });
+    }
+
+    if (user.verificationCode !== code) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid verification code",
+      });
+    }
+
+    // Verify user
+    user.isVerified = true;
+    user.verificationCode = undefined;
+    user.verificationCodeExpires = undefined;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Email verified successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
     });
   }
 };

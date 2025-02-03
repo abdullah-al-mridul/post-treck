@@ -38,3 +38,20 @@ export const protect = async (req, res, next) => {
     });
   }
 };
+
+export const requireVerification = async (req, res, next) => {
+  try {
+    if (!req.user.isVerified) {
+      return res.status(403).json({
+        success: false,
+        message: "Please verify your email to access this feature",
+      });
+    }
+    next();
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

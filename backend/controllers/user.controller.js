@@ -1,7 +1,38 @@
 import User from "../models/User.model.js";
 import mongoose from "mongoose";
 
-// Update Profile
+// Update Cover Photo
+export const updateCoverPhoto = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide a cover photo",
+      });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { coverPhoto: req.file.path },
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).select("-password");
+
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Update Profile (Modified to handle both profile pic and cover photo)
 export const updateProfile = async (req, res) => {
   try {
     const updates = {
@@ -29,7 +60,7 @@ export const updateProfile = async (req, res) => {
       }
     }
 
-    // If file was uploaded, add the cloudinary URL to updates
+    // If profile pic was uploaded
     if (req.file) {
       updates.profilePic = req.file.path;
     }
@@ -37,15 +68,11 @@ export const updateProfile = async (req, res) => {
     const user = await User.findByIdAndUpdate(req.user._id, updates, {
       new: true,
       runValidators: true,
-    });
-
-    // Remove password from response
-    const userResponse = user.toObject();
-    delete userResponse.password;
+    }).select("-password");
 
     res.status(200).json({
       success: true,
-      user: userResponse,
+      user,
     });
   } catch (error) {
     res.status(500).json({

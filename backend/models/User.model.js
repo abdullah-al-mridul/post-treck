@@ -24,6 +24,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "default-avatar.png",
     },
+    coverPhoto: {
+      type: String,
+      default: "default-cover.png",
+    },
     bio: {
       type: String,
       maxlength: 500,
@@ -76,6 +80,16 @@ const userSchema = new mongoose.Schema(
       type: Date,
       select: false,
     },
+    isBanned: {
+      type: Boolean,
+      default: false,
+    },
+    banReason: String,
+    bannedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    bannedAt: Date,
   },
   {
     timestamps: true,

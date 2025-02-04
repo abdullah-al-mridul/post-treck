@@ -9,8 +9,9 @@ import {
   getFriends,
   getProfile,
   getUserProfile,
+  updateCoverPhoto,
 } from "../controllers/user.controller.js";
-import { upload } from "../config/cloudinary.js";
+import { upload, coverUpload } from "../config/cloudinary.js";
 
 const router = express.Router();
 
@@ -23,6 +24,13 @@ router.put(
   requireVerification,
   upload.single("profilePic"),
   updateProfile
+);
+router.put(
+  "/cover-photo",
+  protect,
+  requireVerification,
+  coverUpload.single("coverPhoto"),
+  updateCoverPhoto
 );
 
 // Social routes - All require verification

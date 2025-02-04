@@ -21,6 +21,7 @@ import {
   removeReplyReaction,
 } from "../controllers/post.controller.js";
 import { postUpload } from "../config/cloudinary.js";
+import { reportPost } from "../controllers/moderation.controller.js";
 
 const router = express.Router();
 
@@ -101,5 +102,8 @@ router.post(
   requireVerification,
   removeCommentReaction
 );
+
+// Report Post (Any verified user can report)
+router.post("/:id/report", protect, requireVerification, reportPost);
 
 export default router;

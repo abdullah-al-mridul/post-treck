@@ -90,6 +90,10 @@ const userSchema = new mongoose.Schema(
       ref: "User",
     },
     bannedAt: Date,
+    lastActive: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
     timestamps: true,

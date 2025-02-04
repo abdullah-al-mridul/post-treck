@@ -4,13 +4,15 @@ import Post from "../models/Post.model.js";
 // Get Admin Dashboard Stats
 export const getDashboardStats = async (req, res) => {
   try {
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
     const stats = await Promise.all([
       User.countDocuments(),
       User.countDocuments({ isBanned: true }),
       Post.countDocuments(),
       Post.countDocuments({ isReported: true }),
       User.countDocuments({
-        lastActive: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+        lastActive: { $gte: twentyFourHoursAgo },
       }),
     ]);
 
@@ -82,6 +84,19 @@ export const banUser = async (req, res) => {
     const { reason } = req.body;
 
     const user = await User.findById(userId);
+    if (!reason) {
+      return res.status(400).json({
+        success: false,
+        message: "Ban reason is required",
+      });
+    }
+
+    if (reason.length < 10) {
+      return res.status(400).json({
+        success: false,
+        message: "Ban reason must be at least 10 characters long",
+      });
+    }
 
     if (!user) {
       return res.status(404).json({
@@ -154,6 +169,12 @@ export const changeUserRole = async (req, res) => {
   try {
     const { userId } = req.params;
     const { role } = req.body;
+    if (!role) {
+      return res.status(400).json({
+        success: false,
+        message: "Role is required",
+      });
+    }
 
     if (!["user", "moderator"].includes(role)) {
       return res.status(400).json({

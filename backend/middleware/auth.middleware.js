@@ -16,11 +16,15 @@ export const protect = async (req, res, next) => {
     const user = await User.findById(decoded.id);
 
     if (!user) {
-      return res.status(404).json({
+      return res.status(401).json({
         success: false,
         message: "User not found",
       });
     }
+
+    // Update last active timestamp
+    user.lastActive = new Date();
+    await user.save({ validateBeforeSave: false });
 
     if (user.accountStatus !== "active") {
       return res.status(403).json({
@@ -32,7 +36,7 @@ export const protect = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    return res.status(401).json({
+    res.status(401).json({
       success: false,
       message: "Not authorized to access this route",
     });

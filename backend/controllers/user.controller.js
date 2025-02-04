@@ -293,10 +293,10 @@ export const getUserProfile = async (req, res) => {
     const userId = new mongoose.Types.ObjectId(req.params.id);
 
     const user = await User.findById(userId)
-      .select("-password -friendRequests")
-      .populate("followers", "name email profilePic")
-      .populate("following", "name email profilePic")
-      .populate("friends", "name email profilePic");
+      .select("-password -friendRequests -bannedBy -bannedAt")
+      .populate("followers", "name email profilePic lastActive")
+      .populate("following", "name email profilePic lastActive")
+      .populate("friends", "name email profilePic lastActive");
 
     if (!user) {
       return res.status(404).json({

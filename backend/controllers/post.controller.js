@@ -1,6 +1,7 @@
 import Post from "../models/Post.model.js";
 import User from "../models/User.model.js";
 import { REACTION_TYPES } from "../models/Post.model.js";
+import { createNotification } from "./notification.controller.js";
 
 // Create Post
 export const createPost = async (req, res) => {
@@ -284,6 +285,16 @@ export const addComment = async (req, res) => {
 
     // Populate user details in the new comment
     await post.populate("comments.user", "name email profilePic");
+
+    // Add notification
+    await createNotification({
+      recipient: post.user,
+      sender: req.user._id,
+      type: "comment",
+      post: post._id,
+      comment: comment._id,
+      message: `${req.user.name} commented on your post`,
+    });
 
     res.status(200).json({
       success: true,
@@ -679,7 +690,7 @@ export const removeCommentReaction = async (req, res) => {
   }
 };
 
-// Add Reaction to Post
+// Add Reaction
 export const addReaction = async (req, res) => {
   try {
     const { type } = req.body;
@@ -723,6 +734,15 @@ export const addReaction = async (req, res) => {
       users.some((userId) => userId.toString() === req.user._id.toString())
     );
 
+    // Add notification
+    await createNotification({
+      recipient: post.user,
+      sender: req.user._id,
+      type: "post_like",
+      post: post._id,
+      message: `${req.user.name} reacted to your post`,
+    });
+
     res.status(200).json({
       success: true,
       message: "Reaction added successfully",
@@ -738,7 +758,7 @@ export const addReaction = async (req, res) => {
   }
 };
 
-// Remove Reaction from Post
+// Remove Reaction
 export const removeReaction = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);

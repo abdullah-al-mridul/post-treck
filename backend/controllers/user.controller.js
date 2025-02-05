@@ -1,5 +1,6 @@
 import User from "../models/User.model.js";
 import mongoose from "mongoose";
+import { createNotification } from "../controllers/notification.controller.js";
 
 // Update Cover Photo
 export const updateCoverPhoto = async (req, res) => {
@@ -107,6 +108,14 @@ export const followUser = async (req, res) => {
 
     await currentUser.save();
     await userToFollow.save();
+
+    // Add notification
+    await createNotification({
+      recipient: userToFollow._id,
+      sender: req.user._id,
+      type: "follow",
+      message: `${req.user.name} started following you`,
+    });
 
     res.status(200).json({
       success: true,

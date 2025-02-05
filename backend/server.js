@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser";
 import postRoutes from "./routes/post.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import chatRoutes from "./routes/chat.routes.js";
+import notificationRoutes from "./routes/notification.routes.js";
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ server.use("/api/users", userRoutes);
 server.use("/api/posts", postRoutes);
 server.use("/api/admin", adminRoutes);
 server.use("/api/chats", chatRoutes);
+server.use("/api/notifications", notificationRoutes);
 
 // Error handling middleware
 server.use((err, req, res, next) => {

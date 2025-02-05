@@ -40,6 +40,16 @@ const postStorage = new CloudinaryStorage({
   },
 });
 
+// Add chat media storage configuration
+const chatStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "post-treck/chat-media",
+    allowed_formats: ["jpg", "jpeg", "png", "gif"],
+    transformation: [{ width: 1000, height: 1000, crop: "limit" }],
+  },
+});
+
 // Multer upload middleware
 export const upload = multer({ storage: storage });
 export const coverUpload = multer({ storage: coverStorage });
@@ -47,6 +57,13 @@ export const postUpload = multer({
   storage: postStorage,
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+});
+
+export const chatUpload = multer({
+  storage: chatStorage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
   },
 });
 

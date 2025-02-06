@@ -36,44 +36,26 @@ export const updateCoverPhoto = async (req, res) => {
 // Update Profile (Modified to handle both profile pic and cover photo)
 export const updateProfile = async (req, res) => {
   try {
-    const updates = {
-      name: req.body.name,
-      bio: req.body.bio,
+    const { name, bio } = req.body;
+    const profilePic = req.file; // If using multer for file upload
+
+    const updateData = {
+      ...(name && { name }),
+      ...(bio && { bio }),
     };
 
-    // Validate name length
-    if (updates.name) {
-      if (updates.name.length < 2 || updates.name.length > 20) {
-        return res.status(400).json({
-          success: false,
-          message: "Name must be between 2 and 20 characters",
-        });
-      }
+    if (profilePic) {
+      // Handle profile picture upload to Cloudinary
+      updateData.profilePic = profilePic.path;
     }
 
-    // Validate bio length if provided
-    if (updates.bio) {
-      if (updates.bio.length > 100) {
-        return res.status(400).json({
-          success: false,
-          message: "Bio cannot exceed 100 characters",
-        });
-      }
-    }
-
-    // If profile pic was uploaded
-    if (req.file) {
-      updates.profilePic = req.file.path;
-    }
-
-    const user = await User.findByIdAndUpdate(req.user._id, updates, {
+    const updatedUser = await User.findByIdAndUpdate(req.user._id, updateData, {
       new: true,
-      runValidators: true,
     }).select("-password");
 
     res.status(200).json({
       success: true,
-      user,
+      user: updatedUser,
     });
   } catch (error) {
     res.status(500).json({

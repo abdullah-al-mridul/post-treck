@@ -133,14 +133,15 @@ const postSchema = new mongoose.Schema(
     },
     caption: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
       maxlength: 2000,
+      default: "",
     },
     media: [
       {
         type: String, // Cloudinary URLs
-        required: true,
+        required: false,
       },
     ],
     reactions: {

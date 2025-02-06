@@ -35,10 +35,7 @@ export default function Header({ activeTab, setActiveTab }) {
           />
         </svg>
       ),
-      onClick: () => {
-        router.push(`/profile/${user?._id}`);
-        setShowProfileMenu(false);
-      },
+      href: "/profile",
     },
     {
       label: "Settings",

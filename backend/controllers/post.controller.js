@@ -9,31 +9,23 @@ export const createPost = async (req, res) => {
     const { caption } = req.body;
     const files = req.files;
 
-    // Validate caption
-    if (!caption) {
+    // Validate that at least caption or media is provided
+    if (!caption && (!files || files.length === 0)) {
       return res.status(400).json({
         success: false,
-        message: "Caption is required",
+        message: "Either caption or media is required",
       });
     }
 
-    // Validate media
-    if (!files || files.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "At least one media file is required",
-      });
-    }
-
-    // Create post with media URLs from Cloudinary
+    // Create post with optional caption and media
     const post = await Post.create({
       user: req.user._id,
-      caption,
-      media: files.map((file) => file.path),
+      caption: caption || "", // Make caption optional
+      media: files ? files.map((file) => file.path) : [],
     });
 
     // Populate user details
-    await post.populate("user", "name email profilePic");
+    await post.populate("user", "name email profilePic role");
 
     res.status(201).json({
       success: true,
@@ -57,7 +49,7 @@ export const getFeedPosts = async (req, res) => {
     const posts = await Post.find({
       $or: [{ user: { $in: following } }, { user: req.user._id }],
     })
-      .populate("user", "name email profilePic")
+      .populate("user", "name email profilePic role")
       .populate({
         path: "comments.user",
         select: "name email profilePic",
@@ -76,7 +68,7 @@ export const getFeedPosts = async (req, res) => {
     const postsWithReactionInfo = posts.map((post) => {
       const userReaction = Object.entries(post.reactions).find(
         ([type, users]) =>
-          users.some((user) => user._id.toString() === req.user._id.toString())
+          users.some((userId) => userId.toString() === req.user._id.toString())
       );
 
       return {
@@ -101,7 +93,7 @@ export const getFeedPosts = async (req, res) => {
 export const getSinglePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id)
-      .populate("user", "name email profilePic")
+      .populate("user", "name email profilePic role")
       .populate({
         path: "comments.user",
         select: "name email profilePic",
@@ -136,7 +128,7 @@ export const getUserPosts = async (req, res) => {
     const userId = req.params.userId;
 
     const posts = await Post.find({ user: userId })
-      .populate("user", "name email profilePic")
+      .populate("user", "name email profilePic role")
       .populate({
         path: "comments.user",
         select: "name email profilePic",
@@ -556,7 +548,7 @@ export const repostPost = async (req, res) => {
     await originalPost.save();
 
     // Populate user details
-    await repost.populate("user", "name email profilePic");
+    await repost.populate("user", "name email profilePic role");
     await repost.populate("originalPost");
 
     res.status(201).json({
@@ -926,6 +918,37 @@ export const removeReplyReaction = async (req, res) => {
       success: true,
       message: "Reply reaction removed successfully",
       reactions: reply.reactions,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Get Post Reactions
+export const getPostReactions = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
+    }
+
+    // Get user's current reaction
+    const userReaction = Object.entries(post.reactions).find(([type, users]) =>
+      users.some((userId) => userId.toString() === req.user._id.toString())
+    );
+
+    res.status(200).json({
+      success: true,
+      reactions: post.reactions,
+      reactionCount: post.reactionCount,
+      userReaction: userReaction ? userReaction[0] : null,
     });
   } catch (error) {
     res.status(500).json({

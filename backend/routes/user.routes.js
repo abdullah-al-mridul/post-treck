@@ -18,13 +18,7 @@ const router = express.Router();
 // Profile routes
 router.get("/profile", protect, getProfile); // No verification needed to view own profile
 router.get("/profile/:id", protect, getUserProfile); // No verification needed to view others profile
-router.put(
-  "/profile",
-  protect,
-  requireVerification,
-  upload.single("profilePic"),
-  updateProfile
-);
+router.put("/profile", protect, upload.single("profilePic"), updateProfile);
 router.put(
   "/cover-photo",
   protect,

@@ -1,17 +1,20 @@
 import { create } from "zustand";
 import { useApi } from "@/hooks/useApi";
 
-const useUserStore = create((set) => ({
+const useUserStore = create((set, get) => ({
   userProfile: null,
   userPosts: [],
   loading: false,
   error: null,
 
-  // Get user profile
+  // Get own profile
   getUserProfile: async () => {
+    const currentState = get();
+    if (currentState.loading) return;
+
     try {
       set({ loading: true, error: null });
-      const { data } = await useApi().get(`/users/profile`);
+      const { data } = await useApi().get("/users/profile");
       set({ userProfile: data.user, loading: false });
     } catch (error) {
       set({
@@ -21,32 +24,52 @@ const useUserStore = create((set) => ({
     }
   },
 
-  // Update profile
-  updateProfile: async (updates) => {
+  // Update profile (including profile picture)
+  updateProfile: async (formData) => {
     try {
       set({ loading: true, error: null });
-      const { data } = await useApi().put("/users/profile", updates);
-      set({ userProfile: data.user, loading: false });
+
+      const form = new FormData();
+      if (formData.name) form.append("name", formData.name);
+      if (formData.bio) form.append("bio", formData.bio);
+      if (formData.profilePic) form.append("profilePic", formData.profilePic);
+
+      const { data } = await useApi().put("/users/profile", form, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      // Update the store with new user data
+      set((state) => ({
+        userProfile: { ...state.userProfile, ...data.user },
+        loading: false,
+      }));
+
+      return data;
     } catch (error) {
       set({
         error: error.response?.data?.message || "Failed to update profile",
         loading: false,
       });
+      throw new Error(
+        error.response?.data?.message || "Failed to update profile"
+      );
     }
   },
 
-  // Update profile picture
-  updateProfilePic: async (formData) => {
+  // Update cover photo
+  updateCoverPhoto: async (coverPhoto) => {
     try {
       set({ loading: true, error: null });
-      const { data } = await useApi().put("/users/profile-pic", formData, {
+      const formData = new FormData();
+      formData.append("coverPhoto", coverPhoto);
+
+      const { data } = await useApi().put("/users/cover-photo", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       set({ userProfile: data.user, loading: false });
     } catch (error) {
       set({
-        error:
-          error.response?.data?.message || "Failed to update profile picture",
+        error: error.response?.data?.message || "Failed to update cover photo",
         loading: false,
       });
     }
@@ -54,10 +77,20 @@ const useUserStore = create((set) => ({
 
   // Get user posts
   getUserPosts: async (userId) => {
+    const currentState = get();
+    if (currentState.loading) return;
+
     try {
       set({ loading: true, error: null });
       const { data } = await useApi().get(`/posts/user/${userId}`);
-      set({ userPosts: data.posts, loading: false });
+      // Only update if the posts are different
+      if (
+        JSON.stringify(currentState.userPosts) !== JSON.stringify(data.posts)
+      ) {
+        set({ userPosts: data.posts, loading: false });
+      } else {
+        set({ loading: false });
+      }
     } catch (error) {
       set({
         error: error.response?.data?.message || "Failed to fetch posts",

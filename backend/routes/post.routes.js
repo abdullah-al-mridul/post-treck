@@ -19,6 +19,7 @@ import {
   removeCommentReaction,
   addReplyReaction,
   removeReplyReaction,
+  getPostReactions,
 } from "../controllers/post.controller.js";
 import { postUpload } from "../config/cloudinary.js";
 import { reportPost } from "../controllers/moderation.controller.js";
@@ -105,5 +106,8 @@ router.post(
 
 // Report Post (Any verified user can report)
 router.post("/:id/report", protect, requireVerification, reportPost);
+
+// Get Post Reactions
+router.get("/:id/reactions", protect, getPostReactions);
 
 export default router;

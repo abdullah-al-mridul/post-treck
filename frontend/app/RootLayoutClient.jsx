@@ -1,15 +1,19 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import useAuthStore from "@/store/authStore";
 import useThemeStore from "@/store/themeStore";
 import SecureRoute from "@/components/SecureRoute";
+import { usePathname } from "next/navigation";
+import Header from "@/components/Header";
 
 const letters = "LOADING".split("");
 
 export default function RootLayoutClient({ children }) {
   const { checkAuth, loading } = useAuthStore();
   const { theme } = useThemeStore();
+  const pathname = usePathname();
+  const [activeTab, setActiveTab] = useState(pathname);
 
   useEffect(() => {
     checkAuth();
@@ -97,7 +101,8 @@ export default function RootLayoutClient({ children }) {
   return (
     <html lang="en" className={theme === "dark" ? "dark" : ""}>
       <body>
-        <SecureRoute>{children}</SecureRoute>
+        <Header activeTab={activeTab} setActiveTab={setActiveTab} />
+        <main>{children}</main>
       </body>
     </html>
   );

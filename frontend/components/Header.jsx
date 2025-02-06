@@ -3,9 +3,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import useAuthStore from "@/store/authStore";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Header({ activeTab, setActiveTab }) {
   const { user, logout } = useAuthStore();
+  const router = useRouter();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
@@ -33,7 +35,10 @@ export default function Header({ activeTab, setActiveTab }) {
           />
         </svg>
       ),
-      href: "/profile",
+      onClick: () => {
+        router.push(`/profile/${user?._id}`);
+        setShowProfileMenu(false);
+      },
     },
     {
       label: "Settings",

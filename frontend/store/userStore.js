@@ -4,13 +4,14 @@ import { useApi } from "@/hooks/useApi";
 const useUserStore = create((set) => ({
   userProfile: null,
   userPosts: [],
+  loading: false,
   error: null,
 
   // Get user profile
-  getUserProfile: async (userId) => {
+  getUserProfile: async () => {
     try {
       set({ loading: true, error: null });
-      const { data } = await useApi().get(`/users/profile/${userId}`);
+      const { data } = await useApi().get(`/users/profile`);
       set({ userProfile: data.user, loading: false });
     } catch (error) {
       set({
@@ -24,8 +25,8 @@ const useUserStore = create((set) => ({
   updateProfile: async (updates) => {
     try {
       set({ loading: true, error: null });
-      const { data } = await axios.put("/api/users/profile", updates);
-      set({ userProfile: data, loading: false });
+      const { data } = await useApi().put("/users/profile", updates);
+      set({ userProfile: data.user, loading: false });
     } catch (error) {
       set({
         error: error.response?.data?.message || "Failed to update profile",
@@ -38,10 +39,10 @@ const useUserStore = create((set) => ({
   updateProfilePic: async (formData) => {
     try {
       set({ loading: true, error: null });
-      const { data } = await axios.put("/api/users/profile-pic", formData, {
+      const { data } = await useApi().put("/users/profile-pic", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      set({ userProfile: data, loading: false });
+      set({ userProfile: data.user, loading: false });
     } catch (error) {
       set({
         error:
@@ -55,8 +56,8 @@ const useUserStore = create((set) => ({
   getUserPosts: async (userId) => {
     try {
       set({ loading: true, error: null });
-      const { data } = await axios.get(`/api/users/${userId}/posts`);
-      set({ userPosts: data, loading: false });
+      const { data } = await useApi().get(`/posts/user/${userId}`);
+      set({ userPosts: data.posts, loading: false });
     } catch (error) {
       set({
         error: error.response?.data?.message || "Failed to fetch posts",

@@ -4,8 +4,10 @@ import { motion } from "framer-motion";
 import useAuthStore from "@/store/authStore";
 import useUserStore from "@/store/userStore";
 import PostCard from "./PostCard";
+import { useRouter } from "next/navigation";
 
 export default function ProfileClient() {
+  const router = useRouter();
   const { user } = useAuthStore();
   const {
     userProfile,
@@ -25,15 +27,21 @@ export default function ProfileClient() {
     website: "",
   });
 
-  useEffect(() => {
-    if (user?._id) {
-      getUserProfile(user._id);
-      //   getUserPosts(user._id);
-    }
-  }, [user?._id]);
+  const isOwnProfile = user?._id === userProfile?._id;
 
   useEffect(() => {
-    if (userProfile) {
+    getUserProfile();
+    getUserPosts(user?._id);
+  }, []);
+
+  useEffect(() => {
+    if (!user && !loading) {
+      router.push("/auth/login");
+    }
+  }, [user, loading]);
+
+  useEffect(() => {
+    if (userProfile && isOwnProfile) {
       setFormData({
         name: userProfile.name || "",
         bio: userProfile.bio || "",
@@ -41,15 +49,17 @@ export default function ProfileClient() {
         website: userProfile.website || "",
       });
     }
-  }, [userProfile]);
+  }, [userProfile, isOwnProfile]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!isOwnProfile) return;
     await updateProfile(formData);
     setIsEditing(false);
   };
 
   const handleImageUpload = async (e) => {
+    if (!isOwnProfile) return;
     const file = e.target.files[0];
     if (file) {
       const formData = new FormData();
@@ -230,12 +240,14 @@ export default function ProfileClient() {
                     {userProfile.website}
                   </a>
                 )}
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="px-4 py-2 border-2 border-black dark:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors"
-                >
-                  Edit Profile
-                </button>
+                {isOwnProfile && (
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="px-4 py-2 border-2 border-black dark:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors"
+                  >
+                    Edit Profile
+                  </button>
+                )}
               </div>
             )}
           </div>

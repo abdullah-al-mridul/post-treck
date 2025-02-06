@@ -1,7 +1,9 @@
 "use client";
 import { motion } from "framer-motion";
+import { formatDate } from "@/utils/formatDate";
 
 export default function PostCard({ post }) {
+  console.log(post);
   return (
     <motion.article
       initial={{ opacity: 0, y: 20 }}
@@ -10,23 +12,27 @@ export default function PostCard({ post }) {
     >
       <div className="flex items-center gap-4 mb-6">
         <img
-          src={post.author.avatar}
-          alt={post.author.name}
+          src={
+            post?.user?.profilePic === "default-avatar.png"
+              ? "/default-avatar.png"
+              : post?.user?.profilePic
+          }
+          alt={post?.user?.name}
           className="w-12 h-12 border-4 border-black dark:border-white"
         />
         <div>
-          <h3 className="font-bold text-lg">{post.author.name}</h3>
+          <h3 className="font-bold text-lg">{post?.user?.name}</h3>
           <p className="font-mono text-black/50 dark:text-white/50">
-            {post.createdAt}
+            {formatDate(post?.createdAt)}
           </p>
         </div>
       </div>
 
-      <p className="mb-6 text-lg leading-relaxed">{post.content}</p>
+      <p className="mb-6 text-lg leading-relaxed">{post?.caption}</p>
 
-      {post.image && (
+      {post?.media && (
         <div className="mb-6 border-4 border-black dark:border-white">
-          <img src={post.image} alt="Post" className="w-full" />
+          <img src={post?.media[0]} alt="Post" className="w-full" />
         </div>
       )}
 

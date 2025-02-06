@@ -103,32 +103,8 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    // Validate required fields
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide email and password",
-      });
-    }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide a valid email address",
-      });
-    }
-
-    // Validate password length
-    if (password.length < 6) {
-      return res.status(400).json({
-        success: false,
-        message: "Password must be at least 6 characters long",
-      });
-    }
-
-    // Check if user exists
+    // Find user
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({
@@ -146,27 +122,21 @@ export const login = async (req, res) => {
       });
     }
 
-    // Check account status
-    if (user.accountStatus !== "active") {
-      return res.status(403).json({
-        success: false,
-        message: "Your account is not active",
-      });
-    }
-
     // Generate token
     const token = generateToken(user._id);
 
-    // Set token in cookie
+    // Set cookie
     res.cookie("token", token, cookieOptions);
 
+    // Send response with user data including isVerified
     res.status(200).json({
       success: true,
-      token,
       user: {
-        id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
+        isVerified: user.isVerified,
+        profilePic: user.profilePic,
         role: user.role,
       },
     });
@@ -335,7 +305,14 @@ export const getMe = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      user,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isVerified: user.isVerified,
+        profilePic: user.profilePic,
+        role: user.role,
+      },
     });
   } catch (error) {
     res.status(500).json({

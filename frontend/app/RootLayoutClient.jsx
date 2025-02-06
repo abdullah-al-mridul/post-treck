@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import useAuthStore from "@/store/authStore";
 import useThemeStore from "@/store/themeStore";
+import SecureRoute from "@/components/SecureRoute";
 
 const letters = "LOADING".split("");
 
@@ -95,7 +96,9 @@ export default function RootLayoutClient({ children }) {
 
   return (
     <html lang="en" className={theme === "dark" ? "dark" : ""}>
-      <body>{children}</body>
+      <body>
+        <SecureRoute>{children}</SecureRoute>
+      </body>
     </html>
   );
 }

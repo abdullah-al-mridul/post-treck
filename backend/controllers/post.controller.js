@@ -42,13 +42,8 @@ export const createPost = async (req, res) => {
 // Get Feed Posts
 export const getFeedPosts = async (req, res) => {
   try {
-    const currentUser = await User.findById(req.user._id);
-    const following = currentUser.following;
-
-    // Get posts from users we follow and our own posts
-    const posts = await Post.find({
-      $or: [{ user: { $in: following } }, { user: req.user._id }],
-    })
+    // Get all posts instead of just following
+    const posts = await Post.find()
       .populate("user", "name email profilePic role")
       .populate({
         path: "comments.user",

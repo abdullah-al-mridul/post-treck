@@ -176,12 +176,12 @@ export default function ReactionDrawer({
                 </AnimatePresence>
 
                 {/* Active Indicator */}
-                {isActive && (
+                {/* {isActive && (
                   <motion.div
                     layoutId="activeIndicator"
                     className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-blue-500 rounded-full"
                   />
-                )}
+                )} */}
               </motion.button>
             );
           })}

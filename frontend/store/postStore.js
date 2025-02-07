@@ -120,6 +120,28 @@ const usePostStore = create((set, get) => ({
       );
     }
   },
+
+  // Create a new post
+  createPost: async (formData) => {
+    try {
+      set({ loading: true, error: null });
+      const { data } = await useApi().post("/posts", formData);
+
+      // Update posts list with new post
+      set((state) => ({
+        posts: [data.post, ...state.posts],
+        loading: false,
+      }));
+
+      return data;
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Failed to create post",
+        loading: false,
+      });
+      throw error;
+    }
+  },
 }));
 
 export default usePostStore;

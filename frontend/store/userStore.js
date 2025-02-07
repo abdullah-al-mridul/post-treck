@@ -57,21 +57,22 @@ const useUserStore = create((set, get) => ({
   },
 
   // Update cover photo
-  updateCoverPhoto: async (coverPhoto) => {
+  updateCoverPhoto: async (formData) => {
     try {
-      set({ loading: true, error: null });
-      const formData = new FormData();
-      formData.append("coverPhoto", coverPhoto);
+      const { data } = await useApi().put("/users/cover-photo", formData);
 
-      const { data } = await useApi().put("/users/cover-photo", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      set({ userProfile: data.user, loading: false });
+      set((state) => ({
+        userProfile: {
+          ...state.userProfile,
+          coverPhoto: data.coverPhoto,
+        },
+      }));
+
+      return data;
     } catch (error) {
-      set({
-        error: error.response?.data?.message || "Failed to update cover photo",
-        loading: false,
-      });
+      throw new Error(
+        error.response?.data?.message || "Failed to update cover photo"
+      );
     }
   },
 
@@ -102,6 +103,54 @@ const useUserStore = create((set, get) => ({
   // Clear store
   clearStore: () => {
     set({ userProfile: null, userPosts: [], loading: false, error: null });
+  },
+
+  // Get user profile by ID
+  getUserProfileById: async (userId) => {
+    try {
+      set({ loading: true, error: null });
+      const { data } = await useApi().get(`/users/profile/${userId}`);
+      set({ userProfile: data.user, loading: false });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Failed to fetch profile",
+        loading: false,
+      });
+    }
+  },
+
+  // Follow user
+  followUser: async (userId) => {
+    try {
+      const { data } = await useApi().post(`/users/follow/${userId}`);
+      return data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Failed to follow user");
+    }
+  },
+
+  // Unfollow user
+  unfollowUser: async (userId) => {
+    try {
+      const { data } = await useApi().post(`/users/unfollow/${userId}`);
+      return data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to unfollow user"
+      );
+    }
+  },
+
+  // Send friend request
+  sendFriendRequest: async (userId) => {
+    try {
+      const { data } = await useApi().post(`/users/friend-request/${userId}`);
+      return data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to send friend request"
+      );
+    }
   },
 }));
 

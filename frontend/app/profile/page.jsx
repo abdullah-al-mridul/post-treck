@@ -1,10 +1,18 @@
-import ProfileClient from "@/components/ProfileClient";
+"use client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import useAuthStore from "@/store/authStore";
+import Spinner from "@/components/ui/Spinner";
 
-export const metadata = {
-  title: "Profile | Post Treck",
-  description: "User profile and posts",
-};
+export default function ProfileRedirect() {
+  const router = useRouter();
+  const { user } = useAuthStore();
 
-export default function Profile() {
-  return <ProfileClient />;
+  useEffect(() => {
+    if (user?._id) {
+      router.replace(`/profile/${user._id}`);
+    }
+  }, [user, router]);
+
+  return <Spinner />;
 }

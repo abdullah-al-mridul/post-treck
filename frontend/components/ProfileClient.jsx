@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import useAuthStore from "@/store/authStore";
 import useUserStore from "@/store/userStore";
 import PostCard from "./PostCard";
@@ -7,6 +7,7 @@ import { toTitleCase } from "@/utils/textCase";
 import { motion, AnimatePresence } from "framer-motion";
 import Spinner from "@/components/ui/Spinner";
 import EditProfileModal from "@/components/ui/EditProfileModal";
+import Image from "next/image";
 
 const VerificationBadge = ({ role }) => {
   const [showTooltip, setShowTooltip] = useState(false);
@@ -80,45 +81,138 @@ const VerificationBadge = ({ role }) => {
 };
 
 // Components
-const ProfileHeader = ({ userProfile }) => (
-  <div className="relative mb-12">
-    {/* Cover Image */}
-    <div className="h-48 bg-black/10 dark:bg-white/10 rounded-lg overflow-hidden">
-      <img
-        src={
-          userProfile?.coverPhoto === "default-cover.png"
-            ? "/default-cover.jpg"
-            : userProfile?.coverPhoto
-        }
-        alt="Cover"
-        className="w-full h-full object-cover"
-      />
-    </div>
+const ProfileHeader = ({ userProfile, isOwnProfile }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const fileInputRef = useRef(null);
+  const { updateCoverPhoto } = useUserStore();
+  const [isUploading, setIsUploading] = useState(false);
 
-    {/* Profile Info */}
-    <div className="absolute -bottom-16 left-8 flex items-end gap-6">
-      <div className="relative group">
+  const handleCoverPhotoChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append("coverPhoto", file);
+      await updateCoverPhoto(formData);
+    } catch (error) {
+      console.error("Error updating cover photo:", error);
+      alert(error.message || "Failed to update cover photo");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  return (
+    <div className="relative mb-12">
+      {/* Cover Image */}
+      <div
+        className="h-48 bg-black/10 dark:bg-white/10 rounded-lg overflow-hidden relative group"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         <img
           src={
-            userProfile?.profilePic === "default-avatar.png"
-              ? "/default-avatar.png"
-              : userProfile?.profilePic
+            userProfile?.coverPhoto === "default-cover.png"
+              ? "/default-cover.jpg"
+              : userProfile?.coverPhoto
           }
-          alt={userProfile?.name}
-          className="w-32 h-32 border-4 border-black dark:border-white bg-white dark:bg-black transition-transform hover:scale-105"
+          alt="Cover"
+          className="w-full h-full object-cover"
         />
+
+        {/* Upload overlay - only show for own profile when hovered */}
+        {isOwnProfile && isHovered && (
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleCoverPhotoChange}
+              accept="image/*"
+              className="hidden"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+              className="px-4 py-2 bg-white text-black font-bold rounded-md hover:bg-white/90 transition-colors flex items-center gap-2 disabled:opacity-50"
+            >
+              {isUploading ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z"
+                    />
+                  </svg>
+                  Update Cover Photo
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
 
-      <div className="mb-4">
-        <h1 className="text-3xl font-bold flex items-center">
-          {userProfile?.name}
-          <VerificationBadge role={userProfile?.role} />
-        </h1>
-        <p className="text-black/50 dark:text-white/50">{userProfile?.email}</p>
+      {/* Profile Info */}
+      <div className="absolute -bottom-16 left-8 flex items-end gap-6">
+        <div className="relative group">
+          <img
+            src={
+              userProfile?.profilePic === "default-avatar.png"
+                ? "/default-avatar.png"
+                : userProfile?.profilePic
+            }
+            alt={userProfile?.name}
+            className="w-32 h-32 border-4 border-black dark:border-white bg-white dark:bg-black transition-transform hover:scale-105"
+          />
+        </div>
+
+        <div className="mb-4">
+          <h1 className="text-3xl font-bold flex items-center">
+            {userProfile?.name}
+            <VerificationBadge role={userProfile?.role} />
+          </h1>
+          <p className="text-black/50 dark:text-white/50">
+            {userProfile?.email}
+          </p>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const StatsCard = ({ userProfile }) => (
   <div className="grid grid-cols-3 gap-4 p-4 border-4 border-black dark:border-white hover:translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#000] dark:hover:shadow-[4px_4px_0_0_#fff] transition-all">
@@ -211,7 +305,7 @@ const PostsSection = ({ userPosts }) => (
   </div>
 );
 
-export default function ProfileClient() {
+export default function ProfileClient({ userId }) {
   const { user } = useAuthStore();
   const {
     userProfile,
@@ -221,8 +315,36 @@ export default function ProfileClient() {
     getUserProfile,
     getUserPosts,
     updateProfile,
+    getUserProfileById,
+    followUser,
+    unfollowUser,
+    sendFriendRequest,
   } = useUserStore();
-  console.log(userProfile);
+
+  // Determine if viewing own profile
+  const isOwnProfile = !userId || userId === user?._id;
+
+  // Memoize the fetch functions
+  const fetchUserData = useCallback(async () => {
+    if (isOwnProfile) {
+      await getUserProfile();
+    } else {
+      // Add getUserProfileById to userStore and use it here
+      await getUserProfileById(userId);
+    }
+    await getUserPosts(isOwnProfile ? user?._id : userId);
+  }, [userId, user?._id, getUserProfile, getUserPosts, isOwnProfile]);
+
+  useEffect(() => {
+    fetchUserData();
+  }, [fetchUserData]);
+
+  useEffect(() => {
+    if (user) {
+      document.title = `${user.name} | Post Treck`;
+    }
+  }, [user]);
+
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -231,18 +353,6 @@ export default function ProfileClient() {
     website: "",
   });
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
-  // Memoize the fetch functions
-  const fetchUserData = useCallback(async () => {
-    if (user?._id) {
-      await getUserProfile();
-      await getUserPosts(user._id);
-    }
-  }, [user?._id, getUserProfile, getUserPosts]);
-
-  useEffect(() => {
-    fetchUserData();
-  }, [fetchUserData]);
 
   useEffect(() => {
     if (userProfile) {
@@ -254,12 +364,6 @@ export default function ProfileClient() {
       });
     }
   }, [userProfile]);
-
-  useEffect(() => {
-    if (user) {
-      document.title = `${user.name} | Post Treck`;
-    }
-  }, [user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -278,6 +382,32 @@ export default function ProfileClient() {
     }
   };
 
+  const handleFollow = async () => {
+    try {
+      if (userProfile.friendshipStatus === "following") {
+        await unfollowUser(userId);
+      } else {
+        await followUser(userId);
+      }
+      // Refresh profile to get updated status
+      await getUserProfileById(userId);
+    } catch (error) {
+      console.error("Error following user:", error);
+      alert(error.message || "Failed to follow user");
+    }
+  };
+
+  const handleFriendRequest = async () => {
+    try {
+      await sendFriendRequest(userId);
+      // Refresh profile to get updated status
+      await getUserProfileById(userId);
+    } catch (error) {
+      console.error("Error sending friend request:", error);
+      alert(error.message || "Failed to send friend request");
+    }
+  };
+
   if (loading) return <Spinner />;
 
   if (error)
@@ -290,7 +420,7 @@ export default function ProfileClient() {
   return (
     <div className="min-h-screen pt-24 pb-12 px-4">
       <div className="max-w-4xl mx-auto">
-        <ProfileHeader userProfile={userProfile} />
+        <ProfileHeader userProfile={userProfile} isOwnProfile={isOwnProfile} />
 
         <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Left Column - Profile Info */}
@@ -299,26 +429,70 @@ export default function ProfileClient() {
             <ProfileInfo userProfile={userProfile} />
             <AccountStatus userProfile={userProfile} />
 
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setIsEditModalOpen(true)}
-              className="w-full px-4 py-2 border-2 border-black dark:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all"
-            >
-              Edit Profile
-            </motion.button>
+            {isOwnProfile ? (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setIsEditModalOpen(true)}
+                className="w-full px-4 py-2 border-2 border-black dark:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all"
+              >
+                Edit Profile
+              </motion.button>
+            ) : (
+              <div className="space-y-3">
+                {/* Follow Button */}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleFollow}
+                  className="w-full px-4 py-2 border-2 border-black dark:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all"
+                >
+                  {userProfile?.friendshipStatus === "following"
+                    ? "Unfollow"
+                    : "Follow"}
+                </motion.button>
+
+                {/* Friend Request Button - Only show if not already friends or request pending */}
+                {userProfile?.friendshipStatus === "none" && (
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleFriendRequest}
+                    className="w-full px-4 py-2 bg-black text-white dark:bg-white dark:text-black border-2 border-black dark:border-white hover:opacity-90 transition-all"
+                  >
+                    Add Friend
+                  </motion.button>
+                )}
+
+                {/* Show status if request is pending */}
+                {userProfile?.friendshipStatus === "request_sent" && (
+                  <p className="text-center text-black/50 dark:text-white/50">
+                    Friend Request Sent
+                  </p>
+                )}
+
+                {/* Show status if they're already friends */}
+                {userProfile?.friendshipStatus === "friends" && (
+                  <p className="text-center text-green-500 font-medium">
+                    Friends
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           <PostsSection userPosts={userPosts} />
         </div>
 
-        {/* Edit Profile Modal */}
-        <EditProfileModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          user={userProfile}
-          onSave={handleUpdateProfile}
-        />
+        {/* Edit Profile Modal - Only show for own profile */}
+        {isOwnProfile && (
+          <EditProfileModal
+            isOpen={isEditModalOpen}
+            onClose={() => setIsEditModalOpen(false)}
+            user={userProfile}
+            onSave={handleUpdateProfile}
+          />
+        )}
       </div>
     </div>
   );

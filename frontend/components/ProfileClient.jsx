@@ -1,17 +1,19 @@
 "use client";
 import { useEffect, useState, useCallback, useRef } from "react";
-import useAuthStore from "@/store/authStore";
-import useUserStore from "@/store/userStore";
-import PostCard from "./PostCard";
-import { toTitleCase } from "@/utils/textCase";
 import { motion, AnimatePresence } from "framer-motion";
+import PostCard from "@/components/PostCard";
 import Spinner from "@/components/ui/Spinner";
 import EditProfileModal from "@/components/ui/EditProfileModal";
-import Image from "next/image";
+import useAuthStore from "@/store/authStore";
+import useUserStore from "@/store/userStore";
+import { toTitleCase } from "@/utils/textCase";
 
+//verification badge component
 const VerificationBadge = ({ role }) => {
+  //declare show tooltip state
   const [showTooltip, setShowTooltip] = useState(false);
 
+  //get badge info
   const getBadgeInfo = (role) => {
     switch (role) {
       case "admin":
@@ -80,31 +82,44 @@ const VerificationBadge = ({ role }) => {
   );
 };
 
-// Components
+// Profile Header Component
 const ProfileHeader = ({ userProfile, isOwnProfile }) => {
+  //declare is hovered state
   const [isHovered, setIsHovered] = useState(false);
+  //declare file input ref
   const fileInputRef = useRef(null);
+  //get update cover photo from user store
   const { updateCoverPhoto } = useUserStore();
+  //declare is uploading state
   const [isUploading, setIsUploading] = useState(false);
 
   const handleCoverPhotoChange = async (e) => {
+    //get file from input
     const file = e.target.files?.[0];
+    //if file is not found, return
     if (!file) return;
 
     try {
+      //set is uploading to true
       setIsUploading(true);
+      //create form data
       const formData = new FormData();
+      //append file to form data
       formData.append("coverPhoto", file);
+      //update cover photo
       await updateCoverPhoto(formData);
     } catch (error) {
+      //if error, show error message
       console.error("Error updating cover photo:", error);
       alert(error.message || "Failed to update cover photo");
     } finally {
+      //set is uploading to false
       setIsUploading(false);
     }
   };
 
   return (
+    //return profile header component
     <div className="relative mb-12">
       {/* Cover Image */}
       <div
@@ -214,6 +229,7 @@ const ProfileHeader = ({ userProfile, isOwnProfile }) => {
   );
 };
 
+// Stats Card Component
 const StatsCard = ({ userProfile }) => (
   <div className="grid grid-cols-3 gap-4 p-4 border-4 border-black dark:border-white hover:translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#000] dark:hover:shadow-[4px_4px_0_0_#fff] transition-all">
     <StatItem label="Followers" count={userProfile?.followers?.length || 0} />
@@ -222,6 +238,7 @@ const StatsCard = ({ userProfile }) => (
   </div>
 );
 
+// Stat Item Component
 const StatItem = ({ label, count }) => (
   <div className="text-center">
     <p className="text-2xl font-bold">{count}</p>
@@ -229,6 +246,7 @@ const StatItem = ({ label, count }) => (
   </div>
 );
 
+// Profile Info Component
 const ProfileInfo = ({ userProfile }) => (
   <div className="p-4 border-4 border-black dark:border-white hover:translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#000] dark:hover:shadow-[4px_4px_0_0_#fff] transition-all">
     <h3 className="font-bold mb-2">About</h3>
@@ -244,6 +262,7 @@ const ProfileInfo = ({ userProfile }) => (
   </div>
 );
 
+// Account Status Component
 const AccountStatus = ({ userProfile }) => (
   <div className="p-4 border-4 border-black dark:border-white hover:translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#000] dark:hover:shadow-[4px_4px_0_0_#fff] transition-all">
     <h3 className="font-bold mb-2">Account Status</h3>
@@ -266,6 +285,7 @@ const AccountStatus = ({ userProfile }) => (
   </div>
 );
 
+// Status Indicator Component
 const StatusIndicator = ({ isActive, activeColor, inactiveColor, label }) => (
   <p className="flex items-center gap-2">
     <span
@@ -277,12 +297,14 @@ const StatusIndicator = ({ isActive, activeColor, inactiveColor, label }) => (
   </p>
 );
 
+// Time Info Component
 const TimeInfo = ({ label, date }) => (
   <p className="text-sm text-black/50 dark:text-white/50">
     {label}: {new Date(date).toLocaleDateString()}
   </p>
 );
 
+// Posts Section Component
 const PostsSection = ({ userPosts }) => (
   <div className="md:col-span-2 space-y-6">
     <h2 className="text-2xl font-bold mb-6">Posts</h2>
@@ -305,6 +327,7 @@ const PostsSection = ({ userPosts }) => (
   </div>
 );
 
+// Profile Client Component
 export default function ProfileClient({ userId }) {
   const { user } = useAuthStore();
   const {
@@ -340,20 +363,15 @@ export default function ProfileClient({ userId }) {
   }, [fetchUserData]);
 
   useEffect(() => {
-    if (user) {
-      document.title = `${user.name} | Post Treck`;
+    if (userProfile) {
+      document.title = `${userProfile.name} | Post Treck`;
     }
-  }, [user]);
+  }, [userProfile]);
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    bio: "",
-    location: "",
-    website: "",
-  });
+  //declare is edit modal open state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  //set form data
   useEffect(() => {
     if (userProfile) {
       setFormData({
@@ -365,12 +383,7 @@ export default function ProfileClient({ userId }) {
     }
   }, [userProfile]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await updateProfile(formData);
-    setIsEditing(false);
-  };
-
+  //handle update profile
   const handleUpdateProfile = async (formData) => {
     try {
       await updateProfile(formData);
@@ -382,6 +395,7 @@ export default function ProfileClient({ userId }) {
     }
   };
 
+  //handle follow user
   const handleFollow = async () => {
     try {
       if (userProfile.friendshipStatus === "following") {
@@ -397,6 +411,7 @@ export default function ProfileClient({ userId }) {
     }
   };
 
+  //handle friend request
   const handleFriendRequest = async () => {
     try {
       await sendFriendRequest(userId);
@@ -408,8 +423,9 @@ export default function ProfileClient({ userId }) {
     }
   };
 
+  //if loading, show spinner
   if (loading) return <Spinner />;
-
+  //if error, show error message
   if (error)
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -425,8 +441,11 @@ export default function ProfileClient({ userId }) {
         <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Left Column - Profile Info */}
           <div className="space-y-6">
+            {/* Stats Card */}
             <StatsCard userProfile={userProfile} />
+            {/* Profile Info */}
             <ProfileInfo userProfile={userProfile} />
+            {/* Account Status */}
             <AccountStatus userProfile={userProfile} />
 
             {isOwnProfile ? (

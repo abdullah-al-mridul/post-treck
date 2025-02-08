@@ -7,10 +7,12 @@ const publicRoutes = ["/auth/login", "/auth/register"];
 const verificationRoutes = ["/auth/verification"];
 
 export default function SecureRoute({ children }) {
+  //get router, pathname and user
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuthStore();
 
+  //check if user is logged in
   useEffect(() => {
     const handleRedirect = () => {
       // Case 1: No user trying to access protected route
@@ -42,7 +44,9 @@ export default function SecureRoute({ children }) {
       return null;
     };
 
+    //get redirect to
     const redirectTo = handleRedirect();
+    //if redirect to is not null, redirect to it
     if (redirectTo) {
       router.replace(redirectTo);
     }
@@ -60,5 +64,6 @@ export default function SecureRoute({ children }) {
       !publicRoutes.includes(pathname) &&
       !verificationRoutes.includes(pathname));
 
+  //return children if should render
   return shouldRenderChildren ? children : null;
 }

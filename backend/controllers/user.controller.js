@@ -284,7 +284,7 @@ export const getUserProfile = async (req, res) => {
     const userId = new mongoose.Types.ObjectId(req.params.id);
 
     const user = await User.findById(userId)
-      .select("-password -friendRequests -bannedBy -bannedAt")
+      .select("-password -bannedBy -bannedAt")
       .populate("followers", "name email profilePic lastActive")
       .populate("following", "name email profilePic lastActive")
       .populate("friends", "name email profilePic lastActive");
@@ -301,32 +301,34 @@ export const getUserProfile = async (req, res) => {
       "friends following friendRequests"
     );
 
-    // Add friendship status
+    // Add friendship status with proper checks
     let friendshipStatus = "none";
 
-    if (currentUser.friends && currentUser.friends.includes(user._id)) {
+    // Check if they are friends
+    if (currentUser.friends.includes(user._id)) {
       friendshipStatus = "friends";
-    } else if (
-      currentUser.following &&
-      currentUser.following.includes(user._id)
-    ) {
+    }
+    // Check if current user is following them
+    else if (currentUser.following.includes(user._id)) {
       friendshipStatus = "following";
-    } else if (
-      currentUser.friendRequests &&
-      currentUser.friendRequests.includes(user._id)
-    ) {
+    }
+    // Check if current user has received a friend request from them
+    else if (currentUser.friendRequests.includes(user._id)) {
       friendshipStatus = "request_received";
-    } else if (
-      user.friendRequests &&
-      user.friendRequests.includes(currentUser._id)
-    ) {
+    }
+    // Check if current user has sent a friend request to them
+    else if (user.friendRequests.includes(currentUser._id)) {
       friendshipStatus = "request_sent";
     }
+
+    // Remove sensitive data before sending response
+    const userResponse = user.toObject();
+    delete userResponse.friendRequests; // Remove friendRequests from response
 
     res.status(200).json({
       success: true,
       user: {
-        ...user.toObject(),
+        ...userResponse,
         friendshipStatus,
       },
     });

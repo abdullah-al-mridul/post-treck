@@ -126,11 +126,11 @@ export const getUserPosts = async (req, res) => {
       .populate("user", "name email profilePic role")
       .populate({
         path: "comments.user",
-        select: "name email profilePic",
+        select: "name email profilePic role",
       })
       .populate({
         path: "comments.replies.user",
-        select: "name email profilePic",
+        select: "name email profilePic role",
       })
       .sort({ createdAt: -1 });
     if (!posts || posts.length === 0) {

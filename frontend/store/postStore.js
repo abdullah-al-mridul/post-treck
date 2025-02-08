@@ -142,6 +142,81 @@ const usePostStore = create((set, get) => ({
       throw error;
     }
   },
+
+  // Add comment to post
+  addComment: async (postId, content) => {
+    try {
+      if (!postId) throw new Error("Post ID is required");
+      set({ loading: true, error: null });
+
+      const { data } = await useApi().post(`/posts/${postId}/comment`, {
+        content,
+      });
+
+      // Update the post in the store
+      set((state) => ({
+        posts: state.posts.map((post) =>
+          post._id === postId
+            ? {
+                ...post,
+                comments: [...post.comments, data.comment],
+              }
+            : post
+        ),
+        loading: false,
+      }));
+
+      return data;
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Failed to add comment",
+        loading: false,
+      });
+      throw error;
+    }
+  },
+
+  // Add reply to comment
+  addReply: async (postId, commentId, content) => {
+    try {
+      if (!postId || !commentId)
+        throw new Error("Post ID and Comment ID are required");
+      set({ loading: true, error: null });
+
+      const { data } = await useApi().post(
+        `/posts/${postId}/comment/${commentId}/reply`,
+        { content }
+      );
+
+      // Update the post in the store
+      set((state) => ({
+        posts: state.posts.map((post) =>
+          post._id === postId
+            ? {
+                ...post,
+                comments: post.comments.map((comment) =>
+                  comment._id === commentId
+                    ? {
+                        ...comment,
+                        replies: [...comment.replies, data.reply],
+                      }
+                    : comment
+                ),
+              }
+            : post
+        ),
+        loading: false,
+      }));
+
+      return data;
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Failed to add reply",
+        loading: false,
+      });
+      throw error;
+    }
+  },
 }));
 
 export default usePostStore;

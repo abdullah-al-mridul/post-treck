@@ -1,24 +1,32 @@
 "use client";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { usePathname } from "next/navigation";
 import useAuthStore from "@/store/authStore";
 import useThemeStore from "@/store/themeStore";
-import SecureRoute from "@/components/SecureRoute";
-import { usePathname } from "next/navigation";
 import Header from "@/components/Header";
 
+//declare letters for loading animation
 const letters = "LOADING".split("");
 
+//declare root layout client component
 export default function RootLayoutClient({ children }) {
-  const { checkAuth, loading } = useAuthStore();
+  //get auth and theme store
+  const { checkAuth, loading, user } = useAuthStore();
   const { theme } = useThemeStore();
+
+  //get pathname
   const pathname = usePathname();
+
+  //declare active tab
   const [activeTab, setActiveTab] = useState(pathname);
 
+  //check auth
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
+  //set theme
   useEffect(() => {
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
@@ -27,6 +35,7 @@ export default function RootLayoutClient({ children }) {
     }
   }, [theme]);
 
+  //if loading, show loading screen
   if (loading) {
     return (
       <html lang="en" className={theme === "dark" ? "dark" : ""}>
@@ -98,10 +107,13 @@ export default function RootLayoutClient({ children }) {
     );
   }
 
+  //if not loading, show main content
   return (
     <html lang="en" className={theme === "dark" ? "dark" : ""}>
       <body>
-        <Header activeTab={activeTab} setActiveTab={setActiveTab} />
+        {/* if user is logged in, show header */}
+        {user && <Header activeTab={activeTab} setActiveTab={setActiveTab} />}
+        {/* show main content */}
         <main>{children}</main>
       </body>
     </html>

@@ -5,6 +5,7 @@ import { formatDate } from "@/utils/formatDate";
 import ReactionDrawer from "@/components/ui/ReactionDrawer";
 import VerificationBadge from "@/components/ui/VerificationBadge";
 import usePostStore from "@/store/postStore";
+import Image from "next/image";
 
 const ReactionButton = ({
   icon,
@@ -40,16 +41,65 @@ const ReactionButton = ({
     />
   </div>
 );
+const getBadgeInfo = (role) => {
+  if (!role) return null;
 
+  switch (role) {
+    case "admin":
+      return {
+        title: "Admin",
+        description: "Full access to manage and moderate the platform",
+        color: "text-blue-500",
+      };
+    case "moderator":
+      return {
+        title: "Moderator",
+        description: "Helps maintain community guidelines and content quality",
+        color: "text-black dark:text-white",
+      };
+    default:
+      return null;
+  }
+};
+function CommentVerificationBadge({ role }) {
+  const badgeInfo = getBadgeInfo(role);
+  if (!badgeInfo) return null;
+
+  return (
+    <div className="relative inline-flex items-center justify-center">
+      <div className="cursor-help">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className={`w-6 h-6 ${badgeInfo.color} inline-block `}
+        >
+          <path
+            fillRule="evenodd"
+            d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </div>
+    </div>
+  );
+}
 // New Comment Section Component
 const CommentSection = ({ post, isVisible }) => {
   const [newComment, setNewComment] = useState("");
+  const { addComment } = usePostStore();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Add comment submission logic
-    console.log("New comment:", newComment);
-    setNewComment("");
+    if (!newComment.trim()) return;
+
+    try {
+      await addComment(post._id, newComment.trim());
+      setNewComment("");
+    } catch (error) {
+      console.error("Error adding comment:", error);
+      alert(error.message || "Failed to add comment");
+    }
   };
 
   return (
@@ -105,7 +155,7 @@ const CommentSection = ({ post, isVisible }) => {
                       <div className="bg-black/5 dark:bg-white/5 p-3">
                         <div className="flex items-center gap-2 mb-1">
                           <h4 className="font-bold">{comment.user?.name}</h4>
-                          <VerificationBadge role={comment.user?.role} />
+                          <CommentVerificationBadge role={comment.user?.role} />
                         </div>
                         <p>{comment.content}</p>
                       </div>
@@ -118,6 +168,37 @@ const CommentSection = ({ post, isVisible }) => {
                         </button>
                         <span>{formatDate(comment.createdAt)}</span>
                       </div>
+                      {comment.replies.length > 0 && (
+                        <div className="flex flex-col gap-2">
+                          {comment.replies.map((reply) => (
+                            <div
+                              id={reply._id}
+                              className="flex gap-4 flex-col mt-2 text-sm text-black/50 dark:text-white/50"
+                            >
+                              <div className="bg-black/5 dark:bg-white/5 p-3">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h4 className="font-bold">
+                                    {reply.user?.name}
+                                  </h4>
+                                  <CommentVerificationBadge
+                                    role={reply.user?.role}
+                                  />
+                                </div>
+                                <p>{reply.content}</p>
+                              </div>
+                              <div>
+                                <button className="hover:text-blue-500 transition-colors">
+                                  Like
+                                </button>
+                                {/* <button className="hover:text-blue-500 transition-colors">
+                                Reply
+                              </button> */}
+                                <span>{formatDate(reply.createdAt)}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 ))
@@ -215,7 +296,8 @@ const PostCard = memo(
     const [showReactions, setShowReactions] = useState(false);
     const [showComments, setShowComments] = useState(false);
     const [localPost, setLocalPost] = useState(post);
-    const { addReaction, removeReaction, getPostReactions } = usePostStore();
+    const { addReaction, removeReaction, getPostReactions, addComment } =
+      usePostStore();
 
     // Fetch post reactions when component mounts
     useEffect(() => {
@@ -244,8 +326,8 @@ const PostCard = memo(
 
     const handleReaction = async (type) => {
       try {
-        const prevState = { ...localPost };
         const prevUserReaction = localPost.userReaction;
+        const prevState = localPost; // Store previous state for error recovery
 
         // Optimistic update
         if (type === prevUserReaction) {
@@ -254,11 +336,14 @@ const PostCard = memo(
             ...prev,
             reactions: {
               ...prev.reactions,
-              [type]: prev.reactions[type].filter(
-                (userId) => userId !== prev.user._id
-              ),
+              [type]:
+                prev.reactions[type]?.filter(
+                  (userId) => userId !== prev.user._id
+                ) || [],
             },
             userReaction: null,
+            reactionCount:
+              (prev.reactionCount || 0) > 0 ? prev.reactionCount - 1 : 0,
           }));
 
           await removeReaction(localPost._id);
@@ -269,21 +354,37 @@ const PostCard = memo(
             reactions: {
               ...prev.reactions,
               ...(prevUserReaction && {
-                [prevUserReaction]: prev.reactions[prevUserReaction].filter(
-                  (userId) => userId !== prev.user._id
-                ),
+                [prevUserReaction]:
+                  prev.reactions[prevUserReaction]?.filter(
+                    (userId) => userId !== prev.user._id
+                  ) || [],
               }),
               [type]: [...(prev.reactions[type] || []), prev.user._id],
             },
             userReaction: type,
+            reactionCount: prevUserReaction
+              ? prev.reactionCount || 0 // If changing reaction, count stays same
+              : (prev.reactionCount || 0) + 1, // If new reaction, increase count
           }));
 
           await addReaction(localPost._id, type);
         }
 
+        // Fetch fresh data after operation to ensure UI is in sync
+        const data = await getPostReactions(localPost._id);
+        setLocalPost((prev) => ({
+          ...prev,
+          reactions: data.reactions,
+          userReaction: data.userReaction,
+          reactionCount: Object.values(data.reactions).reduce(
+            (sum, reactions) => sum + reactions.length,
+            0
+          ),
+        }));
+
         setShowReactions(false);
       } catch (error) {
-        // Revert on error
+        // Revert to previous state on error
         setLocalPost(prevState);
         console.error("Error handling reaction:", error);
         alert(error.message || "Failed to update reaction");
@@ -304,7 +405,11 @@ const PostCard = memo(
         {/* Post Header */}
         <div className="flex items-center gap-4 mb-6">
           <div className="flex-1 flex items-center gap-4">
-            <img
+            <Image
+              width={48}
+              height={48}
+              placeholder="blur"
+              blurDataURL={post?.user?.profilePic}
               src={
                 post?.user?.profilePic === "default-avatar.png"
                   ? "/default-avatar.png"
@@ -364,11 +469,14 @@ const PostCard = memo(
 
           {/* Media */}
           {post?.media && post.media.length > 0 && (
-            <div className="border-4 border-black dark:border-white overflow-hidden">
-              <img
+            <div className="relative w-full aspect-square">
+              <Image
+                fill
+                placeholder="blur"
+                blurDataURL={post.media[0]}
                 src={post.media[0]}
                 alt="Post content"
-                className="w-full h-auto transition-transform hover:scale-105"
+                className="object-cover transition-transform hover:scale-105"
               />
             </div>
           )}

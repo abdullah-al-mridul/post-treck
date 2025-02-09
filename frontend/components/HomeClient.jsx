@@ -8,7 +8,7 @@ import Spinner from "@/components/ui/Spinner";
 
 export default function HomeClient() {
   //get posts, loading, error and getFeedPosts from post store
-  const { posts, loading, error, getFeedPosts } = usePostStore();
+  const { posts, loading, error, getFeedPosts, createPost } = usePostStore();
   //get user from auth store
   const { user } = useAuthStore();
   //declare new post and is posting state
@@ -18,7 +18,7 @@ export default function HomeClient() {
   //get feed posts
   useEffect(() => {
     getFeedPosts();
-  }, [getFeedPosts]);
+  }, []);
 
   //handle create post
   const handleCreatePost = async (e) => {
@@ -27,9 +27,11 @@ export default function HomeClient() {
 
     try {
       setIsPosting(true);
-      await createPost({ caption: newPost });
+      const result = await createPost({ caption: newPost });
       setNewPost("");
-      await getFeedPosts();
+      if (result) {
+        getFeedPosts();
+      }
     } catch (error) {
       console.error("Error creating post:", error);
       alert(error.message || "Failed to create post");

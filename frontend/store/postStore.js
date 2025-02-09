@@ -76,10 +76,19 @@ const usePostStore = create((set, get) => ({
 
   // Get feed posts
   getFeedPosts: async () => {
+    const currentState = get();
+    if (currentState.loading) return; // Prevent multiple calls if already loading
+
     try {
       set({ loading: true, error: null });
       const { data } = await useApi().get("/posts/feed");
-      set({ posts: data.posts, loading: false });
+
+      // Only update if posts have changed
+      if (JSON.stringify(currentState.posts) !== JSON.stringify(data.posts)) {
+        set({ posts: data.posts, loading: false });
+      } else {
+        set({ loading: false });
+      }
     } catch (error) {
       set({
         error: error.response?.data?.message || "Failed to fetch posts",

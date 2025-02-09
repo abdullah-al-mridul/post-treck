@@ -14,13 +14,72 @@ const useUserStore = create((set, get) => ({
 
     try {
       set({ loading: true, error: null });
-      const { data } = await useApi().get("/users/profile");
-      set({ userProfile: data.user, loading: false });
+
+      // Get profile once
+      const { data: profileData } = await useApi().get("/users/profile");
+      const userData = profileData?.user || null;
+      const userId = userData?._id;
+
+      if (!userId) {
+        throw new Error("Failed to get user ID");
+      }
+
+      // Only fetch posts since we already have profile data
+      const { data: postsData } = await useApi().get(`/posts/user/${userId}`);
+      const posts = postsData?.posts || [];
+
+      // Single state update with existing profile data
+      set({
+        userProfile: userData,
+        userPosts: posts,
+        loading: false,
+        error: null,
+      });
+
+      return { profile: userData, posts };
     } catch (error) {
       set({
-        error: error.response?.data?.message || "Failed to fetch profile",
+        error: error.response?.data?.message || "Failed to fetch profile data",
+        loading: false,
+        userProfile: null,
+        userPosts: [],
+      });
+      throw error;
+    }
+  },
+
+  // New combined function to get profile and posts
+  getProfileById: async (userId) => {
+    const currentState = get();
+    if (currentState.loading) return;
+
+    try {
+      set({ loading: true, error: null });
+
+      // Fix the API endpoints to match backend routes
+      const [profileResponse, postsResponse] = await Promise.all([
+        useApi().get(`/users/profile/${userId}`), // Changed from /users/${userId}
+        useApi().get(`/posts/user/${userId}`), // This one was correct
+      ]);
+
+      // Update both states at once
+      set({
+        userProfile: profileResponse.data.user,
+        userPosts: postsResponse.data.posts,
+        loading: false,
+        error: null,
+      });
+
+      return {
+        profile: profileResponse.data.user,
+        posts: postsResponse.data.posts,
+      };
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Failed to fetch profile data",
         loading: false,
       });
+      throw error;
     }
   },
 

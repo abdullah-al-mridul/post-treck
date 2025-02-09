@@ -6,6 +6,7 @@ import ReactionDrawer from "@/components/ui/ReactionDrawer";
 import VerificationBadge from "@/components/ui/VerificationBadge";
 import usePostStore from "@/store/postStore";
 import Image from "next/image";
+import Link from "next/link";
 
 const ReactionButton = ({
   icon,
@@ -420,7 +421,12 @@ const PostCard = memo(
             />
             <div>
               <h3 className="font-bold text-lg flex items-center">
-                {post?.user?.name}
+                <Link
+                  href={`/profile/${post?.user?._id}`}
+                  className="hover:text-blue-500 transition-colors"
+                >
+                  {post?.user?.name}
+                </Link>
                 {post?.user?.role && (
                   <VerificationBadge role={post?.user?.role} />
                 )}
@@ -472,6 +478,7 @@ const PostCard = memo(
             <div className="relative w-full aspect-square">
               <Image
                 fill
+                sizes="100vh"
                 placeholder="blur"
                 blurDataURL={post.media[0]}
                 src={post.media[0]}

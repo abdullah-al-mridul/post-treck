@@ -7,6 +7,7 @@ import EditProfileModal from "@/components/ui/EditProfileModal";
 import useAuthStore from "@/store/authStore";
 import useUserStore from "@/store/userStore";
 import { toTitleCase } from "@/utils/textCase";
+import { useApi } from "@/hooks/useApi";
 
 //verification badge component
 const VerificationBadge = ({ role }) => {
@@ -336,9 +337,8 @@ export default function ProfileClient({ userId }) {
     loading,
     error,
     getUserProfile,
-    getUserPosts,
+    getProfileById,
     updateProfile,
-    getUserProfileById,
     followUser,
     unfollowUser,
     sendFriendRequest,
@@ -347,16 +347,18 @@ export default function ProfileClient({ userId }) {
   // Determine if viewing own profile
   const isOwnProfile = !userId || userId === user?._id;
 
-  // Memoize the fetch functions
+  // Simplified fetch function
   const fetchUserData = useCallback(async () => {
-    if (isOwnProfile) {
-      await getUserProfile();
-    } else {
-      // Add getUserProfileById to userStore and use it here
-      await getUserProfileById(userId);
+    try {
+      if (isOwnProfile) {
+        await getUserProfile();
+      } else {
+        await getProfileById(userId);
+      }
+    } catch (error) {
+      console.error("Error fetching profile data:", error);
     }
-    await getUserPosts(isOwnProfile ? user?._id : userId);
-  }, [userId, user?._id, getUserProfile, getUserPosts, isOwnProfile]);
+  }, [userId, isOwnProfile, getUserProfile, getProfileById]);
 
   useEffect(() => {
     fetchUserData();
@@ -371,14 +373,24 @@ export default function ProfileClient({ userId }) {
   //declare is edit modal open state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  //set form data
+  // Add this state declaration at the top of your component
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    bio: "",
+    profilePic: "",
+    coverPic: "",
+  });
+
+  // Instead, update formData when userProfile changes
   useEffect(() => {
     if (userProfile) {
       setFormData({
         name: userProfile.name || "",
+        email: userProfile.email || "",
         bio: userProfile.bio || "",
-        location: userProfile.location || "",
-        website: userProfile.website || "",
+        profilePic: userProfile.profilePic || "",
+        coverPic: userProfile.coverPhoto || "",
       });
     }
   }, [userProfile]);
@@ -404,7 +416,7 @@ export default function ProfileClient({ userId }) {
         await followUser(userId);
       }
       // Refresh profile to get updated status
-      await getUserProfileById(userId);
+      await getProfileById(userId);
     } catch (error) {
       console.error("Error following user:", error);
       alert(error.message || "Failed to follow user");
@@ -416,7 +428,7 @@ export default function ProfileClient({ userId }) {
     try {
       await sendFriendRequest(userId);
       // Refresh profile to get updated status
-      await getUserProfileById(userId);
+      await getProfileById(userId);
     } catch (error) {
       console.error("Error sending friend request:", error);
       alert(error.message || "Failed to send friend request");

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import PostCard from "@/components/PostCard";
 import usePostStore from "@/store/postStore";
@@ -14,23 +14,64 @@ export default function HomeClient() {
   //declare new post and is posting state
   const [newPost, setNewPost] = useState("");
   const [isPosting, setIsPosting] = useState(false);
+  // Add new state for image
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  // Add ref for image input
+  const imageInputRef = useRef(null);
 
   //get feed posts
   useEffect(() => {
     getFeedPosts();
   }, []);
 
-  //handle create post
+  // Handle image selection with validation
+  const handleImageSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Check file size (e.g., 5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Image size should be less than 5MB");
+        return;
+      }
+
+      // Check file type
+      if (!file.type.startsWith("image/")) {
+        alert("Please select an image file");
+        return;
+      }
+
+      setSelectedImage(file);
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
+  };
+
+  // Clear image selection
+  const clearImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (imageInputRef.current) {
+      imageInputRef.current.value = "";
+    }
+  };
+
+  // Modified handleCreatePost with better error handling
   const handleCreatePost = async (e) => {
     e.preventDefault();
-    if (!newPost.trim()) return;
+    if (!newPost.trim() && !selectedImage) return;
 
     try {
       setIsPosting(true);
-      const result = await createPost({ caption: newPost });
-      setNewPost("");
+      const result = await createPost({
+        caption: newPost,
+        image: selectedImage,
+      });
+
       if (result) {
-        getFeedPosts();
+        setNewPost("");
+        clearImage();
+        await getFeedPosts();
       }
     } catch (error) {
       console.error("Error creating post:", error);
@@ -83,11 +124,47 @@ export default function HomeClient() {
               rows={3}
             />
 
-            <div className="flex justify-between items-center">
-              <div className="flex gap-2">
-                {/* Add these buttons later for media upload */}
+            {/* Image Preview */}
+            {imagePreview && (
+              <div className="relative">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="max-h-64 w-auto rounded border-4 border-black dark:border-white"
+                />
                 <button
                   type="button"
+                  onClick={clearImage}
+                  className="absolute top-2 right-2 p-1 bg-black/50 hover:bg-black text-white rounded-full"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </div>
+            )}
+
+            <div className="flex justify-between items-center">
+              <div className="flex gap-2">
+                <input
+                  type="file"
+                  ref={imageInputRef}
+                  onChange={handleImageSelect}
+                  accept="image/*"
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => imageInputRef.current?.click()}
                   className="p-2 border-4 border-black dark:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors"
                 >
                   📷
@@ -102,7 +179,7 @@ export default function HomeClient() {
 
               <button
                 type="submit"
-                disabled={isPosting || !newPost.trim()}
+                disabled={isPosting || (!newPost.trim() && !selectedImage)}
                 className="px-8 py-2 bg-black text-white dark:bg-white dark:text-black font-bold border-4 border-black dark:border-white hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
               >
                 {isPosting ? (

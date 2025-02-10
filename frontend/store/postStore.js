@@ -130,25 +130,35 @@ const usePostStore = create((set, get) => ({
     }
   },
 
-  // Create a new post
-  createPost: async (formData) => {
+  // Modified createPost to handle image with better error handling
+  createPost: async (postData) => {
     try {
-      set({ loading: true, error: null });
-      const { data } = await useApi().post("/posts", formData);
+      const formData = new FormData();
+      formData.append("caption", postData.caption);
 
-      // Update posts list with new post
-      set((state) => ({
-        posts: [data.post, ...state.posts],
-        loading: false,
-      }));
+      if (postData.image) {
+        formData.append("media", postData.image);
+        console.log("Image being sent:", postData.image);
+      }
+
+      // Log the entire FormData
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
+      const { data } = await useApi().post("/posts", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       return data;
     } catch (error) {
-      set({
-        error: error.response?.data?.message || "Failed to create post",
-        loading: false,
-      });
-      throw error;
+      console.error("Full error details:", error.response?.data);
+      throw new Error(
+        error.response?.data?.message ||
+          "Failed to create post. Please check if the image size is within limits."
+      );
     }
   },
 

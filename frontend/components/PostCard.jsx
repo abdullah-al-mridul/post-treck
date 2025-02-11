@@ -152,6 +152,7 @@ const CommentSection = ({ post, isVisible }) => {
                       alt={comment.user?.name}
                       className="w-10 h-10 border-2 border-black dark:border-white"
                     />
+                    {console.log(comment.user.role)}
                     <div className="flex-1">
                       <div className="bg-black/5 dark:bg-white/5 p-3">
                         <div className="flex items-center gap-2 mb-1">

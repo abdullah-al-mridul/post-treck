@@ -47,11 +47,11 @@ export const getFeedPosts = async (req, res) => {
       .populate("user", "name email profilePic role")
       .populate({
         path: "comments.user",
-        select: "name email profilePic",
+        select: "name email profilePic role",
       })
       .populate({
         path: "comments.replies.user",
-        select: "name email profilePic",
+        select: "name email profilePic role",
       })
       .populate({
         path: "reactions.like reactions.love reactions.haha reactions.wow reactions.sad reactions.angry",

@@ -6,6 +6,7 @@ const MessageContainer = () => {
   const { selectedChat, sendMessage } = useMessages();
   const { user } = useAuthStore();
   const [message, setMessage] = useState("");
+  const [file, setFile] = useState(null);
   console.log("selectedChat", selectedChat);
   let messages;
   if (selectedChat) {
@@ -13,7 +14,7 @@ const MessageContainer = () => {
   }
   const handleSubmit = (e) => {
     e.preventDefault();
-    sendMessage(message, selectedChat._id);
+    sendMessage(message, selectedChat._id, file);
   };
   return (
     <div className="mt-[200px] w-full ml-[50px]">
@@ -34,6 +35,13 @@ const MessageContainer = () => {
             ))}
           </div>
           <form onSubmit={handleSubmit}>
+            <input
+              type="file"
+              name="file"
+              id="file"
+              accept="image/*"
+              onChange={(e) => setFile(e.target.files[0])}
+            />
             <input
               className="border-2 border-black"
               type="text"

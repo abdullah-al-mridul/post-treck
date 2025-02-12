@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import useMessages from "@/store/useMessages";
 import useAuthStore from "@/store/authStore";
+import Image from "next/image";
 const MessageContainer = () => {
   const { selectedChat, sendMessage } = useMessages();
   const { user } = useAuthStore();
@@ -30,6 +31,17 @@ const MessageContainer = () => {
                 }`}
                 key={message._id}
               >
+                {message.media && (
+                  <Image
+                    height={100}
+                    width={100}
+                    placeholder="blur"
+                    blurDataURL={message.media}
+                    src={message.media}
+                    alt="media"
+                    className="w-10 h-10"
+                  />
+                )}
                 {message.content}
               </div>
             ))}

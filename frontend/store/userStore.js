@@ -6,7 +6,7 @@ const useUserStore = create((set, get) => ({
   userPosts: [],
   loading: false,
   error: null,
-
+  userFollowers: [],
   // Get own profile
   getUserProfile: async () => {
     const currentState = get();
@@ -66,6 +66,7 @@ const useUserStore = create((set, get) => ({
       set({
         userProfile: profileResponse.data.user,
         userPosts: postsResponse.data.posts,
+        userFollowers: profileResponse.data.user.followers,
         loading: false,
         error: null,
       });

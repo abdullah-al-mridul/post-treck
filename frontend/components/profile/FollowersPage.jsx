@@ -14,6 +14,9 @@ const FollowersPage = ({ userId }) => {
   if (loading) {
     return <Spinner />;
   }
+  if (followers.length === 0) {
+    return <div className=" mt-[250px]">No followers found</div>;
+  }
   return (
     <div className=" mt-[250px]">
       {followers.map((follower) => (

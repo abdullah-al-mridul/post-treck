@@ -23,7 +23,7 @@ const ReactionButton = ({
     <button
       onClick={onClick}
       onMouseEnter={onHover}
-      className="group flex items-center gap-2 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+      className="group flex items-center gap-2 text-black dark:text-white hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
     >
       {icon}
       <span className="group-hover:font-bold transition-all">
@@ -34,7 +34,7 @@ const ReactionButton = ({
     <ReactionDrawer
       isVisible={showDrawer}
       onReact={(type) => onClick(type)}
-      className="z-50"
+      className="z-50 bg-white dark:bg-black border-4 border-black dark:border-white shadow-lg"
       onMouseEnter={onHover}
       onMouseLeave={onMouseLeave}
       postId={postId}
@@ -121,7 +121,7 @@ const CommentSection = ({ post, isVisible }) => {
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Write a comment..."
-                className="flex-1 bg-transparent border-2 border-black dark:border-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 bg-transparent border-2 border-black dark:border-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 placeholder:text-black/50 dark:placeholder:text-white/50 text-black dark:text-white"
               />
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -152,50 +152,56 @@ const CommentSection = ({ post, isVisible }) => {
                       alt={comment.user?.name}
                       className="w-10 h-10 border-2 border-black dark:border-white"
                     />
-                    {console.log(comment.user.role)}
                     <div className="flex-1">
                       <div className="bg-black/5 dark:bg-white/5 p-3">
                         <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-bold">{comment.user?.name}</h4>
+                          <h4 className="font-bold text-black dark:text-white">
+                            {comment.user?.name}
+                          </h4>
                           <CommentVerificationBadge role={comment.user?.role} />
                         </div>
-                        <p>{comment.content}</p>
+                        <p className="text-black dark:text-white">
+                          {comment.content}
+                        </p>
                       </div>
                       <div className="flex gap-4 mt-2 text-sm text-black/50 dark:text-white/50">
-                        <button className="hover:text-blue-500 transition-colors">
+                        <button className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
                           Like
                         </button>
-                        <button className="hover:text-blue-500 transition-colors">
+                        <button className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
                           Reply
                         </button>
                         <span>{formatDate(comment.createdAt)}</span>
                       </div>
+
+                      {/* Replies section */}
                       {comment.replies.length > 0 && (
                         <div className="flex flex-col gap-2">
                           {comment.replies.map((reply) => (
                             <div
-                              id={reply._id}
+                              key={reply._id}
                               className="flex gap-4 flex-col mt-2 text-sm text-black/50 dark:text-white/50"
                             >
                               <div className="bg-black/5 dark:bg-white/5 p-3">
                                 <div className="flex items-center gap-2 mb-1">
-                                  <h4 className="font-bold">
+                                  <h4 className="font-bold text-black dark:text-white">
                                     {reply.user?.name}
                                   </h4>
                                   <CommentVerificationBadge
                                     role={reply.user?.role}
                                   />
                                 </div>
-                                <p>{reply.content}</p>
+                                <p className="text-black dark:text-white">
+                                  {reply.content}
+                                </p>
                               </div>
                               <div>
-                                <button className="hover:text-blue-500 transition-colors">
+                                <button className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
                                   Like
                                 </button>
-                                {/* <button className="hover:text-blue-500 transition-colors">
-                                Reply
-                              </button> */}
-                                <span>{formatDate(reply.createdAt)}</span>
+                                <span className="ml-4">
+                                  {formatDate(reply.createdAt)}
+                                </span>
                               </div>
                             </div>
                           ))}
@@ -267,22 +273,8 @@ const PostMenu = ({ onReport }) => {
                   onReport();
                   setIsOpen(false);
                 }}
-                className="w-full px-4 py-2 text-left hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex items-center gap-2 text-red-500"
+                className="w-full px-4 py-2 text-left hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-                  />
-                </svg>
                 Report Post
               </button>
             </motion.div>
@@ -402,7 +394,7 @@ const PostCard = memo(
       <motion.article
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="p-8 border-4 border-black dark:border-white hover:translate-x-2 hover:-translate-y-2 hover:shadow-[8px_8px_0_0_#000] dark:hover:shadow-[8px_8px_0_0_#fff] transition-all"
+        className="p-8 bg-white dark:bg-black border-4 border-black dark:border-white hover:translate-x-2 hover:-translate-y-2 hover:shadow-[8px_8px_0_0_#000] dark:hover:shadow-[8px_8px_0_0_#fff] transition-all"
       >
         {/* Post Header */}
         <div className="flex items-center gap-4 mb-6">
@@ -424,7 +416,7 @@ const PostCard = memo(
               <h3 className="font-bold text-lg flex items-center">
                 <Link
                   href={`/profile/${post?.user?._id}`}
-                  className="hover:text-blue-500 transition-colors"
+                  className="hover:text-blue-500 dark:hover:text-blue-400 text-black dark:text-white transition-colors"
                 >
                   {post?.user?.name}
                 </Link>
@@ -458,7 +450,9 @@ const PostCard = memo(
         {/* Post Content */}
         <div className="space-y-4">
           {/* Caption */}
-          <p className="text-lg leading-relaxed">{post?.caption}</p>
+          <p className="text-lg leading-relaxed text-black dark:text-white">
+            {post?.caption}
+          </p>
 
           {/* Hashtags */}
           {post?.hashtags?.length > 0 && (
@@ -500,7 +494,7 @@ const PostCard = memo(
                 viewBox="0 0 24 24"
                 strokeWidth={2}
                 stroke="currentColor"
-                className="w-6 h-6 group-hover:fill-current transition-all"
+                className="w-6 h-6 group-hover:fill-current transition-all text-black dark:text-white"
               >
                 <path
                   strokeLinecap="round"
@@ -527,7 +521,7 @@ const PostCard = memo(
                 viewBox="0 0 24 24"
                 strokeWidth={2}
                 stroke="currentColor"
-                className="w-6 h-6 group-hover:fill-current transition-all"
+                className="w-6 h-6 group-hover:fill-current transition-all text-black dark:text-white"
               >
                 <path
                   strokeLinecap="round"
@@ -549,7 +543,7 @@ const PostCard = memo(
                 viewBox="0 0 24 24"
                 strokeWidth={2}
                 stroke="currentColor"
-                className="w-6 h-6 group-hover:fill-current transition-all"
+                className="w-6 h-6 group-hover:fill-current transition-all text-black dark:text-white"
               >
                 <path
                   strokeLinecap="round"

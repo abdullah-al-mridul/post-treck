@@ -8,14 +8,14 @@ export default function SettingsClient() {
   const { user } = useAuthStore();
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4">
+    <div className="min-h-screen pt-24 pb-12 px-4 dark:bg-black dark:text-white">
       <div className="max-w-2xl mx-auto">
         <h1 className="text-4xl font-black mb-8">Settings</h1>
 
         {/* Theme Settings */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-6">Appearance</h2>
-          <div className="p-6 border-4 border-black dark:border-white hover:translate-x-2 hover:-translate-y-2 hover:shadow-[8px_8px_0_0_#000] dark:hover:shadow-[8px_8px_0_0_#fff] transition-all">
+          <div className="p-6 bg-white dark:bg-black border-4 border-black dark:border-white hover:translate-x-2 hover:-translate-y-2 hover:shadow-[8px_8px_0_0_#000] dark:hover:shadow-[8px_8px_0_0_#fff] transition-all">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-bold text-lg mb-2">Theme</h3>
@@ -41,7 +41,7 @@ export default function SettingsClient() {
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-6">Account</h2>
           <div className="space-y-4">
-            <div className="p-6 border-4 border-black dark:border-white">
+            <div className="p-6 bg-white dark:bg-black border-4 border-black dark:border-white">
               <h3 className="font-bold text-lg mb-2">Email</h3>
               <p className="text-black/60 dark:text-white/60">{user?.email}</p>
             </div>
@@ -59,7 +59,7 @@ export default function SettingsClient() {
         <section>
           <h2 className="text-2xl font-bold mb-6">Notifications</h2>
           <div className="space-y-4">
-            <div className="p-6 border-4 border-black dark:border-white">
+            <div className="p-6 bg-white dark:bg-black border-4 border-black dark:border-white">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-bold text-lg mb-2">
@@ -74,7 +74,7 @@ export default function SettingsClient() {
                 </button>
               </div>
             </div>
-            <div className="p-6 border-4 border-black dark:border-white">
+            <div className="p-6 bg-white dark:bg-black border-4 border-black dark:border-white">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-bold text-lg mb-2">Push Notifications</h3>

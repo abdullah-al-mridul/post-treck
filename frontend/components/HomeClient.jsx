@@ -95,7 +95,7 @@ export default function HomeClient() {
 
   //if not loading and no error, show home page
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4">
+    <div className="min-h-screen dark:bg-black pt-24 pb-12 px-4">
       <div className="max-w-2xl mx-auto space-y-8">
         {/* Create Post Section */}
         <div className="bg-white dark:bg-black border-4 border-black dark:border-white shadow-[8px_8px_0px_0px_rgba(0,0,0)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255)]">
@@ -135,7 +135,7 @@ export default function HomeClient() {
                 <button
                   type="button"
                   onClick={clearImage}
-                  className="absolute top-2 right-2 p-1 bg-black/50 hover:bg-black text-white rounded-full"
+                  className="absolute top-2 right-2 p-1 bg-black/50 hover:bg-black text-white dark:bg-white/50 dark:hover:bg-white dark:text-black rounded-full transition-colors"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -195,15 +195,15 @@ export default function HomeClient() {
                         fill="none"
                       />
                       <path
-                        className="opacity-75"
+                        className="opacity-75 dark:fill-black"
                         fill="currentColor"
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       />
                     </svg>
-                    POSTING...
+                    <span className="dark:text-black">POSTING...</span>
                   </div>
                 ) : (
-                  "POST"
+                  <span className="dark:text-black">POST</span>
                 )}
               </button>
             </div>
@@ -223,8 +223,10 @@ export default function HomeClient() {
             </motion.div>
           ))
         ) : (
-          <div className="text-center py-8 border-4 border-black dark:border-white p-8">
-            <h2 className="text-2xl font-bold mb-4">NO POSTS YET</h2>
+          <div className="text-center py-8 border-4 border-black dark:border-white p-8 bg-white dark:bg-black transition-colors">
+            <h2 className="text-2xl font-bold mb-4 text-black dark:text-white">
+              NO POSTS YET
+            </h2>
             <p className="text-black/50 dark:text-white/50">
               Be the first one to post something!
             </p>

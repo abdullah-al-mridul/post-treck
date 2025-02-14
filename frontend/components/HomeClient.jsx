@@ -5,6 +5,7 @@ import PostCard from "@/components/PostCard";
 import usePostStore from "@/store/postStore";
 import useAuthStore from "@/store/authStore";
 import Spinner from "@/components/ui/Spinner";
+import { Image } from "lucide-react";
 
 export default function HomeClient() {
   //get posts, loading, error and getFeedPosts from post store
@@ -98,16 +99,18 @@ export default function HomeClient() {
     <div className="min-h-screen pt-24 pb-12 px-4">
       <div className="max-w-2xl mx-auto space-y-8">
         {/* Create Post Section */}
-        <div className="bg-white dark:bg-black border-4 border-black dark:border-white shadow-[8px_8px_0px_0px_rgba(0,0,0)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255)]">
-          <div className="border-b-4 border-black dark:border-white p-4">
+        <div className="bg-white dark:bg-transparent dark:hover:bg-[#38444d1a] border-2 border-black dark:border-darkBorder hover:shadow-[8px_8px_0_0_#000] dark:hover:shadow-[8px_8px_0_0_rgba(56,68,77,0.4)] transition-all">
+          <div className="border-b-2 border-black dark:border-darkBorder p-4">
             <div className="flex items-center gap-4">
               <img
                 src={user?.profilePic || "/default-avatar.png"}
                 alt={user?.name}
-                className="w-12 h-12 rounded-full border-4 border-black dark:border-white"
+                className="w-12 h-12 rounded-none border-2 border-black dark:border-darkBorder"
               />
               <div className="flex-1">
-                <h2 className="font-bold text-lg">{user?.name}</h2>
+                <h2 className="font-bold dark:text-zinc-100 text-lg">
+                  {user?.name}
+                </h2>
                 <p className="text-black/50 dark:text-white/50 text-sm">
                   Share your thoughts
                 </p>
@@ -120,7 +123,7 @@ export default function HomeClient() {
               value={newPost}
               onChange={(e) => setNewPost(e.target.value)}
               placeholder="What's on your mind?"
-              className="w-full bg-transparent border-4 border-black dark:border-white p-4 rounded-none resize-none focus:outline-none min-h-[120px] placeholder:text-black/50 dark:placeholder:text-white/50 font-medium"
+              className="w-full bg-transparent border-2 border-black dark:border-darkBorder dark:border-dashed p-4 rounded-none resize-none focus:outline-none min-h-[120px] placeholder:text-black/50 dark:placeholder:text-zinc-100 dark:text-zinc-100 font-medium"
               rows={3}
             />
 
@@ -130,12 +133,12 @@ export default function HomeClient() {
                 <img
                   src={imagePreview}
                   alt="Preview"
-                  className="max-h-64 w-auto rounded border-4 border-black dark:border-white"
+                  className="max-h-64 w-auto border-4 border-black dark:border-darkBorder"
                 />
                 <button
                   type="button"
                   onClick={clearImage}
-                  className="absolute top-2 right-2 p-1 bg-black/50 hover:bg-black text-white rounded-full"
+                  className="absolute top-2 right-2 p-1 bg-black/50 hover:bg-black text-white dark:text-zinc-100 dark:bg-darkBorder/50 transition-colors dark:hover:bg-darkBorder/60"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -165,22 +168,22 @@ export default function HomeClient() {
                 <button
                   type="button"
                   onClick={() => imageInputRef.current?.click()}
-                  className="p-2 border-4 border-black dark:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors"
+                  className="p-2 border-2 border-black dark:border-darkBorder hover:bg-black hover:text-white dark:hover:bg-[#38444d36] dark:hover:text-black transition-colors"
                 >
-                  📷
+                  <Image className=" text-black dark:text-darkBorder" />
                 </button>
-                <button
+                {/* <button
                   type="button"
-                  className="p-2 border-4 border-black dark:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors"
+                  className="p-2 border-2 border-black dark:border-darkBorder hover:bg-black hover:text-white dark:hover:bg-[#38444d36] dark:hover:text-black transition-colors"
                 >
                   🎥
-                </button>
+                </button> */}
               </div>
 
               <button
                 type="submit"
                 disabled={isPosting || (!newPost.trim() && !selectedImage)}
-                className="px-8 py-2 bg-black text-white dark:bg-white dark:text-black font-bold border-4 border-black dark:border-white hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
+                className="px-8 py-2 bg-black text-white dark:bg-darkBorder dark:text-zinc-100 font-bold border-4 border-black dark:border-darkBorder hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
               >
                 {isPosting ? (
                   <div className="flex items-center gap-2">

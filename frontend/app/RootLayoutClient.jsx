@@ -9,7 +9,7 @@ import { Sidebar } from "@/components/ui/Sidebar";
 export default function RootLayoutClient({ children }) {
   const { theme } = useThemeStore();
   const pathname = usePathname();
-  const { checkAuth } = useAuthStore();
+  const { user, checkAuth } = useAuthStore();
 
   // Check auth on mount
   useEffect(() => {
@@ -21,18 +21,15 @@ export default function RootLayoutClient({ children }) {
     document.documentElement.classList.toggle("dark", theme === "dark");
   }, [theme]);
 
-  // Don't show sidebar and navbar on auth pages
-  const isAuthPage = pathname === "/login" || pathname === "/register";
-
   return (
-    <div className={`${theme} min-h-screen`}>
-      {!isAuthPage && (
+    <div className={`${theme} min-h-screen dark:bg-[#15202B]`}>
+      {user && (
         <>
           <Navbar />
           <Sidebar />
         </>
       )}
-      <main className={!isAuthPage ? "pl-64" : ""}>{children}</main>
+      <main className={user ? "pl-64" : ""}>{children}</main>
     </div>
   );
 }

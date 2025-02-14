@@ -19,14 +19,15 @@ const ReactionButton = ({
   postId,
   currentReaction,
 }) => (
-  <div className="relative" onMouseLeave={onMouseLeave}>
-    <button
-      onClick={onClick}
-      onMouseEnter={onHover}
-      className="group flex items-center gap-2 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
-    >
+  <div
+    className="relative w-full cursor-pointer border-r dark:border-darkBorder dark:hover:bg-darkHover px-4 py-2"
+    onMouseLeave={onMouseLeave}
+    onClick={onClick}
+    onMouseEnter={onHover}
+  >
+    <button className="group flex items-center gap-2 text-black dark:text-zinc-100 transition-colors">
       {icon}
-      <span className="group-hover:font-bold transition-all">
+      <span className=" transition-all">
         {count}
         <span className="sr-only">{label}</span>
       </span>
@@ -68,7 +69,7 @@ function CommentVerificationBadge({ role }) {
 
   return (
     <div className="relative inline-flex items-center justify-center">
-      <div className="cursor-help">
+      <div className="">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -113,7 +114,7 @@ const CommentSection = ({ post, isVisible }) => {
           transition={{ duration: 0.2 }}
           className="overflow-hidden"
         >
-          <div className="border-t-4 border-black dark:border-white mt-6 pt-6">
+          <div className="border-t-4 border-black dark:border-darkBorder mt-6 pt-6">
             {/* Comment Form */}
             <form onSubmit={handleSubmit} className="flex gap-4 mb-6">
               <input
@@ -121,13 +122,13 @@ const CommentSection = ({ post, isVisible }) => {
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Write a comment..."
-                className="flex-1 bg-transparent border-2 border-black dark:border-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 bg-transparent border-2 border-black dark:border-darkBorder dark:text-zinc-100 p-2 focus:outline-none"
               />
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 type="submit"
-                className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black font-medium hover:bg-black/80 dark:hover:bg-white/80 transition-colors"
+                className="px-4 py-2 bg-black dark:bg-darkBorder text-white dark:text-zinc-100 font-medium hover:bg-black/80 dark:hover:bg-darkHover transition-colors"
               >
                 Comment
               </motion.button>
@@ -150,16 +151,18 @@ const CommentSection = ({ post, isVisible }) => {
                           : comment.user?.profilePic
                       }
                       alt={comment.user?.name}
-                      className="w-10 h-10 border-2 border-black dark:border-white"
+                      className="w-10 h-10 border-2 border-black dark:border-darkBorder"
                     />
-                    {console.log(comment.user.role)}
+
                     <div className="flex-1">
                       <div className="bg-black/5 dark:bg-white/5 p-3">
                         <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-bold">{comment.user?.name}</h4>
+                          <h4 className="font-bold dark:text-zinc-100">
+                            {comment.user?.name}
+                          </h4>
                           <CommentVerificationBadge role={comment.user?.role} />
                         </div>
-                        <p>{comment.content}</p>
+                        <p className="dark:text-zinc-100">{comment.content}</p>
                       </div>
                       <div className="flex gap-4 mt-2 text-sm text-black/50 dark:text-white/50">
                         <button className="hover:text-blue-500 transition-colors">
@@ -225,7 +228,7 @@ const PostMenu = ({ onReport }) => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors"
+        className="p-2 hover:bg-black/5 dark:hover:bg-darkHover dark:text-zinc-100 rounded-full transition-colors"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -402,7 +405,7 @@ const PostCard = memo(
       <motion.article
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="p-8 border-4 border-black dark:border-white hover:translate-x-2 hover:-translate-y-2 hover:shadow-[8px_8px_0_0_#000] dark:hover:shadow-[8px_8px_0_0_#fff] transition-all"
+        className="p-8 border-2 border-black hover:bg-darkBorder/10 dark:border-[#38444d] hover:translate-x-2 hover:-translate-y-2 hover:shadow-[8px_8px_0_0_#000] dark:hover:shadow-[8px_8px_0_0_rgba(56,68,77,0.4)] transition-all"
       >
         {/* Post Header */}
         <div className="flex items-center gap-4 mb-6">
@@ -418,13 +421,13 @@ const PostCard = memo(
                   : post?.user?.profilePic
               }
               alt={post?.user?.name}
-              className="w-12 h-12 border-4 border-black dark:border-white"
+              className="w-12 h-12 border-2 border-black dark:border-darkBorder"
             />
             <div>
               <h3 className="font-bold text-lg flex items-center">
                 <Link
                   href={`/profile/${post?.user?._id}`}
-                  className="hover:text-blue-500 transition-colors"
+                  className=" dark:text-zinc-100 relative before:absolute before:content-[''] before:h-[1px] before:transition-all before:bg-zinc-900 dark:before:bg-zinc-100 before:w-0 hover:before:w-full before:bottom-[2px] transition-colors"
                 >
                   {post?.user?.name}
                 </Link>
@@ -458,7 +461,9 @@ const PostCard = memo(
         {/* Post Content */}
         <div className="space-y-4">
           {/* Caption */}
-          <p className="text-lg leading-relaxed">{post?.caption}</p>
+          <p className="text-lg leading-relaxed dark:text-zinc-100">
+            {post?.caption}
+          </p>
 
           {/* Hashtags */}
           {post?.hashtags?.length > 0 && (
@@ -491,7 +496,7 @@ const PostCard = memo(
         </div>
 
         {/* Post Actions */}
-        <div className="flex gap-8 mt-6 font-mono">
+        <div className="flex border w-max dark:border-darkBorder mt-6 font-mono">
           <ReactionButton
             icon={
               <svg
@@ -500,7 +505,7 @@ const PostCard = memo(
                 viewBox="0 0 24 24"
                 strokeWidth={2}
                 stroke="currentColor"
-                className="w-6 h-6 group-hover:fill-current transition-all"
+                className="w-6 h-6 transition-all"
               >
                 <path
                   strokeLinecap="round"
@@ -527,7 +532,7 @@ const PostCard = memo(
                 viewBox="0 0 24 24"
                 strokeWidth={2}
                 stroke="currentColor"
-                className="w-6 h-6 group-hover:fill-current transition-all"
+                className="w-6 h-6 transition-all"
               >
                 <path
                   strokeLinecap="round"
@@ -549,7 +554,7 @@ const PostCard = memo(
                 viewBox="0 0 24 24"
                 strokeWidth={2}
                 stroke="currentColor"
-                className="w-6 h-6 group-hover:fill-current transition-all"
+                className="w-6 h-6 transition-all"
               >
                 <path
                   strokeLinecap="round"

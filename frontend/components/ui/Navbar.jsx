@@ -9,10 +9,13 @@ export function Navbar() {
   const { user, logout } = useAuthStore();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 h-16 bg-white dark:bg-black border-b-4 border-black dark:border-white z-50">
+    <nav className="fixed top-0 left-0 right-0 h-16 bg-white dark:bg-[#15202B]/50 backdrop-blur-2xl border-b-2 border-black dark:border-[#38444d] z-50">
       <div className="flex items-center justify-between h-full px-8">
         {/* Left side - Logo */}
-        <Link href="/" className="text-2xl font-black">
+        <Link
+          href="/"
+          className="text-2xl font-black text-zinc-900 dark:text-zinc-100"
+        >
           POST TRECK
         </Link>
 
@@ -21,7 +24,7 @@ export function Navbar() {
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
-            className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors"
+            className="p-2 hover:bg-black/5 dark:hover:bg-[rgba(247,249,249,0.1)] dark:text-zinc-100 rounded-lg transition-colors"
           >
             {theme === "dark" ? (
               <svg
@@ -49,7 +52,7 @@ export function Navbar() {
           </button>
 
           {/* Notifications */}
-          <button className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors relative">
+          <button className="p-2 hover:bg-black/5 dark:hover:bg-[rgba(247,249,249,0.1)] dark:text-zinc-100 rounded-lg transition-colors relative">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -71,7 +74,7 @@ export function Navbar() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={logout}
-            className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black font-bold rounded-lg hover:opacity-90 transition-opacity"
+            className="px-4 py-2 bg-black dark:bg-darkHover text-white dark:text-zinc-100 font-bold rounded-lg hover:opacity-90 transition-opacity"
           >
             Logout
           </motion.button>

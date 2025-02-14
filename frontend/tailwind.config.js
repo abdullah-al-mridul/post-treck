@@ -11,6 +11,10 @@ module.exports = {
       fontFamily: {
         roboto: ["var(--font-roboto)"],
       },
+      colors: {
+        darkBorder: "#38444d",
+        darkHover: "#f7f9f91a",
+      },
     },
   },
   plugins: [],

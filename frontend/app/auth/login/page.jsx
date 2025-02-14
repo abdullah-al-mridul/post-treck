@@ -42,9 +42,9 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex bg-white dark:bg-black transition-colors">
+    <div className="min-h-screen flex bg-[#E7E9EA] dark:bg-[#15202B] transition-colors">
       {/* Left Side - App Introduction */}
-      <div className="hidden lg:flex w-1/2 flex-col justify-between p-12 bg-black dark:bg-white relative overflow-hidden">
+      <div className="hidden lg:flex w-1/2 flex-col justify-between p-12 bg-[#15202B] dark:bg-[#E7E9EA] relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div

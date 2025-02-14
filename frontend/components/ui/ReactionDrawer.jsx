@@ -123,7 +123,7 @@ export default function ReactionDrawer({
           animate="visible"
           exit="exit"
           variants={containerVariants}
-          className={`absolute -top-16 left-0 bg-white dark:bg-black border-4 border-black dark:border-white p-2 rounded-full shadow-lg flex gap-1 ${className}`}
+          className={`absolute -top-16 left-0 bg-white dark:bg-[#15202B] border-2 border-black dark:border-darkBorder p-2 rounded-full shadow-lg flex gap-1 ${className}`}
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
         >
@@ -167,7 +167,7 @@ export default function ReactionDrawer({
                       initial="hidden"
                       animate="visible"
                       exit="exit"
-                      className="absolute -top-11 left-1/2 -translate-x-1/2 text-sm font-bold bg-black dark:bg-white text-white dark:text-black px-3 py-1.5 rounded-md whitespace-nowrap shadow-lg"
+                      className="absolute -top-11 left-1/2 -translate-x-1/2 text-sm font-bold bg-black dark:bg-[#15202B] text-white dark:text-zinc-100 dark:border-darkBorder dark:border-2 px-3 py-1.5 rounded-md whitespace-nowrap shadow-lg"
                     >
                       {reaction.name.charAt(0).toUpperCase() +
                         reaction.name.slice(1)}

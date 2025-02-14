@@ -58,7 +58,7 @@ export default function VerificationBadge({ role }) {
             exit={{ opacity: 0, y: 10 }}
             className="absolute z-50 top-full mt-2"
           >
-            <div className="relative w-48 px-4 py-3 bg-white dark:bg-darkBorder/50 border-4 border-black backdrop-blur-md dark:border-darkBorder shadow-lg">
+            <div className="relative w-48 px-4 py-3 bg-white dark:bg-darkBorder/60 border-4 border-black backdrop-blur-lg dark:border-darkBorder shadow-lg">
               {/* Arrow */}
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[8px] border-b-black dark:border-b-darkBorder" />
 

@@ -3,7 +3,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import useAuthStore from "@/store/authStore";
-import { House, Settings, SquareUser } from "lucide-react";
+import {
+  House,
+  MessageSquare,
+  Settings,
+  SquareUser,
+  UserPlus,
+} from "lucide-react";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -19,6 +25,16 @@ export function Sidebar() {
       label: "Profile",
       href: `/profile/${user?._id}`,
       icon: <SquareUser className="w-6 h-6 dark:text-zinc-100/60" />,
+    },
+    {
+      label: "Messages",
+      href: "/messages",
+      icon: <MessageSquare className="w-6 h-6 dark:text-zinc-100/60" />,
+    },
+    {
+      label: "Friend Requests",
+      href: `/profile/${user?._id}/friend-requests`,
+      icon: <UserPlus className="w-6 h-6 dark:text-zinc-100/60" />,
     },
     {
       label: "Settings",

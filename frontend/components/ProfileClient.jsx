@@ -8,6 +8,7 @@ import useAuthStore from "@/store/authStore";
 import useUserStore from "@/store/userStore";
 import { toTitleCase } from "@/utils/textCase";
 import { useApi } from "@/hooks/useApi";
+import Link from "next/link";
 
 //verification badge component
 const VerificationBadge = ({ role }) => {
@@ -67,9 +68,9 @@ const VerificationBadge = ({ role }) => {
             exit={{ opacity: 0, y: 10 }}
             className="absolute z-50 top-full mt-2"
           >
-            <div className="relative w-48 px-4 py-3 bg-white dark:bg-black border-4 border-black dark:border-white shadow-lg">
+            <div className="relative w-48 px-4 py-3 bg-white dark:bg-darkHover backdrop-blur-md border-4 border-black dark:border-darkBorder shadow-lg">
               {/* Arrow */}
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[8px] border-b-black dark:border-b-white" />
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[8px] border-b-black dark:border-b-darkBorder" />
 
               <h4 className="font-bold mb-1">{badgeInfo.title}</h4>
               <p className="text-sm text-black/70 dark:text-white/70">
@@ -124,7 +125,7 @@ const ProfileHeader = ({ userProfile, isOwnProfile }) => {
     <div className="relative mb-12">
       {/* Cover Image */}
       <div
-        className="h-48 bg-black/10 dark:bg-white/10 rounded-lg overflow-hidden relative group"
+        className="h-48 bg-black/10 dark:bg-white/10 border-4 dark:border-darkBorder overflow-hidden relative group"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -212,16 +213,16 @@ const ProfileHeader = ({ userProfile, isOwnProfile }) => {
                 : userProfile?.profilePic
             }
             alt={userProfile?.name}
-            className="w-32 h-32 border-4 border-black dark:border-white bg-white dark:bg-black transition-transform hover:scale-105"
+            className="w-32 h-32 border-4 border-black dark:border-darkBorder bg-white dark:bg-black transition-transform hover:scale-105"
           />
         </div>
 
-        <div className="mb-4">
-          <h1 className="text-3xl font-bold flex items-center">
+        <div className="mb-0">
+          <h1 className="text-3xl font-bold flex items-center dark:text-zinc-100">
             {userProfile?.name}
             <VerificationBadge role={userProfile?.role} />
           </h1>
-          <p className="text-black/50 dark:text-white/50">
+          <p className="text-black/50 dark:text-zinc-100/50">
             {userProfile?.email}
           </p>
         </div>
@@ -232,31 +233,46 @@ const ProfileHeader = ({ userProfile, isOwnProfile }) => {
 
 // Stats Card Component
 const StatsCard = ({ userProfile }) => (
-  <div className="grid grid-cols-3 gap-4 p-4 border-4 border-black dark:border-white hover:translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#000] dark:hover:shadow-[4px_4px_0_0_#fff] transition-all">
-    <StatItem label="Followers" count={userProfile?.followers?.length || 0} />
-    <StatItem label="Following" count={userProfile?.following?.length || 0} />
-    <StatItem label="Friends" count={userProfile?.friends?.length || 0} />
+  <div className="grid grid-cols-3 border-2 border-black  border-r-0 dark:border-darkBorder hover:translate-x-1 hover:-translate-y-1 hover:shadow-[8px_8px_0_0_#000] dark:hover:shadow-[8px_8px_0_0_rgba(56,68,77,0.4)] transition-all">
+    <StatItem
+      id={userProfile?._id}
+      label="Followers"
+      count={userProfile?.followers?.length || 0}
+    />
+    <StatItem
+      id={userProfile?._id}
+      label="Following"
+      count={userProfile?.following?.length || 0}
+    />
+    <StatItem
+      id={userProfile?._id}
+      label="Friends"
+      count={userProfile?.friends?.length || 0}
+    />
   </div>
 );
 
 // Stat Item Component
-const StatItem = ({ label, count }) => (
-  <div className="text-center">
-    <p className="text-2xl font-bold">{count}</p>
-    <p className="text-sm text-black/50 dark:text-white/50">{label}</p>
-  </div>
+const StatItem = ({ label, count, id }) => (
+  <Link
+    href={`/profile/${id}/${label.toLowerCase()}`}
+    className="text-center border-r-2 py-4 border-black dark:hover:bg-[#38444d1a] cursor-pointer transition-all dark:border-darkBorder"
+  >
+    <p className="text-2xl font-bold dark:text-zinc-100">{count}</p>
+    <p className="text-sm text-black/50 dark:text-zinc-100/70">{label}</p>
+  </Link>
 );
 
 // Profile Info Component
 const ProfileInfo = ({ userProfile }) => (
-  <div className="p-4 border-4 border-black dark:border-white hover:translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#000] dark:hover:shadow-[4px_4px_0_0_#fff] transition-all">
-    <h3 className="font-bold mb-2">About</h3>
+  <div className="p-4 border-2 border-black dark:border-darkBorder dark:hover:bg-[#38444d1a] hover:translate-x-1 hover:-translate-y-1 hover:shadow-[8px_8px_0_0_#000] dark:hover:shadow-[8px_8px_0_0_rgba(56,68,77,0.4)] transition-all">
+    <h3 className="font-bold mb-2 dark:text-zinc-100">About</h3>
     {userProfile?.bio ? (
-      <p className="text-black/70 dark:text-white/70 whitespace-pre-wrap">
+      <p className="text-black/70 dark:text-zinc-100/70 whitespace-pre-wrap">
         {userProfile.bio}
       </p>
     ) : (
-      <p className="text-black/50 dark:text-white/50 italic">
+      <p className="text-black/50 dark:text-zinc-100/50 italic">
         No bio added yet
       </p>
     )}
@@ -265,8 +281,8 @@ const ProfileInfo = ({ userProfile }) => (
 
 // Account Status Component
 const AccountStatus = ({ userProfile }) => (
-  <div className="p-4 border-4 border-black dark:border-white hover:translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#000] dark:hover:shadow-[4px_4px_0_0_#fff] transition-all">
-    <h3 className="font-bold mb-2">Account Status</h3>
+  <div className="p-4 border-2 border-black dark:border-darkBorder dark:hover:bg-[#38444d1a] hover:translate-x-1 hover:-translate-y-1 hover:shadow-[8px_8px_0_0_#000] dark:hover:shadow-[8px_8px_0_0_rgba(56,68,77,0.4)] transition-all">
+    <h3 className="font-bold mb-2 dark:text-zinc-100">Account Status</h3>
     <div className="space-y-2">
       <StatusIndicator
         isActive={userProfile?.isVerified}
@@ -288,7 +304,7 @@ const AccountStatus = ({ userProfile }) => (
 
 // Status Indicator Component
 const StatusIndicator = ({ isActive, activeColor, inactiveColor, label }) => (
-  <p className="flex items-center gap-2">
+  <p className="flex items-center gap-2 dark:text-zinc-100/80">
     <span
       className={`w-2 h-2 rounded-full ${
         isActive ? activeColor : inactiveColor
@@ -308,7 +324,7 @@ const TimeInfo = ({ label, date }) => (
 // Posts Section Component
 const PostsSection = ({ userPosts }) => (
   <div className="md:col-span-2 space-y-6">
-    <h2 className="text-2xl font-bold mb-6">Posts</h2>
+    <h2 className="text-2xl font-bold mb-6 dark:text-zinc-100">Posts</h2>
     {userPosts?.length > 0 ? (
       userPosts.map((post) => (
         <motion.div
@@ -462,10 +478,8 @@ export default function ProfileClient({ userId }) {
 
             {isOwnProfile ? (
               <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
                 onClick={() => setIsEditModalOpen(true)}
-                className="w-full px-4 py-2 border-2 border-black dark:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all"
+                className="w-full px-4 py-2 border-2 border-black dark:border-darkBorder hover:bg-black hover:text-white dark:hover:bg-darkHover dark:text-zinc-100 transition-all"
               >
                 Edit Profile
               </motion.button>
@@ -476,7 +490,7 @@ export default function ProfileClient({ userId }) {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={handleFollow}
-                  className="w-full px-4 py-2 border-2 border-black dark:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all"
+                  className="w-full px-4 py-2 border-2 border-black dark:border-darkBorder hover:bg-black hover:text-white dark:hover:bg-darkHover dark:hover:text-zinc-100 transition-all"
                 >
                   {userProfile?.friendshipStatus === "following"
                     ? "Unfollow"
@@ -489,7 +503,7 @@ export default function ProfileClient({ userId }) {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleFriendRequest}
-                    className="w-full px-4 py-2 bg-black text-white dark:bg-white dark:text-black border-2 border-black dark:border-white hover:opacity-90 transition-all"
+                    className="w-full px-4 py-2 bg-black text-white dark:bg-white dark:text-black border-2 border-black dark:border-darkBorder hover:opacity-90 transition-all"
                   >
                     Add Friend
                   </motion.button>

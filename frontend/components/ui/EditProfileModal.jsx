@@ -74,9 +74,11 @@ export default function EditProfileModal({ isOpen, onClose, user, onSave }) {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="relative w-full max-w-md mx-4 bg-white dark:bg-black border-4 border-black dark:border-white p-6"
+            className="relative w-full max-w-md mx-4 bg-white dark:bg-[#15202B]/90 backdrop-blur-lg border-4 border-black dark:border-darkBorder p-6"
           >
-            <h2 className="text-2xl font-bold mb-6">Edit Profile</h2>
+            <h2 className="text-2xl font-bold mb-6 dark:text-zinc-100">
+              Edit Profile
+            </h2>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Profile Picture */}
@@ -88,7 +90,7 @@ export default function EditProfileModal({ isOpen, onClose, user, onSave }) {
                   <img
                     src={previewUrl || "/default-avatar.png"}
                     alt="Profile"
-                    className="w-full h-full object-cover border-4 border-black dark:border-white"
+                    className="w-full h-full object-cover border-4 border-black dark:border-darkBorder"
                   />
                   <input
                     ref={fileInputRef}
@@ -110,27 +112,31 @@ export default function EditProfileModal({ isOpen, onClose, user, onSave }) {
 
               {/* Name */}
               <div>
-                <label className="block text-sm font-medium mb-2">Name</label>
+                <label className="block text-sm font-medium mb-2 dark:text-zinc-100">
+                  Name
+                </label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, name: e.target.value }))
                   }
-                  className="w-full bg-transparent border-2 border-black dark:border-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full bg-transparent border-2 border-black dark:border-darkBorder p-2 focus:outline-none dark:text-zinc-100"
                   maxLength={50}
                 />
               </div>
 
               {/* Bio */}
               <div>
-                <label className="block text-sm font-medium mb-2">Bio</label>
+                <label className="block text-sm font-medium mb-2 dark:text-zinc-100">
+                  Bio
+                </label>
                 <textarea
                   value={formData.bio}
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, bio: e.target.value }))
                   }
-                  className="w-full bg-transparent border-2 border-black dark:border-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full bg-transparent border-2 border-black dark:border-darkBorder p-2 focus:outline-none dark:text-zinc-100 resize-none"
                   rows={4}
                   maxLength={160}
                 />
@@ -139,20 +145,16 @@ export default function EditProfileModal({ isOpen, onClose, user, onSave }) {
               {/* Actions */}
               <div className="flex gap-4">
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={isLoading}
-                  className="flex-1 px-4 py-2 bg-black dark:bg-white text-white dark:text-black font-medium hover:bg-black/80 dark:hover:bg-white/80 disabled:opacity-50 transition-colors"
+                  className="flex-1 px-4 py-2 bg-black dark:bg-transparent dark:border-2 dark:border-darkBorder text-white dark:text-zinc-100 font-medium hover:bg-black/80 dark:hover:bg-darkHover disabled:opacity-50 transition-colors"
                 >
                   {isLoading ? "Saving..." : "Save Changes"}
                 </motion.button>
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
                   type="button"
                   onClick={onClose}
-                  className="flex-1 px-4 py-2 border-2 border-black dark:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all"
+                  className="flex-1 px-4 py-2 border-2 border-black dark:text-zinc-100 dark:border-darkBorder hover:bg-black hover:text-white dark:hover:bg-darkHover dark:hover:text-zinc-100 transition-all"
                 >
                   Cancel
                 </motion.button>

@@ -2,7 +2,7 @@ import HomeClient from "@/components/HomeClient";
 
 //declare metadata for home page
 export const metadata = {
-  title: "Home | Post Treck",
+  title: "Feed | Post Treck",
   description: "Share your thoughts with the world",
 };
 

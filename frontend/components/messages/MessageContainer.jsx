@@ -4,12 +4,14 @@ import useMessages from "@/store/useMessages";
 import useAuthStore from "@/store/authStore";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { Cross, X, Image as ImageIcon } from "lucide-react";
 
 const MessageContainer = () => {
-  const { selectedChat, sendMessage } = useMessages();
+  const { selectedChat, setSelectedChat, sendMessage } = useMessages();
   const { user } = useAuthStore();
   const [message, setMessage] = useState("");
   const [file, setFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -27,6 +29,31 @@ const MessageContainer = () => {
     sendMessage(message, selectedChat._id, file);
     setMessage("");
     setFile(null);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFile(file);
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  const handleRemoveFile = () => {
+    setFile(null);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+    }
   };
 
   if (!selectedChat) {
@@ -60,22 +87,43 @@ const MessageContainer = () => {
     <div className="h-full overflow-y-auto flex flex-col">
       {/* Chat Header */}
       <div className="p-4 border-b-2 border-black dark:border-darkBorder">
-        <div className="flex items-center gap-3">
-          <div className="relative w-10 h-10 border-2 border-black dark:border-darkBorder">
-            <Image
-              fill
-              sizes="40px"
-              className="object-cover"
-              src={
-                selectedChat.participants.find((p) => p._id !== user._id)
-                  ?.profilePic || "/default-avatar.png"
-              }
-              alt="Profile"
-            />
+        <div className="flex items-center gap-3 justify-between">
+          <div className="flex items-center gap-3">
+            <div className="relative w-10 h-10 border-2 border-black dark:border-darkBorder">
+              <Image
+                fill
+                sizes="40px"
+                className="object-cover"
+                src={
+                  selectedChat.participants.find((p) => p._id !== user._id)
+                    ?.profilePic || "/default-avatar.png"
+                }
+                alt="Profile"
+              />
+            </div>
+            <div>
+              <h2 className="font-bold text-lg dark:text-zinc-100">
+                {
+                  selectedChat.participants.find((p) => p._id !== user._id)
+                    ?.name
+                }
+              </h2>
+              <p className="text-sm text-black/50 dark:text-zinc-100/70">
+                {
+                  selectedChat.participants.find((p) => p._id !== user._id)
+                    ?.email
+                }
+              </p>
+            </div>
           </div>
-          <h2 className="font-bold text-lg dark:text-zinc-100">
-            {selectedChat.participants.find((p) => p._id !== user._id)?.name}
-          </h2>
+          <div>
+            <button
+              onClick={() => setSelectedChat(null)}
+              className="p-2 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            >
+              <X className="w-6 h-6 dark:text-zinc-100" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -127,69 +175,55 @@ const MessageContainer = () => {
         className="p-4 border-t-2 border-black dark:border-darkBorder"
       >
         <div className="flex gap-2">
-          <label className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg cursor-pointer">
+          <label className="p-2 hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer">
             <input
               type="file"
               className="hidden"
               accept="image/*"
-              onChange={(e) => setFile(e.target.files[0])}
+              onChange={handleFileChange}
             />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="w-6 h-6 dark:text-zinc-100"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-              />
-            </svg>
+            <ImageIcon className="w-6 h-6 dark:text-zinc-100" />
           </label>
           <input
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1 bg-transparent border-2 border-black dark:border-darkBorder p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white dark:text-zinc-100 placeholder:text-black/50 dark:placeholder:text-white/50"
+            className="flex-1 bg-transparent border-2 border-black dark:border-darkBorder p-2 focus:outline-none dark:text-zinc-100 placeholder:text-black/50 dark:placeholder:text-white/50"
           />
           <button
             type="submit"
-            className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black font-bold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="px-4 py-2 bg-black dark:bg-darkBorder text-white dark:text-zinc-100 font-bold hover:opacity-90 transition-opacity disabled:opacity-50"
             disabled={!message.trim() && !file}
           >
             Send
           </button>
         </div>
         {file && (
-          <div className="mt-2 p-2 border-2 border-black dark:border-darkBorder rounded-lg">
-            <div className="flex items-center justify-between">
-              <span className="text-sm truncate dark:text-zinc-100">
-                {file.name}
-              </span>
-              <button
-                type="button"
-                onClick={() => setFile(null)}
-                className="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-5 h-5 dark:text-zinc-100"
+          <div className="mt-2">
+            <div className="p-2 border-2 border-black dark:border-darkBorder">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm truncate dark:text-zinc-100">
+                  {file.name}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleRemoveFile}
+                  className="p-1 hover:bg-black/5 dark:hover:bg-white/5"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
+                  <X className="w-5 h-5 dark:text-zinc-100" />
+                </button>
+              </div>
+              {previewUrl && (
+                <div className="relative w-full h-[200px]">
+                  <Image
+                    src={previewUrl}
+                    alt="Preview"
+                    fill
+                    className="object-contain"
                   />
-                </svg>
-              </button>
+                </div>
+              )}
             </div>
           </div>
         )}

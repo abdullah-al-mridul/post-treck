@@ -9,7 +9,9 @@ import postRoutes from "./routes/post.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import chatRoutes from "./routes/chat.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
-
+import { socektConnection } from "./socket/socket-io.js";
+import { Server } from "socket.io";
+import { createServer } from "http";
 dotenv.config();
 
 const server = express();
@@ -48,7 +50,13 @@ server.use((err, req, res, next) => {
     message,
   });
 });
-
-server.listen(process.env.PORT || 3000, () => {
+const httpServer = createServer(server);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*",
+  },
+});
+socektConnection(io);
+httpServer.listen(process.env.PORT || 3000, () => {
   console.log(`Server is running on port ${process.env.PORT || 3000}`);
 });

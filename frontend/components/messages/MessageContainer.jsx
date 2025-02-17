@@ -5,30 +5,76 @@ import useAuthStore from "@/store/authStore";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Cross, X, Image as ImageIcon } from "lucide-react";
+import { socket } from "@/socket/socket-client";
 
 const MessageContainer = () => {
-  const { selectedChat, setSelectedChat, sendMessage } = useMessages();
+  // Store hooks
+  const {
+    selectedChat,
+    selectedChatMessages,
+    setSelectedChat,
+    sendMessage,
+    updateSelectedChat,
+  } = useMessages();
   const { user } = useAuthStore();
+
+  // State hooks
   const [message, setMessage] = useState("");
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [isTyping, setIsTyping] = useState(false);
+
+  // Ref hooks
   const messagesEndRef = useRef(null);
+
+  // Effect for scrolling to bottom
+  useEffect(() => {
+    scrollToBottom();
+  }, [selectedChatMessages]);
+
+  // Effect for typing status
+  useEffect(() => {
+    if (selectedChat) {
+      if (message.trim()) {
+        socket.emit("typing", { chatId: selectedChat._id, isTyping: true });
+      } else {
+        socket.emit("typing", { chatId: selectedChat._id, isTyping: false });
+      }
+    }
+  }, [message, selectedChat]);
+
+  // Effect for socket typing event
+  useEffect(() => {
+    socket.on("userTyping", ({ chatId, isTyping }) => {
+      setIsTyping(isTyping);
+    });
+  }, []);
+
+  // Effect for cleaning up preview URL
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [selectedChat?.messages]);
-
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!message.trim() && !file) return;
 
+    socket.on("new-message", (message) => {
+      updateSelectedChat(message);
+    });
+
     sendMessage(message, selectedChat._id, file);
     setMessage("");
     setFile(null);
+    setPreviewUrl(null);
   };
 
   const handleFileChange = (e) => {
@@ -39,14 +85,6 @@ const MessageContainer = () => {
       setPreviewUrl(url);
     }
   };
-
-  useEffect(() => {
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
-  }, [previewUrl]);
 
   const handleRemoveFile = () => {
     setFile(null);
@@ -114,6 +152,11 @@ const MessageContainer = () => {
                     ?.email
                 }
               </p>
+              {isTyping && (
+                <p className="text-sm text-black/50 dark:text-zinc-100/70">
+                  Typing...
+                </p>
+              )}
             </div>
           </div>
           <div>
@@ -129,7 +172,7 @@ const MessageContainer = () => {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {selectedChat.messages.map((message) => (
+        {selectedChatMessages?.map((message) => (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

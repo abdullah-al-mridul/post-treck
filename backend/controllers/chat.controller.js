@@ -1,6 +1,6 @@
 import Chat from "../models/Chat.model.js";
 import User from "../models/User.model.js";
-
+import { emitMessage } from "../socket/socket-io.js";
 // Get or Create Chat
 export const getOrCreateChat = async (req, res) => {
   try {
@@ -139,10 +139,11 @@ export const sendMessage = async (req, res) => {
 
     // Here we'll add WebSocket notification later
     // socket.emit('new-message', { chatId, message });
-
+    let socketRes = chat.messages[chat.messages.length - 1];
+    emitMessage("new-message", socketRes);
     res.status(200).json({
       success: true,
-      message: chat.messages[chat.messages.length - 1],
+      message: socketRes,
     });
   } catch (error) {
     res.status(500).json({

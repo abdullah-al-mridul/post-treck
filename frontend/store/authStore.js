@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { useApi } from "@/hooks/useApi";
 import { persist } from "zustand/middleware";
-
 // Validation rules
 const validateField = (name, value) => {
   switch (name) {

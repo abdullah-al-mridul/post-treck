@@ -19,6 +19,12 @@ const useMessages = create((set, get) => ({
     set({ selectedChat: chat });
     set({ selectedChatMessages: chat.messages });
   },
+  updateSelectedChat: (message) => {
+    const messages = get().selectedChatMessages || []; // যদি null হয়, তাহলে empty array রাখো
+    set({
+      selectedChatMessages: [...messages, message],
+    });
+  },
   sendMessage: async (message, chatId, file) => {
     if (file && message.length > 0) {
       const formData = new FormData();

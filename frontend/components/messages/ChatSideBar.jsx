@@ -7,13 +7,24 @@ import { motion } from "framer-motion";
 import Spinner from "../ui/Spinner";
 
 const ChatSideBar = () => {
-  const { loading, userChats, getUserChats, setSelectedChat, selectedChat } =
-    useMessages();
+  const {
+    loading,
+    userChats,
+    setIsSearchModalOpen,
+    getUserChats,
+    setSelectedChat,
+    selectedChat,
+  } = useMessages();
   const { user } = useAuthStore();
 
   useEffect(() => {
     getUserChats();
   }, [getUserChats]);
+
+  const handleOpenSearchModal = () => {
+    setIsSearchModalOpen(true);
+  };
+
   if (loading) {
     return (
       <div className="h-full flex items-center justify-center p-4">
@@ -26,7 +37,10 @@ const ChatSideBar = () => {
     <div className="p-4">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-black dark:text-zinc-100">Messages</h1>
-        <button className="p-2 hover:bg-black/5 dark:hover:bg-[rgba(247,249,249,0.1)] ggtransition-colors">
+        <button
+          onClick={handleOpenSearchModal}
+          className="p-2 hover:bg-black/5 dark:hover:bg-[rgba(247,249,249,0.1)] ggtransition-colors"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

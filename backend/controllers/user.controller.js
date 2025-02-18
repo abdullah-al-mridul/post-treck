@@ -346,3 +346,42 @@ export const getUserProfile = async (req, res) => {
     });
   }
 };
+
+// Search Users
+export const searchUsers = async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    if (!query) {
+      return res.status(200).json({
+        success: true,
+        users: [],
+      });
+    }
+
+    // Search users by name or email, excluding the current user
+    const users = await User.find({
+      $and: [
+        { _id: { $ne: req.user._id } }, // Exclude current user
+        {
+          $or: [
+            { name: { $regex: query, $options: "i" } },
+            { email: { $regex: query, $options: "i" } },
+          ],
+        },
+      ],
+    })
+      .select("name email profilePic role")
+      .limit(10);
+
+    res.status(200).json({
+      success: true,
+      users,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

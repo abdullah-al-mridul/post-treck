@@ -10,6 +10,7 @@ import {
   getProfile,
   getUserProfile,
   updateCoverPhoto,
+  searchUsers,
 } from "../controllers/user.controller.js";
 import { upload, coverUpload } from "../config/cloudinary.js";
 
@@ -43,5 +44,6 @@ router.post(
   acceptFriendRequest
 );
 router.get("/friends", protect, requireVerification, getFriends);
+router.get("/search", protect, requireVerification, searchUsers);
 
 export default router;

@@ -211,7 +211,7 @@ export const getUserChats = async (req, res) => {
     const chats = await Chat.find({
       participants: req.user._id,
     })
-      .populate("participants", "name email profilePic")
+      .populate("participants", "name email profilePic role")
       .populate({
         path: "messages",
         options: { sort: { createdAt: -1 }, limit: 1 }, // Get only last message

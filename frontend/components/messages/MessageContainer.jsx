@@ -3,14 +3,166 @@ import React, { useState, useRef, useEffect } from "react";
 import useMessages from "@/store/useMessages";
 import useAuthStore from "@/store/authStore";
 import Image from "next/image";
-import { m, motion } from "framer-motion";
-import { Cross, X, Image as ImageIcon } from "lucide-react";
+import { m, motion, AnimatePresence } from "framer-motion";
+import { Cross, X, Image as ImageIcon, Search } from "lucide-react";
 import { socket } from "@/socket/socket-client";
+import Link from "next/link";
+
+const SearchUserModal = ({ onClose }) => {
+  const { isSearchModalOpen } = useMessages();
+  const [searchQuery, setSearchQuery] = useState("");
+  const { isSearching, searchedUsers, setSearchedUsers } = useMessages();
+  useEffect(() => {
+    setSearchedUsers(searchQuery);
+  }, [searchQuery]);
+  useEffect(() => {
+    console.log(searchedUsers);
+  }, [searchedUsers]);
+  return (
+    <AnimatePresence>
+      {isSearchModalOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 bg-black/50 dark:bg-darkBorder/10 backdrop-blur-md flex items-center justify-center z-50"
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{
+              scale: 1,
+              opacity: 1,
+              transition: {
+                type: "spring",
+                duration: 0.3,
+              },
+            }}
+            exit={{
+              scale: 0.9,
+              opacity: 0,
+              transition: {
+                type: "spring",
+                duration: 0.2,
+              },
+            }}
+            className="bg-white dark:bg-[#15202B] dark:border-darkBorder backdrop-blur-md border-2 w-full max-w-md p-6 rounded-none"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold dark:text-zinc-100">
+                Search Users
+              </h2>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+              >
+                <X className="w-6 h-6 dark:text-zinc-100" />
+              </button>
+            </div>
+
+            <div className="relative mb-6">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by name or email..."
+                className="w-full bg-transparent border-2 border-black dark:border-darkBorder p-2 pr-10 focus:outline-none dark:text-zinc-100 placeholder:text-black/50 dark:placeholder:text-white/50"
+              />
+              {isSearching ? (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                    className="w-5 h-5 border-2 border-black/50 dark:border-white/50 !border-t-transparent rounded-full"
+                  />
+                </div>
+              ) : (
+                <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-black/50 dark:text-white/50" />
+              )}
+            </div>
+
+            <div className="max-h-[60vh] overflow-y-auto custom-scrollbar">
+              {/* Search results will go here */}
+              <div className="space-y-2">
+                {/* Placeholder items - will be replaced with actual search results */}
+                {searchedUsers.map((user, idx) => (
+                  <div
+                    id={`${user}+${idx}`}
+                    className="flex items-center gap-3 p-3 hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
+                  >
+                    <div className="relative w-10 h-10 border-2 border-black dark:border-darkBorder">
+                      <Image
+                        fill
+                        sizes="40px"
+                        className="object-cover"
+                        src={
+                          user?.profilePic === "default-avatar.png"
+                            ? "/default-avatar.png"
+                            : user.profilePic
+                        }
+                        alt={`Avatar - ${user.name}`}
+                      />
+                    </div>
+                    <div>
+                      <h3 className="font-bold flex items-center gap-1.5 dark:text-zinc-100">
+                        {user?.name}
+                        {user?.role === "admin" && (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            className="w-4 h-4 text-blue-500"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                        {user?.role === "moderator" && (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            className="w-4 h-4 text-gray-400"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </h3>
+                      <p className="text-sm text-black/50 dark:text-zinc-100/70">
+                        {user?.email}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
 
 const MessageContainer = () => {
   // Store hooks
-  const { selectedChat, selectedChatMessages, setSelectedChat, sendMessage } =
-    useMessages();
+  const {
+    selectedChat,
+    selectedChatMessages,
+    setSelectedChat,
+    setIsSearchModalOpen,
+    sendMessage,
+  } = useMessages();
   const { user } = useAuthStore();
 
   // State hooks
@@ -19,7 +171,6 @@ const MessageContainer = () => {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
   const [fetchedChats, setFetchedChats] = useState([]);
-
   // Ref hooks
   const messagesEndRef = useRef(null);
 
@@ -186,11 +337,56 @@ const MessageContainer = () => {
               />
             </div>
             <div>
-              <h2 className="font-bold text-lg dark:text-zinc-100">
-                {
-                  selectedChat.participants.find((p) => p._id !== user._id)
-                    ?.name
-                }
+              <h2 className="font-bold text-lg dark:text-zinc-100 flex items-center gap-2">
+                <Link
+                  href={`/profile/${
+                    selectedChat.participants.find((p) => p._id !== user._id)
+                      ?._id
+                  }`}
+                  className="flex items-center gap-1"
+                >
+                  {
+                    selectedChat.participants.find((p) => p._id !== user._id)
+                      ?.name
+                  }
+                  {selectedChat.participants.find((p) => p._id !== user._id)
+                    ?.role === "admin" && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="w-4 h-4 text-blue-500"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  )}
+                  {selectedChat.participants.find((p) => p._id !== user._id)
+                    ?.role === "moderator" && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="w-4 h-4 text-gray-400"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  )}
+                </Link>
+                {isTyping && (
+                  <span className="text-sm text-black/50 dark:text-zinc-100/70 flex items-center">
+                    <span className="typing-dot">.</span>
+                    <span className="typing-dot animation-delay-200">.</span>
+                    <span className="typing-dot animation-delay-400">.</span>
+                  </span>
+                )}
               </h2>
               <p className="text-sm text-black/50 dark:text-zinc-100/70">
                 {
@@ -198,14 +394,12 @@ const MessageContainer = () => {
                     ?.email
                 }
               </p>
-              {isTyping && (
-                <p className="text-sm text-black/50 dark:text-zinc-100/70">
-                  Typing...
-                </p>
-              )}
             </div>
           </div>
           <div>
+            {/* <button className="p-2 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+              <Search className="w-6 h-6 dark:text-zinc-100" />
+            </button> */}
             <button
               onClick={() => setSelectedChat(null)}
               className="p-2 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
@@ -217,7 +411,7 @@ const MessageContainer = () => {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-4">
         {fetchedChats?.map((message, index) => (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -230,9 +424,9 @@ const MessageContainer = () => {
             <div
               className={`max-w-[80%] ${
                 message.sender._id === user._id
-                  ? "bg-black text-white dark:bg-white dark:text-black"
+                  ? "bg-black text-white dark:bg-darkHover dark:text-white"
                   : "bg-black/5 dark:bg-white/5"
-              } p-3 rounded-lg`}
+              } p-3`}
             >
               {message.media && (
                 <div className="mb-2">
@@ -241,7 +435,7 @@ const MessageContainer = () => {
                     height={200}
                     src={message.media}
                     alt="media"
-                    className="rounded-lg"
+                    className="rounded-none"
                   />
                 </div>
               )}
@@ -317,6 +511,8 @@ const MessageContainer = () => {
           </div>
         )}
       </form>
+
+      <SearchUserModal onClose={() => setIsSearchModalOpen(false)} />
     </div>
   );
 };

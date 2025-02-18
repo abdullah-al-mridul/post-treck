@@ -6,6 +6,9 @@ const useMessages = create((set, get) => ({
   userChats: [],
   selectedChat: null,
   selectedChatMessages: [],
+  isSearchModalOpen: false,
+  isSearching: false,
+  searchedUsers: [],
   getUserChats: async () => {
     set({ loading: true });
     const { data, error } = await useApi().get("/chats");
@@ -65,6 +68,21 @@ const useMessages = create((set, get) => ({
       }
     } catch (error) {
       set({ error: error.message, loading: false });
+    }
+  },
+  setIsSearchModalOpen: (val) => {
+    set({ isSearchModalOpen: val });
+  },
+  setSearchedUsers: async (searchQuery) => {
+    set({ isSearching: true });
+    try {
+      const { data } = await useApi().get(`/users/search?query=${searchQuery}`);
+      set({ searchedUsers: data.users || [] }); // data.users না থাকলে empty array সেট করো
+    } catch (err) {
+      console.error("Error fetching searched users:", err);
+      set({ error: err.message });
+    } finally {
+      set({ isSearching: false });
     }
   },
 }));

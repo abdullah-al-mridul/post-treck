@@ -8,10 +8,11 @@ import { Cross, X, Image as ImageIcon, Search } from "lucide-react";
 import { socket } from "@/socket/socket-client";
 import Link from "next/link";
 
-const SearchUserModal = ({ onClose }) => {
+export const SearchUserModal = ({ onClose }) => {
   const { isSearchModalOpen } = useMessages();
   const [searchQuery, setSearchQuery] = useState("");
-  const { isSearching, searchedUsers, setSearchedUsers } = useMessages();
+  const { isSearching, searchedUsers, getOrCreateChat, setSearchedUsers } =
+    useMessages();
   useEffect(() => {
     setSearchedUsers(searchQuery);
   }, [searchQuery]);
@@ -77,7 +78,7 @@ const SearchUserModal = ({ onClose }) => {
                       repeat: Infinity,
                       ease: "linear",
                     }}
-                    className="w-5 h-5 border-2 border-black/50 dark:border-white/50 !border-t-transparent rounded-full"
+                    className="w-4 h-4 border-2 border-black/50 dark:border-white/50 !border-t-transparent rounded-full"
                   />
                 </div>
               ) : (
@@ -86,65 +87,93 @@ const SearchUserModal = ({ onClose }) => {
             </div>
 
             <div className="max-h-[60vh] overflow-y-auto custom-scrollbar">
-              {/* Search results will go here */}
               <div className="space-y-2">
-                {/* Placeholder items - will be replaced with actual search results */}
-                {searchedUsers.map((user, idx) => (
-                  <div
-                    id={`${user}+${idx}`}
-                    className="flex items-center gap-3 p-3 hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
-                  >
-                    <div className="relative w-10 h-10 border-2 border-black dark:border-darkBorder">
-                      <Image
-                        fill
-                        sizes="40px"
-                        className="object-cover"
-                        src={
-                          user?.profilePic === "default-avatar.png"
-                            ? "/default-avatar.png"
-                            : user.profilePic
-                        }
-                        alt={`Avatar - ${user.name}`}
-                      />
-                    </div>
-                    <div>
-                      <h3 className="font-bold flex items-center gap-1.5 dark:text-zinc-100">
-                        {user?.name}
-                        {user?.role === "admin" && (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                            className="w-4 h-4 text-blue-500"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        )}
-                        {user?.role === "moderator" && (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                            className="w-4 h-4 text-gray-400"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        )}
-                      </h3>
-                      <p className="text-sm text-black/50 dark:text-zinc-100/70">
-                        {user?.email}
-                      </p>
-                    </div>
+                {!searchQuery ? (
+                  <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <Search className="w-16 h-16 mb-4 text-black/20 dark:text-white/20" />
+                    <p className="text-black/50 dark:text-white/50">
+                      Start typing to search users
+                    </p>
                   </div>
-                ))}
+                ) : searchedUsers.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-16 h-16 mb-4 text-black/20 dark:text-white/20"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+                      />
+                    </svg>
+                    <p className="text-black/50 dark:text-white/50">
+                      No users found matching "{searchQuery}"
+                    </p>
+                  </div>
+                ) : (
+                  searchedUsers.map((user, idx) => (
+                    <div
+                      key={`${user._id}-${idx}`}
+                      onClick={() => getOrCreateChat(user?._id)}
+                      className="flex items-center gap-3 p-3 hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
+                    >
+                      <div className="relative w-10 h-10 border-2 border-black dark:border-darkBorder">
+                        <Image
+                          fill
+                          sizes="40px"
+                          className="object-cover"
+                          src={
+                            user?.profilePic === "default-avatar.png"
+                              ? "/default-avatar.png"
+                              : user.profilePic
+                          }
+                          alt={`Avatar - ${user.name}`}
+                        />
+                      </div>
+                      <div>
+                        <h3 className="font-bold flex items-center gap-1.5 dark:text-zinc-100">
+                          {user?.name}
+                          {user?.role === "admin" && (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              className="w-4 h-4 text-blue-500"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          )}
+                          {user?.role === "moderator" && (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              className="w-4 h-4 text-gray-400"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          )}
+                        </h3>
+                        <p className="text-sm text-black/50 dark:text-zinc-100/70">
+                          {user?.email}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </motion.div>
@@ -156,13 +185,8 @@ const SearchUserModal = ({ onClose }) => {
 
 const MessageContainer = () => {
   // Store hooks
-  const {
-    selectedChat,
-    selectedChatMessages,
-    setSelectedChat,
-    setIsSearchModalOpen,
-    sendMessage,
-  } = useMessages();
+  const { selectedChat, selectedChatMessages, setSelectedChat, sendMessage } =
+    useMessages();
   const { user } = useAuthStore();
 
   // State hooks
@@ -511,8 +535,8 @@ const MessageContainer = () => {
           </div>
         )}
       </form>
-
-      <SearchUserModal onClose={() => setIsSearchModalOpen(false)} />
+      {/* 
+      <SearchUserModal onClose={() => setIsSearchModalOpen(false)} /> */}
     </div>
   );
 };

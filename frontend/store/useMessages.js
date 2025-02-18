@@ -19,8 +19,17 @@ const useMessages = create((set, get) => ({
     }
   },
   setSelectedChat: (chat) => {
-    set({ selectedChat: chat });
-    set({ selectedChatMessages: chat.messages });
+    if (chat) {
+      set({
+        selectedChat: chat,
+        selectedChatMessages: chat.messages || [],
+      });
+    } else {
+      set({
+        selectedChat: null,
+        selectedChatMessages: [],
+      });
+    }
   },
   // updateSelectedChat: (message) => {
   //   const messages = get().selectedChatMessages || []; // যদি null হয়, তাহলে empty array রাখো
@@ -83,6 +92,32 @@ const useMessages = create((set, get) => ({
       set({ error: err.message });
     } finally {
       set({ isSearching: false });
+    }
+  },
+  getOrCreateChat: async (userId) => {
+    set({ loading: true });
+
+    try {
+      const { data } = await useApi().get(`/chats/user/${userId}`);
+      console.log(data);
+      if (data.chat) {
+        set({ selectedChat: data.chat });
+        set({ selectedChatMessages: data.chat.messages });
+        set({ isSearchModalOpen: false });
+
+        set((state) => ({
+          userChats: state.userChats.some((chat) => chat._id === data.chat._id)
+            ? state.userChats
+            : [data.chat, ...state.userChats],
+        }));
+      } else {
+        set({ error: "Chat not found!" });
+      }
+    } catch (err) {
+      console.error("Error in getOrCreateChat:", err);
+      set({ error: err.message });
+    } finally {
+      set({ loading: false });
     }
   },
 }));

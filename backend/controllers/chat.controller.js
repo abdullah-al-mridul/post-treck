@@ -21,7 +21,7 @@ export const getOrCreateChat = async (req, res) => {
         $all: [req.user._id, participantId],
       },
     })
-      .populate("participants", "name email profilePic")
+      .populate("participants", "name email profilePic role")
       .populate({
         path: "messages",
         populate: [

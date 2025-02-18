@@ -19,7 +19,7 @@ const MessageContainer = () => {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
   const [fetchedChats, setFetchedChats] = useState([]);
-  const [selectedChatId, setSelectedChatId] = useState("");
+
   // Ref hooks
   const messagesEndRef = useRef(null);
 
@@ -27,11 +27,7 @@ const MessageContainer = () => {
   useEffect(() => {
     scrollToBottom();
   }, [fetchedChats]);
-  useEffect(() => {
-    if (selectedChat) {
-      setSelectedChatId(selectedChat._id);
-    }
-  }, [selectedChat]);
+
   useEffect(() => {
     if (selectedChat) {
       socket.emit("join-chat", selectedChat._id); // Join the chat room

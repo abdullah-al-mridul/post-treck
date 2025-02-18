@@ -19,50 +19,52 @@ const useMessages = create((set, get) => ({
     set({ selectedChat: chat });
     set({ selectedChatMessages: chat.messages });
   },
-  updateSelectedChat: (message) => {
-    const messages = get().selectedChatMessages || []; // যদি null হয়, তাহলে empty array রাখো
-    set({
-      selectedChatMessages: [...messages, message],
-    });
-  },
+  // updateSelectedChat: (message) => {
+  //   const messages = get().selectedChatMessages || []; // যদি null হয়, তাহলে empty array রাখো
+  //   set({
+  //     selectedChatMessages: [...messages, message],
+  //   });
+  // },
   sendMessage: async (message, chatId, file) => {
-    if (file && message.length > 0) {
-      const formData = new FormData();
-      formData.append("content", message);
-      formData.append("media", file);
-      formData.append("messageType", "text_with_image");
-      const { data, error } = await useApi().post(
-        `/chats/${chatId}/message`,
-        formData
-      );
+    try {
+      let response;
+      if (file && message.length > 0) {
+        const formData = new FormData();
+        formData.append("content", message);
+        formData.append("media", file);
+        formData.append("messageType", "text_with_image");
+        response = await useApi().post(`/chats/${chatId}/message`, formData);
+      } else if (file === null && message.length > 0) {
+        response = await useApi().post(`/chats/${chatId}/message`, {
+          content: message,
+          messageType: "text",
+        });
+      } else if (file && message.length === 0) {
+        const formData = new FormData();
+        formData.append("media", file);
+        formData.append("messageType", "image");
+        response = await useApi().post(`/chats/${chatId}/message`, formData);
+      }
+
+      const { data, error } = response;
       if (error) {
         set({ error: error.message, loading: false });
       } else {
-        set({ selectedChatMessages: data.messages, loading: false });
+        // Update messages while preventing duplicates
+        set((state) => ({
+          selectedChatMessages: Array.from(
+            new Map(
+              [...state.selectedChatMessages, ...data.messages].map((msg) => [
+                msg._id,
+                msg,
+              ])
+            ).values()
+          ),
+          loading: false,
+        }));
       }
-    } else if (file === null && message.length > 0) {
-      const { data, error } = await useApi().post(`/chats/${chatId}/message`, {
-        content: message,
-        messageType: "text",
-      });
-      if (error) {
-        set({ error: error.message, loading: false });
-      } else {
-        set({ selectedChatMessages: data.messages, loading: false });
-      }
-    } else if (file && message.length === 0) {
-      const formData = new FormData();
-      formData.append("media", file);
-      formData.append("messageType", "image");
-      const { data, error } = await useApi().post(
-        `/chats/${chatId}/message`,
-        formData
-      );
-      if (error) {
-        set({ error: error.message, loading: false });
-      } else {
-        set({ selectedChatMessages: data.messages, loading: false });
-      }
+    } catch (error) {
+      set({ error: error.message, loading: false });
     }
   },
 }));

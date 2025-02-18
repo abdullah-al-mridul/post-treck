@@ -3,19 +3,14 @@ import React, { useState, useRef, useEffect } from "react";
 import useMessages from "@/store/useMessages";
 import useAuthStore from "@/store/authStore";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { m, motion } from "framer-motion";
 import { Cross, X, Image as ImageIcon } from "lucide-react";
 import { socket } from "@/socket/socket-client";
 
 const MessageContainer = () => {
   // Store hooks
-  const {
-    selectedChat,
-    selectedChatMessages,
-    setSelectedChat,
-    sendMessage,
-    updateSelectedChat,
-  } = useMessages();
+  const { selectedChat, selectedChatMessages, setSelectedChat, sendMessage } =
+    useMessages();
   const { user } = useAuthStore();
 
   // State hooks
@@ -23,32 +18,74 @@ const MessageContainer = () => {
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
-
+  const [fetchedChats, setFetchedChats] = useState([]);
+  const [selectedChatId, setSelectedChatId] = useState("");
   // Ref hooks
   const messagesEndRef = useRef(null);
 
   // Effect for scrolling to bottom
   useEffect(() => {
     scrollToBottom();
-  }, [selectedChatMessages]);
+  }, [fetchedChats]);
+  useEffect(() => {
+    if (selectedChat) {
+      setSelectedChatId(selectedChat._id);
+    }
+  }, [selectedChat]);
+  useEffect(() => {
+    if (selectedChat) {
+      socket.emit("join-chat", selectedChat._id); // Join the chat room
+    }
+
+    return () => {
+      if (selectedChat) {
+        socket.emit("leave-chat", selectedChat._id); // Leave the chat room when unmount
+      }
+    };
+  }, [selectedChat]);
 
   // Effect for typing status
   useEffect(() => {
     if (selectedChat) {
       if (message.trim()) {
-        socket.emit("typing", { chatId: selectedChat._id, isTyping: true });
+        socket.emit("typing", {
+          chatId: selectedChat._id,
+          userId: user._id,
+          isTyping: true,
+        });
       } else {
-        socket.emit("typing", { chatId: selectedChat._id, isTyping: false });
+        socket.emit("typing", {
+          chatId: selectedChat._id,
+          userId: user._id,
+          isTyping: false,
+        });
       }
     }
   }, [message, selectedChat]);
 
   // Effect for socket typing event
   useEffect(() => {
-    socket.on("userTyping", ({ chatId, isTyping }) => {
-      setIsTyping(isTyping);
+    let typingTimeout;
+
+    socket.on("userTyping", ({ chatId, userId, isTyping }) => {
+      if (chatId === selectedChat?._id) {
+        setIsTyping(isTyping);
+
+        // যদি ইউজার টাইপ করা বন্ধ করে তাহলে ৩ সেকেন্ড পর isTyping ফালস হয়ে যাবে
+        if (isTyping) {
+          clearTimeout(typingTimeout);
+          typingTimeout = setTimeout(() => {
+            setIsTyping(false);
+          }, 3000);
+        }
+      }
     });
-  }, []);
+
+    return () => {
+      socket.off("userTyping");
+      clearTimeout(typingTimeout);
+    };
+  }, [selectedChat]);
 
   // Effect for cleaning up preview URL
   useEffect(() => {
@@ -63,13 +100,26 @@ const MessageContainer = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Listen for new messages
+  useEffect(() => {
+    socket.on("new-message", (message) => {
+      console.log("📩 New message received:", message);
+      setFetchedChats((prev) => [...prev, message]);
+    });
+
+    return () => {
+      socket.off("new-message");
+    };
+  }, []);
+
+  // Sync fetchedChats with selectedChatMessages
+  useEffect(() => {
+    setFetchedChats(selectedChatMessages);
+  }, [selectedChatMessages]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!message.trim() && !file) return;
-
-    socket.on("new-message", (message) => {
-      updateSelectedChat(message);
-    });
 
     sendMessage(message, selectedChat._id, file);
     setMessage("");
@@ -172,11 +222,11 @@ const MessageContainer = () => {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {selectedChatMessages?.map((message) => (
+        {fetchedChats?.map((message, index) => (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            key={message._id}
+            key={`${message._id}-${index}`}
             className={`flex ${
               message.sender._id === user._id ? "justify-end" : "justify-start"
             }`}

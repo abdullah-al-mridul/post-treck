@@ -7,6 +7,7 @@ import VerificationBadge from "@/components/ui/VerificationBadge";
 import usePostStore from "@/store/postStore";
 import Image from "next/image";
 import Link from "next/link";
+import useOnlineUsers from "@/store/onlineUsersStore";
 
 const ReactionButton = ({
   icon,
@@ -304,7 +305,10 @@ const PostCard = memo(
 
     const { addReaction, removeReaction, getPostReactions, addComment } =
       usePostStore();
+    const { onlineUsers } = useOnlineUsers();
 
+    const isOnline = onlineUsers.indexOf(post.user._id) > -1;
+    console.log(isOnline);
     // Fetch post reactions when component mounts
     useEffect(() => {
       const fetchPostReactions = async () => {
@@ -411,19 +415,24 @@ const PostCard = memo(
         {/* Post Header */}
         <div className="flex items-center gap-4 mb-6">
           <div className="flex-1 flex items-center gap-4">
-            <Image
-              width={48}
-              height={48}
-              placeholder="blur"
-              blurDataURL={post?.user?.profilePic}
-              src={
-                post?.user?.profilePic === "default-avatar.png"
-                  ? "/default-avatar.png"
-                  : post?.user?.profilePic
-              }
-              alt={post?.user?.name}
-              className="w-12 h-12 border-2 border-black dark:border-darkBorder"
-            />
+            <div className=" relative">
+              <Image
+                width={48}
+                height={48}
+                placeholder="blur"
+                blurDataURL={post?.user?.profilePic}
+                src={
+                  post?.user?.profilePic === "default-avatar.png"
+                    ? "/default-avatar.png"
+                    : post?.user?.profilePic
+                }
+                alt={post?.user?.name}
+                className="w-12 h-12 border-2 border-black dark:border-darkBorder"
+              />{" "}
+              {isOnline && (
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-[#15202B]" />
+              )}
+            </div>
             <div>
               <h3 className="font-bold text-lg flex items-center">
                 <Link

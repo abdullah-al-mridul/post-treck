@@ -1,5 +1,5 @@
 let ioInstance;
-
+let onlineUsers = new Map();
 const socektConnection = (io) => {
   ioInstance = io;
 
@@ -26,9 +26,19 @@ const socektConnection = (io) => {
       console.log("👤 User typing:", userId, isTyping);
       socket.to(chatId).emit("userTyping", { chatId, userId, isTyping });
     });
+    socket.on("user-online", (userId) => {
+      console.log("user online:" + userId);
+      onlineUsers.set(userId, socket.id);
+      io.emit("online-users", Array.from(onlineUsers.keys()));
+    });
 
     socket.on("disconnect", () => {
       console.log("❌ A user disconnected: " + socket.id);
+      let userId = [...onlineUsers.entries()].find(
+        ([_, id]) => id === socket.id
+      )?.[0];
+      if (userId) onlineUsers.delete(userId);
+      io.emit("online-users", Array.from(onlineUsers.keys()));
     });
   });
 };

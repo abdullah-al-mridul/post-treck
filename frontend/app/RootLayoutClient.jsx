@@ -5,16 +5,34 @@ import useAuthStore from "@/store/authStore";
 import { Navbar } from "@/components/ui/Navbar";
 import { Sidebar } from "@/components/ui/Sidebar";
 import { motion } from "framer-motion";
+import { socket } from "@/socket/socket-client";
+import useOnlineUsers from "@/store/onlineUsersStore";
 const letters = "LOADING".split("");
 export default function RootLayoutClient({ children }) {
   const { theme } = useThemeStore();
   const { loading, user, checkAuth } = useAuthStore();
-
+  const { onlineUsers, setOnlineUsers } = useOnlineUsers();
   // Check auth on mount
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+  useEffect(() => {
+    if (!loading && user?._id) {
+      socket.emit("user-online", user._id);
+    }
 
+    socket.on("online-users", (onlineUsers) => {
+      setOnlineUsers(onlineUsers);
+    });
+
+    return () => {
+      socket.off("online-users");
+    };
+  }, [loading, user]);
+  useEffect(() => {
+    console.log("online users :...");
+    console.log(onlineUsers);
+  }, [onlineUsers]);
   // Handle theme changes
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");

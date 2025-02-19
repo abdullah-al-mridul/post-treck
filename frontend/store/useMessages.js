@@ -1,4 +1,4 @@
-const { create } = require("zustand");
+import { create } from "zustand";
 import { useApi } from "@/hooks/useApi";
 const useMessages = create((set, get) => ({
   loading: false,
@@ -9,6 +9,7 @@ const useMessages = create((set, get) => ({
   isSearchModalOpen: false,
   isSearching: false,
   searchedUsers: [],
+  isSendingMessage: false,
   getUserChats: async () => {
     set({ loading: true });
     const { data, error } = await useApi().get("/chats");
@@ -38,6 +39,7 @@ const useMessages = create((set, get) => ({
   //   });
   // },
   sendMessage: async (message, chatId, file) => {
+    set({ isSendingMessage: true });
     try {
       let response;
       if (file && message.length > 0) {
@@ -77,6 +79,8 @@ const useMessages = create((set, get) => ({
       }
     } catch (error) {
       set({ error: error.message, loading: false });
+    } finally {
+      set({ isSendingMessage: false });
     }
   },
   setIsSearchModalOpen: (val) => {

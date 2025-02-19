@@ -185,8 +185,13 @@ export const SearchUserModal = ({ onClose }) => {
 
 const MessageContainer = () => {
   // Store hooks
-  const { selectedChat, selectedChatMessages, setSelectedChat, sendMessage } =
-    useMessages();
+  const {
+    selectedChat,
+    isSendingMessage,
+    selectedChatMessages,
+    setSelectedChat,
+    sendMessage,
+  } = useMessages();
   const { user } = useAuthStore();
 
   // State hooks
@@ -500,10 +505,22 @@ const MessageContainer = () => {
           />
           <button
             type="submit"
-            className="px-4 py-2 bg-black dark:bg-darkBorder text-white dark:text-zinc-100 font-bold hover:opacity-90 transition-opacity disabled:opacity-50"
-            disabled={!message.trim() && !file}
+            className="px-4 py-2 bg-black dark:bg-darkBorder text-white dark:text-zinc-100 font-bold hover:opacity-90 transition-opacity disabled:opacity-50 min-w-[80px] flex items-center justify-center"
+            disabled={(!message.trim() && !file) || isSendingMessage}
           >
-            Send
+            {isSendingMessage ? (
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{
+                  duration: 1,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+                className="w-4 h-4 border-2 border-white dark:border-zinc-100 !border-t-transparent rounded-full"
+              />
+            ) : (
+              "Send"
+            )}
           </button>
         </div>
         {file && (

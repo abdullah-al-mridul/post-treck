@@ -6,6 +6,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import Spinner from "../ui/Spinner";
 import { SearchUserModal } from "./MessageContainer";
+import useOnlineUsers from "@/store/onlineUsersStore";
 
 const ChatSideBar = () => {
   const {
@@ -17,6 +18,7 @@ const ChatSideBar = () => {
     selectedChat,
   } = useMessages();
   const { user } = useAuthStore();
+  const { onlineUsers } = useOnlineUsers();
 
   useEffect(() => {
     getUserChats();
@@ -62,6 +64,7 @@ const ChatSideBar = () => {
       <div className="space-y-2">
         {userChats.map((chat) => {
           const participant = chat.participants.find((p) => p._id !== user._id);
+          const isOnline = onlineUsers.includes(participant?._id);
 
           return (
             <motion.button
@@ -75,23 +78,28 @@ const ChatSideBar = () => {
                   : "border-transparent hover:border-black dark:hover:border-darkBorder"
               }`}
             >
-              <div className="relative w-12 h-12 border-2 border-black dark:border-darkBorder">
-                {participant?.profilePic !== "default-avatar.png" ? (
-                  <Image
-                    fill
-                    sizes="48px"
-                    className="object-cover"
-                    src={participant.profilePic}
-                    alt={participant.name}
-                  />
-                ) : (
-                  <Image
-                    fill
-                    sizes="48px"
-                    className="object-cover"
-                    src="/default-avatar.png"
-                    alt="Default avatar"
-                  />
+              <div className="relative w-12 h-12">
+                <div className="relative w-full h-full border-2 border-black dark:border-darkBorder">
+                  {participant?.profilePic !== "default-avatar.png" ? (
+                    <Image
+                      fill
+                      sizes="48px"
+                      className="object-cover"
+                      src={participant.profilePic}
+                      alt={participant.name}
+                    />
+                  ) : (
+                    <Image
+                      fill
+                      sizes="48px"
+                      className="object-cover"
+                      src="/default-avatar.png"
+                      alt="Default avatar"
+                    />
+                  )}
+                </div>
+                {isOnline && (
+                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-[#15202B]" />
                 )}
               </div>
               <div className="flex-1 min-w-0 text-left">
@@ -127,8 +135,12 @@ const ChatSideBar = () => {
                   )}
                 </h3>
                 <p className="text-sm text-black/50 dark:text-white/50 truncate">
-                  {chat.messages[chat.messages.length - 1]?.content ||
-                    "No messages yet"}
+                  {chat.messages[chat.messages.length - 1]?.media &&
+                  !chat.messages[chat.messages.length - 1]?.content
+                    ? "Image sent"
+                    : chat.messages[chat.messages.length - 1]?.content ||
+                      (!chat.messages[chat.messages.length - 1] &&
+                        "No messages yet")}
                 </p>
               </div>
             </motion.button>

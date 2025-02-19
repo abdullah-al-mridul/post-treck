@@ -441,6 +441,7 @@ const MessageContainer = () => {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-4">
+        {/* rendering chat bubbles */}
         {fetchedChats?.map((message, index) => (
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -439,7 +439,7 @@ const MessageContainer = () => {
         </div>
       </div>
 
-      {/* Messages */}
+      {/* Messagesy */}
       <div className="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-4">
         {/* rendering chat bubbles */}
         {fetchedChats?.map((message, index) => (

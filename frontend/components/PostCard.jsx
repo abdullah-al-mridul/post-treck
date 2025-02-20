@@ -8,6 +8,8 @@ import usePostStore from "@/store/postStore";
 import Image from "next/image";
 import Link from "next/link";
 import useOnlineUsers from "@/store/onlineUsersStore";
+import useAuthStore from "@/store/authStore";
+import { Trash } from "lucide-react";
 
 const ReactionButton = ({
   icon,
@@ -222,9 +224,9 @@ const CommentSection = ({ post, isVisible }) => {
 };
 
 // Add PostMenu component
-const PostMenu = ({ onReport }) => {
+const PostMenu = ({ postId, onReport, posterId }) => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const { user } = useAuthStore();
   return (
     <div className="relative">
       <button
@@ -264,14 +266,16 @@ const PostMenu = ({ onReport }) => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-black border-4 border-black dark:border-white shadow-lg z-50"
+              className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#15202B] dark:border-darkBorder border-2 border-black shadow-lg z-50"
             >
               <button
                 onClick={() => {
-                  onReport();
+                  onReport(postId, "spam");
                   setIsOpen(false);
                 }}
-                className="w-full px-4 py-2 text-left hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex items-center gap-2 text-red-500"
+                className={`w-full ${
+                  user?._id === posterId ? "border-b-2" : "border-b-0"
+                } border-darkBorder px-4 py-2 text-left hover:bg-black/5 transition-colors dark:hover:bg-[#2B353F] flex items-center gap-2 text-red-500`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -289,6 +293,18 @@ const PostMenu = ({ onReport }) => {
                 </svg>
                 Report Post
               </button>
+              {user?._id === posterId && (
+                <button
+                  onClick={() => {
+                    onReport();
+                    setIsOpen(false);
+                  }}
+                  className="w-full px-4 py-2 text-left dark:hover:bg-[#2B353F] hover:bg-black/5 transition-colors flex items-center gap-2 text-red-500"
+                >
+                  <Trash className="w-5 h-5" />
+                  Delete Post
+                </button>
+              )}
             </motion.div>
           </>
         )}
@@ -303,12 +319,17 @@ const PostCard = memo(
     const [showComments, setShowComments] = useState(false);
     const [localPost, setLocalPost] = useState(post);
 
-    const { addReaction, removeReaction, getPostReactions, addComment } =
-      usePostStore();
+    const {
+      addReaction,
+      reportPost,
+      removeReaction,
+      getPostReactions,
+      addComment,
+    } = usePostStore();
     const { onlineUsers } = useOnlineUsers();
 
     const isOnline = onlineUsers.indexOf(post.user._id) > -1;
-    console.log(isOnline);
+
     // Fetch post reactions when component mounts
     useEffect(() => {
       const fetchPostReactions = async () => {
@@ -401,9 +422,8 @@ const PostCard = memo(
       }
     };
 
-    const handleReport = () => {
-      // TODO: Implement report functionality
-      console.log("Reporting post:", post._id);
+    const handleReport = (postId, reason) => {
+      reportPost(postId, reason);
     };
 
     return (
@@ -465,7 +485,12 @@ const PostCard = memo(
           </div>
 
           {/* Add Menu Button */}
-          <PostMenu onReport={handleReport} />
+
+          <PostMenu
+            postId={post?._id}
+            onReport={handleReport}
+            posterId={post.user._id}
+          />
         </div>
 
         {/* Post Content */}

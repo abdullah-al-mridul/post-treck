@@ -245,6 +245,15 @@ const usePostStore = create((set, get) => ({
       throw error;
     }
   },
+  reportPost: async (postId, reason) => {
+    try {
+      const res = await useApi().post(`/posts/${postId}/report`, {
+        reason,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  },
 }));
 
 export default usePostStore;

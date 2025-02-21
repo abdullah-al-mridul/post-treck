@@ -424,18 +424,20 @@ const PostMenu = ({ postId, onReport, posterId }) => {
               exit={{ opacity: 0, scale: 0.95 }}
               className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#15202B] dark:border-darkBorder border-2 border-black shadow-lg z-50"
             >
-              <button
-                onClick={() => {
-                  setShowReportModal(true);
-                  setIsOpen(false);
-                }}
-                className={`w-full ${
-                  user?._id === posterId ? "border-b-2" : "border-b-0"
-                } border-darkBorder px-4 py-2 text-left hover:bg-black/5 transition-colors dark:hover:bg-[#2B353F] flex items-center gap-2 text-red-500`}
-              >
-                <AlertCircle className="w-5 h-5" />
-                Report Post
-              </button>
+              {user?._id !== posterId && (
+                <button
+                  onClick={() => {
+                    setShowReportModal(true);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full ${
+                    user?._id === posterId ? "border-b-2" : "border-b-0"
+                  } border-darkBorder px-4 py-2 text-left hover:bg-black/5 transition-colors dark:hover:bg-[#2B353F] flex items-center gap-2 text-red-500`}
+                >
+                  <AlertCircle className="w-5 h-5" />
+                  Report Post
+                </button>
+              )}
               {user?._id === posterId && (
                 <button
                   onClick={() => {

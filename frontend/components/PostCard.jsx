@@ -9,7 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import useOnlineUsers from "@/store/onlineUsersStore";
 import useAuthStore from "@/store/authStore";
-import { Trash } from "lucide-react";
+import { Trash, AlertCircle } from "lucide-react";
 
 const ReactionButton = ({
   icon,
@@ -223,10 +223,166 @@ const CommentSection = ({ post, isVisible }) => {
   );
 };
 
+// Add this component before PostCard
+const ReportModal = ({ isOpen, onClose, onSubmit }) => {
+  const [reason, setReason] = useState("spam");
+  const [description, setDescription] = useState("");
+
+  const reportReasons = [
+    {
+      id: "spam",
+      label: "Spam",
+      description: "Repetitive or unwanted content",
+    },
+    {
+      id: "harassment",
+      label: "Harassment",
+      description: "Offensive or bullying behavior",
+    },
+    {
+      id: "inappropriate",
+      label: "Inappropriate",
+      description: "Content that violates community guidelines",
+    },
+    {
+      id: "violence",
+      label: "Violence",
+      description: "Threats or graphic violence",
+    },
+    {
+      id: "other",
+      label: "Other",
+      description: "Other reason not listed above",
+    },
+  ];
+
+  const handleSubmit = () => {
+    if (reason === "other" && !description.trim()) {
+      return; // Don't submit if "other" is selected but no description
+    }
+    onSubmit(reason, description);
+    onClose();
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/50 dark:bg-darkBorder/10 backdrop-blur-md z-[999]"
+          />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed left-[50%] top-[50%] -translate-x-[50%] -translate-y-[50%] w-[calc(100%-2rem)] max-w-md bg-white dark:bg-[#15202B] border-2 border-black dark:border-darkBorder p-6 z-[1000]"
+          >
+            <div className="flex items-start gap-4 mb-6">
+              <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
+              <div>
+                <h2 className="text-xl font-bold dark:text-zinc-100">
+                  Report Post
+                </h2>
+                <p className="text-black/50 dark:text-white/50">
+                  Select a reason for reporting this post
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-2 mb-6">
+              {reportReasons.map((reportReason) => (
+                <label
+                  key={reportReason.id}
+                  className={`block p-4 border-2 cursor-pointer transition-colors ${
+                    reason === reportReason.id
+                      ? "border-black dark:border-darkBorder bg-black/5 dark:bg-white/5"
+                      : "border-transparent hover:border-black dark:hover:border-darkBorder"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="report-reason"
+                      value={reportReason.id}
+                      checked={reason === reportReason.id}
+                      onChange={(e) => setReason(e.target.value)}
+                      className="sr-only"
+                    />
+                    <div
+                      className={`w-4 h-4 border-2 rounded-full ${
+                        reason === reportReason.id
+                          ? "border-black dark:border-darkBorder bg-black dark:bg-darkBorder"
+                          : "border-black/20 dark:border-white/20"
+                      }`}
+                    />
+                    <div>
+                      <p className="font-bold dark:text-zinc-100">
+                        {reportReason.label}
+                      </p>
+                      <p className="text-sm text-black/50 dark:text-white/50">
+                        {reportReason.description}
+                      </p>
+                    </div>
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            {/* Description field for "other" reason */}
+            <AnimatePresence>
+              {reason === "other" && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-6 overflow-hidden"
+                >
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Please describe the issue..."
+                    className="w-full bg-transparent border-2 border-black dark:border-darkBorder p-3 focus:outline-none dark:text-zinc-100 placeholder:text-black/50 dark:placeholder:text-white/50 min-h-[100px] resize-none"
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div className="flex gap-3">
+              <button
+                onClick={onClose}
+                className="flex-1 px-4 py-2 border-2 border-black dark:border-darkBorder font-bold hover:bg-black/5 dark:hover:bg-white/5 transition-colors dark:text-zinc-100"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={reason === "other" && !description.trim()}
+                className="flex-1 px-4 py-2 bg-red-500 text-white font-bold hover:bg-red-600 transition-colors disabled:opacity-50 disabled:hover:bg-red-500"
+              >
+                Report
+              </button>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
+
 // Add PostMenu component
 const PostMenu = ({ postId, onReport, posterId }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
   const { user } = useAuthStore();
+
+  const handleReport = (reason, description = "") => {
+    onReport(postId, reason, description);
+  };
+
   return (
     <div className="relative">
       <button
@@ -270,27 +426,14 @@ const PostMenu = ({ postId, onReport, posterId }) => {
             >
               <button
                 onClick={() => {
-                  onReport(postId, "spam");
+                  setShowReportModal(true);
                   setIsOpen(false);
                 }}
                 className={`w-full ${
                   user?._id === posterId ? "border-b-2" : "border-b-0"
                 } border-darkBorder px-4 py-2 text-left hover:bg-black/5 transition-colors dark:hover:bg-[#2B353F] flex items-center gap-2 text-red-500`}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-                  />
-                </svg>
+                <AlertCircle className="w-5 h-5" />
                 Report Post
               </button>
               {user?._id === posterId && (
@@ -309,6 +452,12 @@ const PostMenu = ({ postId, onReport, posterId }) => {
           </>
         )}
       </AnimatePresence>
+
+      <ReportModal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        onSubmit={handleReport}
+      />
     </div>
   );
 };
@@ -422,8 +571,8 @@ const PostCard = memo(
       }
     };
 
-    const handleReport = (postId, reason) => {
-      reportPost(postId, reason);
+    const handleReport = (postId, reason, desc) => {
+      reportPost(postId, reason, desc);
     };
 
     return (
@@ -521,7 +670,7 @@ const PostCard = memo(
                 fill
                 sizes="100vh"
                 placeholder="blur"
-                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRseHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/2wBDAR0XFx4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRseHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/2wBDAR0XFx4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                 src={post.media[0]}
                 alt="Post content"
                 className="object-cover border border-black dark:border-darkBorder"

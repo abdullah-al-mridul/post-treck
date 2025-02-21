@@ -245,11 +245,19 @@ const usePostStore = create((set, get) => ({
       throw error;
     }
   },
-  reportPost: async (postId, reason) => {
+  reportPost: async (postId, reason, desc) => {
+    console.log(postId, reason, desc);
     try {
-      const res = await useApi().post(`/posts/${postId}/report`, {
-        reason,
-      });
+      if (reason === "other" && desc) {
+        await useApi().post(`/posts/${postId}/report`, {
+          reason,
+          description: desc,
+        });
+      } else {
+        await useApi().post(`/posts/${postId}/report`, {
+          reason,
+        });
+      }
     } catch (err) {
       console.log(err);
     }

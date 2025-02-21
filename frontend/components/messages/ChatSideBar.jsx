@@ -35,7 +35,14 @@ const ChatSideBar = () => {
       </div>
     );
   }
-
+  function selectOtherUserId(unreadCounts, myUserId) {
+    for (const userId in unreadCounts) {
+      if (userId !== myUserId) {
+        return userId;
+      }
+    }
+    return null;
+  }
   return (
     <div className="p-4">
       <div className="flex items-center justify-between mb-6">
@@ -65,6 +72,10 @@ const ChatSideBar = () => {
         {userChats.map((chat) => {
           const participant = chat.participants.find((p) => p._id !== user._id);
           const isOnline = onlineUsers.includes(participant?._id);
+          const unreadCount =
+            chat?.unreadCount[
+              selectOtherUserId(chat?.unreadCount, user?._id)
+            ] || 0;
 
           return (
             <motion.button
@@ -100,6 +111,11 @@ const ChatSideBar = () => {
                 </div>
                 {isOnline && (
                   <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-[#15202B]" />
+                )}
+                {unreadCount > 0 && (
+                  <div className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                    {unreadCount}
+                  </div>
                 )}
               </div>
               <div className="flex-1 min-w-0 text-left">

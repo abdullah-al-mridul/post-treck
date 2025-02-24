@@ -41,7 +41,7 @@ export const getOrCreateChat = async (req, res) => {
       chat = await Chat.create({
         participants: [req.user._id, participantId],
         messages: [],
-        unreadCount: new Map(),
+        unreadCount: {},
       });
       await chat.populate([
         {
@@ -189,7 +189,9 @@ export const markAsRead = async (req, res) => {
     });
 
     // Reset unread count for this user
-    chat.unreadCount.set(req.user._id.toString(), 0);
+    chat.unreadCount[req.user._id.toString()] = 0;
+
+    chat.markModified("unreadCount");
 
     await chat.save();
 

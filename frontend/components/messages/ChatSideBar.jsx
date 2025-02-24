@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import Spinner from "../ui/Spinner";
 import { SearchUserModal } from "./MessageContainer";
 import useOnlineUsers from "@/store/onlineUsersStore";
+import { socket } from "@/socket/socket-client";
 
 const ChatSideBar = () => {
   const {
@@ -16,13 +17,44 @@ const ChatSideBar = () => {
     getUserChats,
     setSelectedChat,
     selectedChat,
+    unreadCounts,
+    setUnReadCount,
   } = useMessages();
   const { user } = useAuthStore();
   const { onlineUsers } = useOnlineUsers();
-
+  function selectOtherUserId(unreadCounts, myUserId) {
+    for (const userId in unreadCounts) {
+      if (userId === myUserId) {
+        console.log(myUserId);
+        return userId;
+      }
+    }
+    return null;
+  }
+  function getOppositeUserId(unreadCounts, myUserId) {
+    for (const userId in unreadCounts) {
+      if (userId !== myUserId) {
+        console.log(myUserId);
+        return userId;
+      }
+    }
+    return null;
+  }
   useEffect(() => {
     getUserChats();
   }, [getUserChats]);
+  useEffect(() => {
+    socket.on("unread", (data) => {
+      console.log(getOppositeUserId(data, user?._id));
+      const userId = getOppositeUserId(data, user?._id);
+      const userIdToCount = selectOtherUserId(data, user?._id);
+      console.log("unread", data);
+      setUnReadCount(userId, data[userIdToCount]);
+    });
+  }, []);
+  useEffect(() => {
+    console.log("updated unread counts", unreadCounts);
+  }, [unreadCounts]);
 
   const handleOpenSearchModal = () => {
     setIsSearchModalOpen(true);
@@ -35,15 +67,7 @@ const ChatSideBar = () => {
       </div>
     );
   }
-  function selectOtherUserId(unreadCounts, myUserId) {
-    for (const userId in unreadCounts) {
-      if (userId === myUserId) {
-        console.log(myUserId);
-        return userId;
-      }
-    }
-    return null;
-  }
+
   return (
     <div className="p-4">
       <div className="flex items-center justify-between mb-6">
@@ -73,11 +97,13 @@ const ChatSideBar = () => {
         {userChats.map((chat) => {
           const participant = chat.participants.find((p) => p._id !== user._id);
           const isOnline = onlineUsers.includes(participant?._id);
+          const otherUserId = selectOtherUserId(chat?.unreadCount, user?._id);
           const unreadCount =
-            chat?.unreadCount[
-              selectOtherUserId(chat?.unreadCount, user?._id)
-            ] || 0;
-
+            otherUserId && chat?.unreadCount
+              ? chat?.unreadCount[otherUserId] || 0
+              : 0;
+          // setUnReadCount(otherUserId, unreadCount[otherUserId]);
+          console.log(chat?.unreadCount);
           return (
             <motion.button
               initial={{ opacity: 0, y: 20 }}
@@ -113,7 +139,7 @@ const ChatSideBar = () => {
                 {isOnline && (
                   <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-[#15202B]" />
                 )}
-                {unreadCount > 0 && (
+                {unreadCounts > 0 && (
                   <div className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
                     {unreadCount}
                   </div>

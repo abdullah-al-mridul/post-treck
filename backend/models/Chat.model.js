@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { emitUnread } from "../socket/socket-io.js";
 
 const messageSchema = new mongoose.Schema(
   {
@@ -76,9 +77,8 @@ const chatSchema = new mongoose.Schema(
       ref: "Message",
     },
     unreadCount: {
-      type: Map,
-      of: Number,
-      default: new Map(),
+      type: Object,
+      default: {},
     },
   },
   {
@@ -88,20 +88,24 @@ const chatSchema = new mongoose.Schema(
 
 // Update unreadCount when new message is added
 chatSchema.pre("save", function (next) {
+  if (!this.unreadCount) {
+    this.unreadCount = {}; // Ensure unreadCount is always an object
+  }
+
   if (this.isModified("messages") && this.messages.length > 0) {
-    // Check if messages array is not empty
     const lastMessage = this.messages[this.messages.length - 1];
 
-    // Update unread count for all participants except sender
     this.participants.forEach((participantId) => {
-      if (participantId.toString() !== lastMessage.sender.toString()) {
-        const currentCount =
-          this.unreadCount.get(participantId.toString()) || 0;
-        this.unreadCount.set(participantId.toString(), currentCount + 1);
+      const participantIdStr = participantId.toString();
+      if (participantIdStr !== lastMessage.sender.toString()) {
+        const currentCount = this.unreadCount[participantIdStr] || 0;
+        this.unreadCount[participantIdStr] = currentCount + 1;
+        console.log("emmiting unread");
+        emitUnread("unread", this.unreadCount);
       }
     });
 
-    // Update lastMessage reference
+    this.markModified("unreadCount"); // Ensure MongoDB detects the change
     this.lastMessage = lastMessage._id;
   }
   next();

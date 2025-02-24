@@ -10,6 +10,7 @@ const useMessages = create((set, get) => ({
   isSearching: false,
   searchedUsers: [],
   isSendingMessage: false,
+  unreadCounts: {},
   getUserChats: async () => {
     set({ loading: true });
     const { data, error } = await useApi().get("/chats");
@@ -132,6 +133,10 @@ const useMessages = create((set, get) => ({
     } catch (err) {
       console.log(err);
     }
+  },
+  setUnReadCount: async (userId, count) => {
+    set({ unreadCounts: { ...get().unreadCounts, [userId]: count } });
+    // console.log(userId, count);
   },
 }));
 

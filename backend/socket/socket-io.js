@@ -49,5 +49,9 @@ const emitMessage = (event, data) => {
     ioInstance.emit(event, data);
   }
 };
-
-export { socektConnection, emitMessage };
+const emitUnread = (event, data) => {
+  if (ioInstance) {
+    ioInstance.emit(event, data);
+  }
+};
+export { socektConnection, emitMessage, emitUnread };

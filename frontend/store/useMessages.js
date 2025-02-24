@@ -25,6 +25,8 @@ const useMessages = create((set, get) => ({
         selectedChat: chat,
         selectedChatMessages: chat.messages || [],
       });
+      console.log("chat selected", chat?._id);
+      get().readMessage(chat?._id);
     } else {
       set({
         selectedChat: null,
@@ -122,6 +124,13 @@ const useMessages = create((set, get) => ({
       set({ error: err.message });
     } finally {
       set({ loading: false });
+    }
+  },
+  readMessage: async (chatId) => {
+    try {
+      await useApi().post(`/chats/${chatId}/read`);
+    } catch (err) {
+      console.log(err);
     }
   },
 }));

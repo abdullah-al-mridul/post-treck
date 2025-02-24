@@ -37,7 +37,8 @@ const ChatSideBar = () => {
   }
   function selectOtherUserId(unreadCounts, myUserId) {
     for (const userId in unreadCounts) {
-      if (userId !== myUserId) {
+      if (userId === myUserId) {
+        console.log(myUserId);
         return userId;
       }
     }

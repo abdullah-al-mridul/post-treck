@@ -22,6 +22,7 @@ const ChatSideBar = () => {
   } = useMessages();
   const { user } = useAuthStore();
   const { onlineUsers } = useOnlineUsers();
+
   function selectOtherUserId(unreadCounts, myUserId) {
     for (const userId in unreadCounts) {
       if (userId === myUserId) {

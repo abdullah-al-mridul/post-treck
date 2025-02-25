@@ -291,7 +291,7 @@ const MessageContainer = () => {
   // Sync fetchedChats with selectedChatMessages
   useEffect(() => {
     setFetchedChats(selectedChatMessages);
-  }, [selectedChatMessages]);
+  }, [selectedChatMessages, selectedChat]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -360,7 +360,10 @@ const MessageContainer = () => {
                 className="object-cover"
                 src={
                   selectedChat.participants.find((p) => p._id !== user._id)
-                    ?.profilePic || "/default-avatar.png"
+                    ?.profilePic !== "default-avatar.png"
+                    ? selectedChat.participants.find((p) => p._id !== user._id)
+                        ?.profilePic
+                    : "/default-avatar.png"
                 }
                 alt="Profile"
               />

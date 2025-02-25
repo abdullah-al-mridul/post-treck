@@ -101,32 +101,105 @@ const UsersClient = () => {
           animate={{ opacity: 1, y: 0 }}
           className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
         >
-          <input
-            type="text"
-            placeholder="Search users..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="p-2 border-2 border-black dark:border-darkBorder bg-transparent dark:text-white"
-          />
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="p-2 border-2 border-black dark:border-darkBorder bg-transparent dark:text-white"
-          >
-            <option value="all">All Roles</option>
-            <option value="user">Users</option>
-            <option value="moderator">Moderators</option>
-            <option value="admin">Admins</option>
-          </select>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="p-2 border-2 border-black dark:border-darkBorder bg-transparent dark:text-white"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="banned">Banned</option>
-          </select>
+          {/* Search Input */}
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full p-3 border-2 border-black dark:border-darkBorder bg-transparent dark:text-white pr-10 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:ring-opacity-20"
+            />
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-black/50 dark:text-white/50">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                />
+              </svg>
+            </div>
+          </div>
+
+          {/* Role Filter */}
+          <div className="relative">
+            <select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              className="w-full appearance-none p-3 border-2 border-black dark:border-darkBorder bg-transparent dark:text-white pr-10 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:ring-opacity-20"
+            >
+              <option value="all" className="bg-white dark:bg-[#15202B]">
+                All Roles
+              </option>
+              <option value="user" className="bg-white dark:bg-[#15202B]">
+                Users
+              </option>
+              <option value="moderator" className="bg-white dark:bg-[#15202B]">
+                Moderators
+              </option>
+              <option value="admin" className="bg-white dark:bg-[#15202B]">
+                Admins
+              </option>
+            </select>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-black/50 dark:text-white/50 pointer-events-none">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                />
+              </svg>
+            </div>
+          </div>
+
+          {/* Status Filter */}
+          <div className="relative">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full appearance-none p-3 border-2 border-black dark:border-darkBorder bg-transparent dark:text-white pr-10 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:ring-opacity-20"
+            >
+              <option value="all" className="bg-white dark:bg-[#15202B]">
+                All Status
+              </option>
+              <option value="active" className="bg-white dark:bg-[#15202B]">
+                Active Users
+              </option>
+              <option value="banned" className="bg-white dark:bg-[#15202B]">
+                Banned Users
+              </option>
+            </select>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-black/50 dark:text-white/50 pointer-events-none">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                />
+              </svg>
+            </div>
+          </div>
         </motion.div>
 
         {/* Users Grid */}

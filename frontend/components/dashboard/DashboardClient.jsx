@@ -3,16 +3,22 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import useAuthStore from "@/store/authStore";
 import Image from "next/image";
+import useAdminStore from "@/store/adminStore";
+import Spinner from "@/components/ui/Spinner";
 
 const DashboardClient = () => {
   const { user } = useAuthStore();
-  const [stats, setStats] = useState({
-    totalUsers: 5,
-    bannedUsers: 0,
-    totalPosts: 13,
-    reportedPosts: 0,
-    activeUsers24h: 3,
-  });
+  const { stats, loading, getStates } = useAdminStore();
+  useEffect(() => {
+    getStates();
+  }, []);
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-24 flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
 
   if (user?.role !== "admin" && user?.role !== "superadmin") {
     return (

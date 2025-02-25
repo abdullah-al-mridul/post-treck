@@ -30,8 +30,8 @@ export default function RootLayoutClient({ children }) {
     };
   }, [loading, user]);
   useEffect(() => {
-    console.log("online users :...");
-    console.log(onlineUsers);
+    // console.log("online users :...");
+    // console.log(onlineUsers);
   }, [onlineUsers]);
   // Handle theme changes
   useEffect(() => {

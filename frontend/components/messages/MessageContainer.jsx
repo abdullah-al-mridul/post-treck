@@ -16,9 +16,9 @@ export const SearchUserModal = ({ onClose }) => {
   useEffect(() => {
     setSearchedUsers(searchQuery);
   }, [searchQuery]);
-  useEffect(() => {
-    console.log(searchedUsers);
-  }, [searchedUsers]);
+  // useEffect(() => {
+  //   console.log(searchedUsers);
+  // }, [searchedUsers]);
   return (
     <AnimatePresence>
       {isSearchModalOpen && (

@@ -7,10 +7,77 @@ import Link from "next/link";
 import Spinner from "@/components/ui/Spinner";
 import useAdminStore from "@/store/adminStore";
 import { formatDate } from "@/utils/formatDate";
+import BanReasonModal from "./BanReasonModal";
+
+const BanButton = ({ user }) => {
+  const { loadingUsers, openBanModal, toggleUserBan, closeBanModal } =
+    useAdminStore();
+  const isLoading = loadingUsers[user._id];
+
+  const handleClick = async (e) => {
+    e.preventDefault();
+    if (user.isBanned) {
+      // Direct unban with loading in card
+      try {
+        openBanModal(user._id, "unban");
+        await toggleUserBan();
+        closeBanModal();
+      } catch (error) {
+        console.log("Failed to unban user");
+        closeBanModal();
+      }
+    } else {
+      // Show modal for ban
+      openBanModal(user._id, "ban");
+    }
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      disabled={user.isBanned && isLoading}
+      className={`
+        px-4 py-2 text-sm font-bold border-2 transition-all
+        ${
+          user.isBanned
+            ? "border-green-500 text-green-500 hover:bg-green-500 hover:text-white dark:border-green-400 dark:text-green-400 dark:hover:bg-green-400 dark:hover:text-black"
+            : "border-red-500 text-red-500 hover:bg-red-500 hover:text-white dark:border-red-400 dark:text-red-400 dark:hover:bg-red-400 dark:hover:text-black"
+        }
+        disabled:opacity-50 disabled:cursor-not-allowed
+      `}
+    >
+      {user.isBanned && isLoading ? (
+        <span className="flex items-center justify-center gap-2">
+          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+              fill="none"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+          Processing...
+        </span>
+      ) : user.isBanned ? (
+        "Unban User"
+      ) : (
+        "Ban User"
+      )}
+    </button>
+  );
+};
 
 const UsersClient = () => {
   const { user } = useAuthStore();
-  const { users, loading, getUsers } = useAdminStore();
+  const { users, loading, getUsers, toggleUserBan } = useAdminStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -213,9 +280,9 @@ const UsersClient = () => {
             >
               <Link
                 href={`/profile/${user._id}`}
-                className="block border-2 border-black dark:border-darkBorder p-4 hover:translate-x-2 hover:-translate-y-2 hover:shadow-[8px_8px_0_0_#000] dark:hover:shadow-[8px_8px_0_0_#38444d] transition-all bg-white dark:bg-[#15202B]/50 backdrop-blur-sm h-full"
+                className="block border-2 border-black dark:border-darkBorder hover:translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#000] dark:hover:shadow-[4px_4px_0_0_rgba(56,68,77,0.4)] transition-all bg-white dark:bg-[#15202B]/50 backdrop-blur-sm h-full"
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 p-3">
                   <div className="relative w-12 h-12 border-2 border-black dark:border-darkBorder">
                     <Image
                       src={
@@ -257,27 +324,32 @@ const UsersClient = () => {
                     <p className="font-mono">{formatDate(user.lastActive)}</p>
                   </div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-black/10 dark:border-white/10 grid grid-cols-3 gap-4 text-sm">
-                  <div>
-                    <p className="text-black/50 dark:text-white/50">Friends</p>
-                    <p className="font-bold dark:text-white">
+                <div className="px-3 pb-3">
+                  <BanButton user={user} />
+                </div>
+                <div className="mt-4 border-t border-black/10 dark:border-white/10 grid grid-cols-3 text-sm">
+                  <div className=" w-full text-center p-3 border-r border-black/10 dark:border-white/10">
+                    <p className="font-bold text-2xl dark:text-white">
                       {user.friends.length}
                     </p>
-                  </div>
-                  <div>
-                    <p className="text-black/50 dark:text-white/50">
-                      Followers
+                    <p className="text-black/50 text-sm dark:text-white/50">
+                      Friends
                     </p>
-                    <p className="font-bold dark:text-white">
+                  </div>
+                  <div className="w-full text-center p-3 border-r border-black/10 dark:border-white/10">
+                    <p className="font-bold text-2xl dark:text-white">
                       {user.followers.length}
                     </p>
-                  </div>
-                  <div>
-                    <p className="text-black/50 dark:text-white/50">
-                      Following
+                    <p className="text-black/50 text-sm dark:text-white/50">
+                      Followers
                     </p>
-                    <p className="font-bold dark:text-white">
+                  </div>
+                  <div className="w-full text-center p-3">
+                    <p className="font-bold text-2xl dark:text-white">
                       {user.following.length}
+                    </p>
+                    <p className="text-black/50 text-sm dark:text-white/50">
+                      Following
                     </p>
                   </div>
                 </div>

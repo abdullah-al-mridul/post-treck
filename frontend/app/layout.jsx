@@ -2,6 +2,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import RootLayoutClient from "./RootLayoutClient";
 import SecureRoute from "@/components/SecureRoute";
+import BanReasonModal from "@/components/dashboard/users/BanReasonModal";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({ children }) {
             <div>{children}</div>
           </SecureRoute>
         </RootLayoutClient>
+        <BanReasonModal />
       </body>
     </html>
   );

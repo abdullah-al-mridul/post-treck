@@ -108,7 +108,7 @@ const UsersClient = () => {
               placeholder="Search users..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full p-3 border-2 border-black dark:border-darkBorder bg-transparent dark:text-white pr-10 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:ring-opacity-20"
+              className="w-full p-3 border-2 border-black dark:border-darkBorder bg-transparent dark:text-white pr-10 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-darkBorder focus:ring-opacity-20"
             />
             <div className="absolute right-3 top-1/2 -translate-y-1/2 text-black/50 dark:text-white/50">
               <svg
@@ -133,7 +133,7 @@ const UsersClient = () => {
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="w-full appearance-none p-3 border-2 border-black dark:border-darkBorder bg-transparent dark:text-white pr-10 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:ring-opacity-20"
+              className="w-full appearance-none p-3 border-2 border-black dark:border-darkBorder bg-transparent dark:text-white pr-10 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-darkBorder focus:ring-opacity-20"
             >
               <option value="all" className="bg-white dark:bg-[#15202B]">
                 All Roles
@@ -171,7 +171,7 @@ const UsersClient = () => {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full appearance-none p-3 border-2 border-black dark:border-darkBorder bg-transparent dark:text-white pr-10 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:ring-opacity-20"
+              className="w-full appearance-none p-3 border-2 border-black dark:border-darkBorder bg-transparent dark:text-white pr-10 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-darkBorder focus:ring-opacity-20"
             >
               <option value="all" className="bg-white dark:bg-[#15202B]">
                 All Status

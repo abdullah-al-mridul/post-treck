@@ -9,6 +9,7 @@ import {
   Settings,
   SquareUser,
   UserPlus,
+  BarChart,
 } from "lucide-react";
 
 export function Sidebar() {
@@ -35,6 +36,11 @@ export function Sidebar() {
       label: "Friend Requests",
       href: `/profile/${user?._id}/friend-requests`,
       icon: <UserPlus className="w-6 h-6 dark:text-zinc-100/60" />,
+    },
+    {
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: <BarChart className="w-6 h-6 dark:text-zinc-100/60" />,
     },
     {
       label: "Settings",

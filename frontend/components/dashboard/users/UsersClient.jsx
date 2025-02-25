@@ -7,7 +7,6 @@ import Link from "next/link";
 import Spinner from "@/components/ui/Spinner";
 import useAdminStore from "@/store/adminStore";
 import { formatDate } from "@/utils/formatDate";
-import BanReasonModal from "./BanReasonModal";
 
 const BanButton = ({ user }) => {
   const { loadingUsers, openBanModal, toggleUserBan, closeBanModal } =
@@ -76,7 +75,7 @@ const BanButton = ({ user }) => {
 };
 
 const UsersClient = () => {
-  const { user } = useAuthStore();
+  const { user: AuthUser } = useAuthStore();
   const { users, loading, getUsers, toggleUserBan } = useAdminStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
@@ -94,7 +93,7 @@ const UsersClient = () => {
     );
   }
 
-  if (user?.role !== "admin" && user?.role !== "superadmin") {
+  if (AuthUser?.role !== "admin" && AuthUser?.role !== "moderator") {
     return (
       <div className="min-h-screen pt-24 px-4">
         <div className="max-w-7xl mx-auto">
@@ -280,7 +279,7 @@ const UsersClient = () => {
             >
               <Link
                 href={`/profile/${user._id}`}
-                className="block border-2 border-black dark:border-darkBorder hover:translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#000] dark:hover:shadow-[4px_4px_0_0_rgba(56,68,77,0.4)] transition-all bg-white dark:bg-[#15202B]/50 backdrop-blur-sm h-full"
+                className="border-2 border-black flex flex-col justify-between dark:border-darkBorder hover:translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#000] dark:hover:shadow-[4px_4px_0_0_rgba(56,68,77,0.4)] transition-all bg-white dark:bg-[#15202B]/50 backdrop-blur-sm h-full"
               >
                 <div className="flex items-center gap-4 p-3">
                   <div className="relative w-12 h-12 border-2 border-black dark:border-darkBorder">
@@ -318,15 +317,22 @@ const UsersClient = () => {
                     <p className="text-black/50 dark:text-white/50 text-sm truncate">
                       {user.email}
                     </p>
+                    {user.isBanned && user.banReason && (
+                      <p className="mt-2 text-red-500 dark:text-red-400 text-sm italic">
+                        Ban reason: {user.banReason}
+                      </p>
+                    )}
                   </div>
                   <div className="text-right text-sm text-black/50 dark:text-white/50">
                     <p>Last active</p>
                     <p className="font-mono">{formatDate(user.lastActive)}</p>
                   </div>
                 </div>
-                <div className="px-3 pb-3">
-                  <BanButton user={user} />
-                </div>
+                {AuthUser?.role === "admin" && AuthUser?._id !== user?._id && (
+                  <div className="px-3 pb-3">
+                    <BanButton user={user} />
+                  </div>
+                )}
                 <div className="mt-4 border-t border-black/10 dark:border-white/10 grid grid-cols-3 text-sm">
                   <div className=" w-full text-center p-3 border-r border-black/10 dark:border-white/10">
                     <p className="font-bold text-2xl dark:text-white">

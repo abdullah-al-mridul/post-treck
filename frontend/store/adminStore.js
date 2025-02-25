@@ -66,7 +66,13 @@ const useAdminStore = create((set, get) => ({
 
       set((state) => ({
         users: state.users.map((user) =>
-          user._id === userId ? { ...user, isBanned: shouldBan } : user
+          user._id === userId
+            ? {
+                ...user,
+                isBanned: shouldBan,
+                banReason: shouldBan ? reason : undefined,
+              }
+            : user
         ),
         stats: {
           ...state.stats,

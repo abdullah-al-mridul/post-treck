@@ -11,10 +11,14 @@ import {
   getUserProfile,
   updateCoverPhoto,
   searchUsers,
+  getStaffUsers,
 } from "../controllers/user.controller.js";
 import { upload, coverUpload } from "../config/cloudinary.js";
 
 const router = express.Router();
+
+// Staff routes
+router.get("/staff", protect, getStaffUsers);
 
 // Profile routes
 router.get("/profile", protect, getProfile); // No verification needed to view own profile

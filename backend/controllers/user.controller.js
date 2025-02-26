@@ -385,3 +385,24 @@ export const searchUsers = async (req, res) => {
     });
   }
 };
+
+export const getStaffUsers = async (req, res) => {
+  try {
+    const staffUsers = await User.find({
+      role: { $in: ["admin", "moderator"] },
+    }).select(
+      "-password -verificationCode -resetPasswordToken -resetPasswordExpires"
+    );
+
+    res.status(200).json({
+      success: true,
+      staffUsers,
+    });
+  } catch (error) {
+    console.error("Error fetching staff users:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching staff users",
+    });
+  }
+};

@@ -68,6 +68,7 @@ const useAuthStore = create(
           },
         },
         lastCodeSentAt: null,
+        refreshingToken: false,
 
         // Form Actions
         setFormData: (type, field, value) => {
@@ -267,6 +268,32 @@ const useAuthStore = create(
 
         // Clear Messages
         clearMessages: () => set({ error: null, successMessage: null }),
+
+        // Add refresh token action
+        refreshToken: async () => {
+          set({ refreshingToken: true, error: null });
+          try {
+            const { data, error, success } = await api.post(
+              "/auth/refresh-token"
+            );
+            if (success) {
+              set({
+                refreshingToken: false,
+                error: null,
+              });
+              return true;
+            } else {
+              set({ error, refreshingToken: false });
+              return false;
+            }
+          } catch (err) {
+            set({
+              error: "Failed to refresh token",
+              refreshingToken: false,
+            });
+            return false;
+          }
+        },
       };
     },
     {

@@ -5,12 +5,14 @@ import useAuthStore from "@/store/authStore";
 import Image from "next/image";
 import useAdminStore from "@/store/adminStore";
 import Spinner from "@/components/ui/Spinner";
+import { formatDate } from "@/utils/formatDate";
 
 const DashboardClient = () => {
   const { user } = useAuthStore();
-  const { stats, loading, getStates } = useAdminStore();
+  const { stats, loading, getStates, getTeam, team } = useAdminStore();
   useEffect(() => {
     getStates();
+    getTeam();
   }, []);
   if (loading) {
     return (
@@ -132,61 +134,53 @@ const DashboardClient = () => {
                   Administrators
                 </h3>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  {[
-                    {
-                      name: "John Doe",
-                      email: "john@posttreck.com",
-                      role: "superadmin",
-                      lastActive: "2024-03-20T10:30:00",
-                      avatar: "/default-avatar.png",
-                    },
-                    {
-                      name: "Jane Smith",
-                      email: "jane@posttreck.com",
-                      role: "admin",
-                      lastActive: "2024-03-20T09:15:00",
-                      avatar: "/default-avatar.png",
-                    },
-                  ].map((admin, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                    >
-                      <div className="block border-2 border-black dark:border-darkBorder p-4 hover:translate-x-2 hover:-translate-y-2 hover:shadow-[8px_8px_0_0_#000] dark:hover:shadow-[8px_8px_0_0_#38444d] transition-all bg-white dark:bg-[#15202B]/50 backdrop-blur-sm h-full">
-                        <div className="flex items-center gap-4">
-                          <div className="relative w-12 h-12 border-2 border-black dark:border-darkBorder">
-                            <Image
-                              src={admin.avatar}
-                              alt={admin.name}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-bold text-lg truncate dark:text-zinc-100 flex items-center gap-2">
-                              {admin.name}
-                              {admin.role === "superadmin" && (
-                                <span className="text-xs bg-black dark:bg-white text-white dark:text-black px-2 py-0.5">
-                                  SUPER
-                                </span>
-                              )}
-                            </h4>
-                            <p className="text-black/50 dark:text-white/50 text-sm truncate">
-                              {admin.email}
-                            </p>
-                          </div>
-                          <div className="text-right text-sm text-black/50 dark:text-white/50">
-                            <p>Last active</p>
-                            <p className="font-mono">
-                              {new Date(admin.lastActive).toLocaleString()}
-                            </p>
+                  {team.map((admin, index) => {
+                    if (admin.role !== "admin") return null;
+                    return (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <div className="block border-2 border-black dark:border-darkBorder p-4 hover:translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#000] dark:hover:shadow-[4px_4px_0_0_rgba(56,68,77,0.4)] transition-all bg-white dark:bg-[#15202B]/50 backdrop-blur-sm h-full">
+                          <div className="flex items-center gap-4">
+                            <div className="relative w-12 h-12 border-2 border-black dark:border-darkBorder">
+                              <Image
+                                src={
+                                  admin.profilePic === "default-avatar"
+                                    ? "/default-avatar.png"
+                                    : admin.profilePic
+                                }
+                                alt={admin.name}
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-bold text-lg truncate dark:text-zinc-100 flex items-center gap-2">
+                                {admin.name}
+                                {admin.role === "admin" && (
+                                  <span className="text-xs bg-black dark:bg-white text-white dark:text-black px-2 py-0.5">
+                                    ADMIN
+                                  </span>
+                                )}
+                              </h4>
+                              <p className="text-black/50 dark:text-white/50 text-sm truncate">
+                                {admin.email}
+                              </p>
+                            </div>
+                            <div className="text-right text-sm text-black/50 dark:text-white/50">
+                              <p>Last active</p>
+                              <p className="font-mono">
+                                {formatDate(admin.lastActive)}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  ))}
+                      </motion.div>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -196,63 +190,54 @@ const DashboardClient = () => {
                   Moderators
                 </h3>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  {[
-                    {
-                      name: "Mike Johnson",
-                      email: "mike@posttreck.com",
-                      role: "moderator",
-                      lastActive: "2024-03-20T11:45:00",
-                      avatar: "/default-avatar.png",
-                    },
-                    {
-                      name: "Sarah Wilson",
-                      email: "sarah@posttreck.com",
-                      role: "moderator",
-                      lastActive: "2024-03-20T10:00:00",
-                      avatar: "/default-avatar.png",
-                    },
-                    {
-                      name: "Alex Brown",
-                      email: "alex@posttreck.com",
-                      role: "moderator",
-                      lastActive: "2024-03-19T23:30:00",
-                      avatar: "/default-avatar.png",
-                    },
-                  ].map((mod, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                    >
-                      <div className="block border-2 border-black dark:border-darkBorder p-4 hover:translate-x-2 hover:-translate-y-2 hover:shadow-[8px_8px_0_0_#000] dark:hover:shadow-[8px_8px_0_0_#38444d] transition-all bg-white dark:bg-[#15202B]/50 backdrop-blur-sm h-full">
-                        <div className="flex items-center gap-4">
-                          <div className="relative w-12 h-12 border-2 border-black dark:border-darkBorder">
-                            <Image
-                              src={mod.avatar}
-                              alt={mod.name}
-                              fill
-                              className="object-cover"
-                            />
+                  {team
+                    .filter((mod) => mod.role === "moderator")
+                    .map((mod, index) => {
+                      return (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                        >
+                          <div className="block border-2 border-black dark:border-darkBorder p-4 hover:translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#000] dark:hover:shadow-[4px_4px_0_0_rgba(56,68,77,0.4)] transition-all bg-white dark:bg-[#15202B]/50 backdrop-blur-sm h-full">
+                            <div className="flex items-center gap-4">
+                              <div className="relative w-12 h-12 border-2 border-black dark:border-darkBorder">
+                                <Image
+                                  src={
+                                    mod.profilePic === "default-avatar"
+                                      ? "/default-avatar.png"
+                                      : mod.profilePic
+                                  }
+                                  alt={mod.name}
+                                  fill
+                                  className="object-cover"
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-bold text-lg truncate dark:text-zinc-100 flex items-center gap-2">
+                                  {mod.name}
+                                  {mod.role === "moderator" && (
+                                    <span className="text-xs bg-black dark:bg-gray-700 text-white dark:text-gray-200 px-2 py-0.5">
+                                      MODERATOR
+                                    </span>
+                                  )}
+                                </h4>
+                                <p className="text-black/50 dark:text-white/50 text-sm truncate">
+                                  {mod.email}
+                                </p>
+                              </div>
+                              <div className="text-right text-sm text-black/50 dark:text-white/50">
+                                <p>Last active</p>
+                                <p className="font-mono">
+                                  {formatDate(mod.lastActive)}
+                                </p>
+                              </div>
+                            </div>
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-bold text-lg truncate dark:text-zinc-100">
-                              {mod.name}
-                            </h4>
-                            <p className="text-black/50 dark:text-white/50 text-sm truncate">
-                              {mod.email}
-                            </p>
-                          </div>
-                          <div className="text-right text-sm text-black/50 dark:text-white/50">
-                            <p>Last active</p>
-                            <p className="font-mono">
-                              {new Date(mod.lastActive).toLocaleString()}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
+                        </motion.div>
+                      );
+                    })}
                 </div>
               </div>
             </motion.div>

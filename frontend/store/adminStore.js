@@ -23,6 +23,7 @@ const useAdminStore = create((set, get) => ({
     userId: null,
     currentRole: null,
   },
+  team: [],
 
   openBanModal: (userId, action) =>
     set({ banModal: { isOpen: true, userId, action } }),
@@ -146,6 +147,17 @@ const useAdminStore = create((set, get) => ({
         },
       }));
       console.log("role changed");
+    }
+  },
+  getTeam: async () => {
+    set({ loading: true });
+    try {
+      const { data } = await useApi().get("/users/staff");
+      set({ team: data.staffUsers });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      set({ loading: false });
     }
   },
 }));

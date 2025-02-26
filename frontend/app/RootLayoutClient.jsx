@@ -104,7 +104,7 @@ export default function RootLayoutClient({ children }) {
     );
   }
   return (
-    <div className={`${theme} min-h-screen dark:bg-[#15202B]`}>
+    <div className={`${theme} min-h-[100dvh] dark:bg-[#15202B]`}>
       {user && (
         <>
           <Navbar />

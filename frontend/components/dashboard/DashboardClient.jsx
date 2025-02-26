@@ -294,7 +294,7 @@ const DashboardClient = () => {
               </svg>
             </div>
             <h1 className="text-4xl font-black dark:text-zinc-100">
-              Admin Dashboard
+              {user.role === "admin" ? "Admin" : "Moderator"} Dashboard
             </h1>
           </motion.div>
           <motion.p

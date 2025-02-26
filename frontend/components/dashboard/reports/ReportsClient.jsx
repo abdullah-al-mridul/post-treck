@@ -281,6 +281,11 @@ const ReportsClient = () => {
                             <div className="text-sm font-medium dark:text-zinc-100">
                               Reason: {reportDetail.reason}
                             </div>
+                            {reportDetail.description && (
+                              <div className="text-sm text-black/70 dark:text-white/70">
+                                Description: {reportDetail.description}
+                              </div>
+                            )}
                           </div>
                         </div>
                       ))}

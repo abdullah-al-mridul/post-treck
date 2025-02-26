@@ -17,12 +17,23 @@ const useAdminStore = create((set, get) => ({
     reportedPosts: 0,
     activeUsers24h: 0,
   },
+  roleModal: {
+    isOpen: false,
+    userId: null,
+    currentRole: null,
+  },
 
   openBanModal: (userId, action) =>
     set({ banModal: { isOpen: true, userId, action } }),
 
   closeBanModal: () =>
     set({ banModal: { isOpen: false, userId: null, action: null } }),
+
+  openRoleModal: (userId, currentRole) =>
+    set({ roleModal: { isOpen: true, userId, currentRole } }),
+
+  closeRoleModal: () =>
+    set({ roleModal: { isOpen: false, userId: null, currentRole: null } }),
 
   getStates: async () => {
     try {
@@ -92,6 +103,48 @@ const useAdminStore = create((set, get) => ({
           [userId]: false,
         },
       }));
+    }
+  },
+  changeUserRole: async (newRole) => {
+    const { roleModal } = get();
+    const { userId } = roleModal;
+    console.log(userId, newRole);
+    set((state) => ({
+      loadingUsers: {
+        ...state.loadingUsers,
+        [userId]: true,
+      },
+    }));
+
+    try {
+      await useApi().post(`/admin/users/${userId}/role`, {
+        role: newRole,
+      });
+
+      set((state) => ({
+        users: state.users.map((user) =>
+          user._id === userId
+            ? {
+                ...user,
+                role: newRole,
+              }
+            : user
+        ),
+        roleModal: { isOpen: false, userId: null, currentRole: null },
+      }));
+
+      console.log(`User role changed successfully`);
+    } catch (error) {
+      console.error(`Failed to change user role:`, error);
+      throw error;
+    } finally {
+      set((state) => ({
+        loadingUsers: {
+          ...state.loadingUsers,
+          [userId]: false,
+        },
+      }));
+      console.log("role changed");
     }
   },
 }));

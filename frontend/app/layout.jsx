@@ -3,6 +3,7 @@ import "./globals.css";
 import RootLayoutClient from "./RootLayoutClient";
 import SecureRoute from "@/components/SecureRoute";
 import BanReasonModal from "@/components/dashboard/users/BanReasonModal";
+import RoleChangeModal from "@/components/dashboard/users/RoleChangeModal";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,6 +26,7 @@ export default function RootLayout({ children }) {
           </SecureRoute>
         </RootLayoutClient>
         <BanReasonModal />
+        <RoleChangeModal />
       </body>
     </html>
   );

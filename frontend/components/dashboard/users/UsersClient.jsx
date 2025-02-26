@@ -74,6 +74,24 @@ const BanButton = ({ user }) => {
   );
 };
 
+const RoleButton = ({ user }) => {
+  const { loadingUsers, openRoleModal } = useAdminStore();
+  const isLoading = loadingUsers[user._id];
+
+  return (
+    <button
+      onClick={(e) => {
+        e.preventDefault();
+        openRoleModal(user._id, user.role);
+      }}
+      disabled={isLoading}
+      className="px-4 py-2 text-sm font-bold border-2 border-black dark:border-white text-black dark:text-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all disabled:opacity-50 disabled:cursor-not-allowed w-full"
+    >
+      Change Role
+    </button>
+  );
+};
+
 const UsersClient = () => {
   const { user: AuthUser } = useAuthStore();
   const { users, loading, getUsers, toggleUserBan } = useAdminStore();
@@ -329,8 +347,9 @@ const UsersClient = () => {
                   </div>
                 </div>
                 {AuthUser?.role === "admin" && AuthUser?._id !== user?._id && (
-                  <div className="px-3 pb-3">
+                  <div className="px-3 pb-3 space-y-2">
                     <BanButton user={user} />
+                    <RoleButton user={user} />
                   </div>
                 )}
                 <div className="mt-4 border-t border-black/10 dark:border-white/10 grid grid-cols-3 text-sm">

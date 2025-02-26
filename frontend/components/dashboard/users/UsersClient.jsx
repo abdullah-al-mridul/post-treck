@@ -147,37 +147,69 @@ const UsersClient = () => {
   return (
     <div className="min-h-screen pt-24 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-3 mb-4"
+        {/* Back Button */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="mb-4"
+        >
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-3 group border-2 border-black dark:border-darkBorder px-4 py-2 hover:shadow-[4px_4px_0_0_#000] dark:hover:shadow-[4px_4px_0_0_rgba(56,68,77,0.4)] transition-all bg-white dark:bg-[#15202B]"
           >
-            <div className="w-12 h-12 border-2 border-black dark:border-white flex items-center justify-center">
+            <div className="p-1 bg-black/5 dark:bg-white/5 group-hover:-translate-x-1 transition-transform">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth={1.5}
+                strokeWidth={2.5}
                 stroke="currentColor"
-                className="w-6 h-6 dark:text-white"
+                className="w-4 h-4 dark:text-zinc-100 "
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
+                  d="M19.5 12h-15m0 0l6.75 6.75M4.5 12l6.75-6.75"
                 />
               </svg>
             </div>
-            <div>
-              <h1 className="text-4xl font-black dark:text-zinc-100">Users</h1>
-              <p className="text-black/50 dark:text-white/50">
-                {users?.length} registered users
-              </p>
-            </div>
-          </motion.div>
-        </div>
+            <span className="font-bold text-sm dark:text-zinc-100">
+              Back to Dashboard
+            </span>
+          </Link>
+        </motion.div>
+
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-4 mb-8"
+        >
+          <div className="p-2 bg-black/5 dark:bg-[rgba(247,249,249,0.1)]">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-6 h-6 dark:text-zinc-100"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-2xl font-black dark:text-zinc-100">
+              Manage Users
+            </h2>
+            <p className="text-sm text-black/50 dark:text-white/50">
+              View and manage all platform users
+            </p>
+          </div>
+        </motion.div>
 
         {/* Filters */}
         <motion.div

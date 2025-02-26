@@ -14,11 +14,11 @@ const roleOptions = [
     label: "Moderator",
     description: "Can moderate content and manage reports",
   },
-  {
-    id: "admin",
-    label: "Admin",
-    description: "Full administrative access and control",
-  },
+  //   {
+  //     id: "admin",
+  //     label: "Admin",
+  //     description: "Full administrative access and control",
+  //   },
 ];
 
 const RoleChangeModal = () => {

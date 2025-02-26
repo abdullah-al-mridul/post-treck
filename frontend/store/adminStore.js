@@ -4,6 +4,7 @@ import { useApi } from "@/hooks/useApi";
 const useAdminStore = create((set, get) => ({
   loading: false,
   loadingUsers: {},
+  loadingRoles: {},
   users: [],
   banModal: {
     isOpen: false,
@@ -110,8 +111,8 @@ const useAdminStore = create((set, get) => ({
     const { userId } = roleModal;
     console.log(userId, newRole);
     set((state) => ({
-      loadingUsers: {
-        ...state.loadingUsers,
+      loadingRoles: {
+        ...state.loadingRoles,
         [userId]: true,
       },
     }));
@@ -139,8 +140,8 @@ const useAdminStore = create((set, get) => ({
       throw error;
     } finally {
       set((state) => ({
-        loadingUsers: {
-          ...state.loadingUsers,
+        loadingRoles: {
+          ...state.loadingRoles,
           [userId]: false,
         },
       }));

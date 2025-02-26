@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import useAuthStore from "@/store/authStore";
 import Image from "next/image";
 import useAdminStore from "@/store/adminStore";

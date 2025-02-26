@@ -36,11 +36,11 @@ const BanButton = ({ user }) => {
       onClick={handleClick}
       disabled={user.isBanned && isLoading}
       className={`
-        px-4 py-2 text-sm font-bold border-2 transition-all
+        px-4 py-2 text-sm font-bold border-t border-darkBorder w-full transition-all
         ${
           user.isBanned
-            ? "border-green-500 text-green-500 hover:bg-green-500 hover:text-white dark:border-green-400 dark:text-green-400 dark:hover:bg-green-400 dark:hover:text-black"
-            : "border-red-500 text-red-500 hover:bg-red-500 hover:text-white dark:border-red-400 dark:text-red-400 dark:hover:bg-red-400 dark:hover:text-black"
+            ? " text-green-500 hover:bg-green-500 hover:text-white  dark:text-green-400 dark:hover:bg-green-400 dark:hover:text-black"
+            : " text-red-500 hover:bg-red-500 hover:text-white  dark:text-red-400 dark:hover:bg-red-400 dark:hover:text-black"
         }
         disabled:opacity-50 disabled:cursor-not-allowed
       `}
@@ -85,7 +85,7 @@ const RoleButton = ({ user }) => {
         openRoleModal(user._id, user.role);
       }}
       disabled={isLoading}
-      className="px-4 py-2 text-sm font-bold border-2 border-black dark:border-white text-black dark:text-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all disabled:opacity-50 disabled:cursor-not-allowed w-full"
+      className="px-4 py-2 text-sm font-bold border-t border-l border-black dark:border-darkBorder text-black dark:text-white hover:bg-black hover:text-white dark:hover:bg-darkHover transition-all disabled:opacity-50 disabled:cursor-not-allowed w-full"
     >
       Change Role
     </button>
@@ -346,36 +346,39 @@ const UsersClient = () => {
                     <p className="font-mono">{formatDate(user.lastActive)}</p>
                   </div>
                 </div>
-                {AuthUser?.role === "admin" && AuthUser?._id !== user?._id && (
-                  <div className="px-3 pb-3 space-y-2">
-                    <BanButton user={user} />
-                    <RoleButton user={user} />
-                  </div>
-                )}
-                <div className="mt-4 border-t border-black/10 dark:border-white/10 grid grid-cols-3 text-sm">
-                  <div className=" w-full text-center p-3 border-r border-black/10 dark:border-white/10">
-                    <p className="font-bold text-2xl dark:text-white">
-                      {user.friends.length}
-                    </p>
-                    <p className="text-black/50 text-sm dark:text-white/50">
-                      Friends
-                    </p>
-                  </div>
-                  <div className="w-full text-center p-3 border-r border-black/10 dark:border-white/10">
-                    <p className="font-bold text-2xl dark:text-white">
-                      {user.followers.length}
-                    </p>
-                    <p className="text-black/50 text-sm dark:text-white/50">
-                      Followers
-                    </p>
-                  </div>
-                  <div className="w-full text-center p-3">
-                    <p className="font-bold text-2xl dark:text-white">
-                      {user.following.length}
-                    </p>
-                    <p className="text-black/50 text-sm dark:text-white/50">
-                      Following
-                    </p>
+                <div>
+                  {AuthUser?.role === "admin" &&
+                    AuthUser?._id !== user?._id && (
+                      <div className="flex mt-4">
+                        <BanButton user={user} />
+                        <RoleButton user={user} />
+                      </div>
+                    )}
+                  <div className=" border-t border-black/10 dark:border-white/10 grid grid-cols-3 text-sm">
+                    <div className=" w-full text-center p-3 border-r border-black/10 dark:border-white/10">
+                      <p className="font-bold text-2xl dark:text-white">
+                        {user.friends.length}
+                      </p>
+                      <p className="text-black/50 text-sm dark:text-white/50">
+                        Friends
+                      </p>
+                    </div>
+                    <div className="w-full text-center p-3 border-r border-black/10 dark:border-white/10">
+                      <p className="font-bold text-2xl dark:text-white">
+                        {user.followers.length}
+                      </p>
+                      <p className="text-black/50 text-sm dark:text-white/50">
+                        Followers
+                      </p>
+                    </div>
+                    <div className="w-full text-center p-3">
+                      <p className="font-bold text-2xl dark:text-white">
+                        {user.following.length}
+                      </p>
+                      <p className="text-black/50 text-sm dark:text-white/50">
+                        Following
+                      </p>
+                    </div>
                   </div>
                 </div>
               </Link>

@@ -1,6 +1,6 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useAdminStore from "@/store/adminStore";
 
 const roleOptions = [
@@ -23,10 +23,16 @@ const roleOptions = [
 
 const RoleChangeModal = () => {
   const [selectedRole, setSelectedRole] = useState("");
-  const { roleModal, closeRoleModal, changeUserRole, loadingUsers } =
+  const { roleModal, closeRoleModal, changeUserRole, loadingRoles } =
     useAdminStore();
   const { isOpen, userId, currentRole } = roleModal;
-  const isLoading = loadingUsers[userId];
+  const isLoading = loadingRoles[userId];
+
+  useEffect(() => {
+    if (isOpen && currentRole) {
+      setSelectedRole(currentRole);
+    }
+  }, [isOpen, currentRole]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -104,7 +110,7 @@ const RoleChangeModal = () => {
                   <button
                     type="submit"
                     disabled={!selectedRole || isLoading}
-                    className="px-4 py-2 text-sm font-bold border-2 border-black text-black hover:bg-black hover:text-white dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black transition-all flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 text-sm font-bold border border-black dark:border-darkBorder text-black dark:text-white hover:bg-black hover:text-white dark:hover:bg-darkHover transition-all flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isLoading ? (
                       <span className="flex items-center justify-center gap-2">
@@ -137,7 +143,7 @@ const RoleChangeModal = () => {
                     type="button"
                     onClick={closeRoleModal}
                     disabled={isLoading}
-                    className="px-4 py-2 text-sm font-bold border-2 border-black dark:border-white text-black dark:text-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 text-sm font-bold border border-black dark:border-darkBorder  text-black dark:text-white hover:bg-black hover:text-white dark:hover:bg-darkHover transition-all flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Cancel
                   </button>

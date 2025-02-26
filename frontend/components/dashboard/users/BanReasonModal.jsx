@@ -54,18 +54,21 @@ const BanReasonModal = () => {
                     Reason for banning
                   </label>
                   <textarea
+                    style={{
+                      resize: "none",
+                    }}
                     value={reason}
                     onChange={(e) => setReason(e.target.value)}
                     required
                     placeholder="Enter reason for banning this user..."
-                    className="w-full p-3 border-2 border-black dark:border-darkBorder bg-transparent dark:text-white focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:ring-opacity-20 min-h-[100px]"
+                    className="w-full p-3 border border-black dark:border-darkBorder bg-transparent dark:text-white focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-darkBorder focus:ring-opacity-20 min-h-[100px]"
                   />
                 </div>
                 <div className="flex gap-3">
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="px-4 py-2 text-sm font-bold border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white dark:border-red-400 dark:text-red-400 dark:hover:bg-red-400 dark:hover:text-black transition-all flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 text-sm font-bold border border-red-500 text-red-500 hover:bg-red-500 hover:text-white dark:border-red-400 dark:text-red-400 dark:hover:bg-red-400 dark:hover:text-black transition-all flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isLoading ? (
                       <span className="flex items-center justify-center gap-2">
@@ -98,7 +101,7 @@ const BanReasonModal = () => {
                     type="button"
                     onClick={closeBanModal}
                     disabled={isLoading}
-                    className="px-4 py-2 text-sm font-bold border-2 border-black dark:border-white text-black dark:text-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 text-sm font-bold border border-black dark:border-darkBorder text-black dark:text-white hover:bg-black hover:text-white dark:hover:bg-darkHover transition-all flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Cancel
                   </button>

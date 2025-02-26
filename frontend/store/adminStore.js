@@ -6,6 +6,10 @@ const useAdminStore = create((set, get) => ({
   loadingUsers: {},
   loadingRoles: {},
   users: [],
+  takingReportAction: {
+    approve: false,
+    delete: false,
+  },
   banModal: {
     isOpen: false,
     userId: null,
@@ -24,7 +28,7 @@ const useAdminStore = create((set, get) => ({
     currentRole: null,
   },
   team: [],
-
+  reports: [],
   openBanModal: (userId, action) =>
     set({ banModal: { isOpen: true, userId, action } }),
 
@@ -158,6 +162,47 @@ const useAdminStore = create((set, get) => ({
       console.log(error);
     } finally {
       set({ loading: false });
+    }
+  },
+  getReports: async () => {
+    set({ loading: true });
+    try {
+      const { data } = await useApi().get("/admin/reported-posts");
+      set({ reports: data.posts });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      set({ loading: false });
+    }
+  },
+  takeReportAction: async (postId, action) => {
+    set({
+      takingReportAction: {
+        approve: action === "approve",
+        delete: action === "delete",
+      },
+    });
+    try {
+      await useApi().post(`/admin/posts/${postId}/moderate`, {
+        action,
+      });
+
+      set((state) => ({
+        reports: state.reports.filter((report) => report._id !== postId),
+        stats: {
+          ...state.stats,
+          reportedPosts: state.stats.reportedPosts - 1,
+        },
+      }));
+    } catch (error) {
+      console.log(error);
+    } finally {
+      set({
+        takingReportAction: {
+          approve: false,
+          delete: false,
+        },
+      });
     }
   },
 }));

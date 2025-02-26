@@ -425,7 +425,7 @@ const DashboardClient = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-12 mb-8"
+          className="mt-12 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4"
         >
           <Link
             href="/dashboard/users"
@@ -455,6 +455,56 @@ const DashboardClient = () => {
                   </h2>
                   <p className="text-black/50 dark:text-white/50">
                     View and manage all platform users
+                  </p>
+                </div>
+              </div>
+              <div className="text-black/50 dark:text-white/50 group-hover:translate-x-1 transition-transform">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                  />
+                </svg>
+              </div>
+            </div>
+          </Link>
+
+          <Link
+            href="/dashboard/reports"
+            className="group block border-2 border-black dark:border-darkBorder p-6 hover:translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#000] dark:hover:shadow-[4px_4px_0_0_rgba(56,68,77,0.4)] transition-all bg-white dark:bg-[#15202B]"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-2 bg-black/5 dark:bg-white/5">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-6 h-6 dark:text-zinc-100"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold dark:text-zinc-100">
+                    Manage Reports
+                  </h2>
+                  <p className="text-black/50 dark:text-white/50">
+                    Review and handle reported content
                   </p>
                 </div>
               </div>

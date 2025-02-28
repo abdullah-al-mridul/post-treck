@@ -106,13 +106,8 @@ export default function ReactionDrawer({
   const { addReaction, removeReaction } = usePostStore();
   const [hoveredEmoji, setHoveredEmoji] = useState(null);
 
-  const handleReaction = async (type) => {
-    try {
-      await onReact(type);
-    } catch (error) {
-      console.error("Error handling reaction:", error);
-      alert(error.message || "Failed to update reaction");
-    }
+  const handleReaction = (type) => {
+    onReact(postId, type);
   };
 
   return (

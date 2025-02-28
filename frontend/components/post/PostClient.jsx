@@ -35,7 +35,7 @@ const ReactionButton = ({
     </button>
     <ReactionDrawer
       isVisible={showDrawer}
-      onReact={(type) => onClick(type)}
+      onReact={(postId, type) => onClick(postId, type)}
       className="z-50"
       onMouseEnter={onHover}
       onMouseLeave={onMouseLeave}
@@ -80,7 +80,14 @@ const PostClient = ({ id }) => {
   //     moderatedAt: "2025-02-26T14:17:08.617Z",
   //     moderatedBy: "67a429b215d7dcc39befe0cd",
   //   };
-  const { post, getPost, loading, currentUserReaction } = useSinglePostStore();
+  const {
+    post,
+    getPost,
+    loading,
+    currentUserReaction,
+    reactToPost,
+    isReacting,
+  } = useSinglePostStore();
   const [newComment, setNewComment] = useState("");
   const [showReactions, setShowReactions] = useState(false);
   const { user } = useAuthStore();
@@ -104,9 +111,9 @@ const PostClient = ({ id }) => {
     0
   );
 
-  const handleReaction = async (type) => {
-    // Your reaction handling logic here
-    console.log("Reaction:", type);
+  const handleReaction = async (postId, type) => {
+    await reactToPost(postId, type, user);
+    console.log(postId, type);
   };
 
   const handleMouseLeave = () => {
@@ -224,32 +231,43 @@ const PostClient = ({ id }) => {
 
           {/* Post Actions */}
           <div className="flex border border-r-0 w-full dark:border-darkBorder mt-6 font-mono">
-            <ReactionButton
-              icon={
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-6 h-6 transition-all"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                  />
-                </svg>
-              }
-              count={totalReactions}
-              label="reactions"
-              onHover={() => setShowReactions(true)}
-              onClick={handleReaction}
-              showDrawer={showReactions}
-              onMouseLeave={handleMouseLeave}
-              postId={post._id}
-              currentReaction={currentUserReaction}
-            />
+            {isReacting ? (
+              <div className="relative w-full cursor-wait border-r dark:border-darkBorder dark:hover:bg-darkHover px-4 py-2">
+                <div className="flex items-center justify-center">
+                  <div className="w-6 h-6 relative">
+                    {/* <div className="absolute inset-0 rounded-full border-2 border-black/20 dark:border-white/20"></div> */}
+                    <div className="absolute inset-0 rounded-full border-2 border-black dark:border-darkBorder !border-t-darkBorder/50 animate-spin"></div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <ReactionButton
+                icon={
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-6 h-6 transition-all"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                    />
+                  </svg>
+                }
+                count={totalReactions}
+                label="reactions"
+                onHover={() => setShowReactions(true)}
+                onClick={handleReaction}
+                showDrawer={showReactions}
+                onMouseLeave={handleMouseLeave}
+                postId={post._id}
+                currentReaction={currentUserReaction}
+              />
+            )}
 
             <ReactionButton
               icon={

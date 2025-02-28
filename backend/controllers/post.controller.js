@@ -952,3 +952,46 @@ export const getPostReactions = async (req, res) => {
     });
   }
 };
+
+// Add this new controller function
+export const getPostReactors = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id).populate({
+      path: "reactions.like reactions.love reactions.haha reactions.wow reactions.sad reactions.angry",
+      select: "name profilePic role lastActive",
+    });
+
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
+    }
+
+    // Format the reactions data into a flat array with reaction type
+    const reactors = Object.entries(post.reactions).reduce(
+      (acc, [type, users]) => {
+        const usersWithType = users.map((user) => ({
+          _id: user._id,
+          name: user.name,
+          profilePic: user.profilePic,
+          role: user.role,
+          lastActive: user.lastActive,
+          reactionType: type,
+        }));
+        return [...acc, ...usersWithType];
+      },
+      []
+    );
+
+    res.status(200).json({
+      success: true,
+      reactors,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

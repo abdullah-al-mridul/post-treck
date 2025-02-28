@@ -9,6 +9,7 @@ import useSinglePostStore from "@/store/SPostStore";
 import Spinner from "../ui/Spinner";
 import ReactionDrawer from "@/components/ui/ReactionDrawer";
 import useAuthStore from "@/store/authStore";
+import { useRouter } from "next/navigation";
 const ReactionButton = ({
   icon,
   count,
@@ -19,31 +20,42 @@ const ReactionButton = ({
   onMouseLeave,
   postId,
   currentReaction,
-}) => (
-  <div
-    className="relative w-full cursor-pointer border-r dark:border-darkBorder dark:hover:bg-darkHover px-4 py-2"
-    onMouseLeave={onMouseLeave}
-    onClick={onClick}
-    onMouseEnter={onHover}
-  >
-    <button className="group flex mx-auto items-center gap-2 text-black dark:text-zinc-100 transition-colors">
-      {icon}
-      <span className="transition-all">
-        {count}
-        <span className="sr-only">{label}</span>
-      </span>
-    </button>
-    <ReactionDrawer
-      isVisible={showDrawer}
-      onReact={(postId, type) => onClick(postId, type)}
-      className="z-50"
-      onMouseEnter={onHover}
+  type,
+}) => {
+  const router = useRouter();
+
+  const handleNavigation = () => {
+    if (type === "react") {
+      router.push(`/post/${postId}/reactors`);
+    }
+  };
+
+  return (
+    <div
+      className="relative w-full cursor-pointer border-r dark:border-darkBorder dark:hover:bg-darkHover px-4 py-2"
       onMouseLeave={onMouseLeave}
-      postId={postId}
-      currentReaction={currentReaction}
-    />
-  </div>
-);
+      onMouseEnter={onHover}
+      onClick={handleNavigation} // এখানে ক্লিক করলে ন্যাভিগেট হবে
+    >
+      <button className="group flex mx-auto items-center gap-2 text-black dark:text-zinc-100 transition-colors">
+        {icon}
+        <span className="transition-all">
+          {count}
+          <span className="sr-only">{label}</span>
+        </span>
+      </button>
+      <ReactionDrawer
+        isVisible={showDrawer}
+        onReact={(postId, type) => onClick(postId, type)}
+        className="z-50"
+        onMouseEnter={onHover}
+        onMouseLeave={onMouseLeave}
+        postId={postId}
+        currentReaction={currentReaction}
+      />
+    </div>
+  );
+};
 
 const PostClient = ({ id }) => {
   // Dummy data based on the example response
@@ -173,6 +185,7 @@ const PostClient = ({ id }) => {
                 alt={post?.user?.name}
                 width={56}
                 height={56}
+                priority
                 className="border-2 border-black dark:border-darkBorder"
               />
             </Link>
@@ -205,6 +218,8 @@ const PostClient = ({ id }) => {
                   src={post?.media[0]}
                   alt="Post media"
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  priority
                   className="object-cover border border-black dark:border-darkBorder"
                 />
               </div>
@@ -266,6 +281,7 @@ const PostClient = ({ id }) => {
                 onMouseLeave={handleMouseLeave}
                 postId={post._id}
                 currentReaction={currentUserReaction}
+                type="react"
               />
             )}
 

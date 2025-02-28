@@ -6,8 +6,9 @@ import { formatDate } from "@/utils/formatDate";
 import VerificationBadge from "@/components/ui/VerificationBadge";
 import useSinglePostStore from "@/store/SPostStore";
 import { useEffect } from "react";
+import Spinner from "@/components/ui/Spinner";
 const ReactorsClient = ({ id }) => {
-  const { reactors, getReactors } = useSinglePostStore();
+  const { reactors, getReactors, loading } = useSinglePostStore();
   useEffect(() => {
     getReactors(id);
   }, [id]);
@@ -19,7 +20,7 @@ const ReactorsClient = ({ id }) => {
     sad: "😢",
     angry: "😠",
   };
-
+  if (loading) return <Spinner />;
   return (
     <div className="min-h-screen pt-24 px-4">
       <div className="max-w-2xl mx-auto">

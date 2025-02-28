@@ -67,16 +67,12 @@ const ReactionButton = ({
 };
 const CommentCard = ({ comment, user, postId }) => {
   const [showCommentReactions, setShowCommentReactions] = useState(false);
-  const {
-    currentCommentReaction,
-    reactToComment,
-    editComment,
-    deleteComment,
-    isDeletingComment,
-  } = useSinglePostStore();
+  const { currentCommentReaction, reactToComment, editComment, deleteComment } =
+    useSinglePostStore();
   const [isReacting, setIsReacting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isCommentUpdating, setIsCommentUpdating] = useState(false);
+  const [isDeletingComment, setIsDeletingComment] = useState(false);
   const [newContent, setNewContent] = useState(comment.content);
   const handleCommentReactionHover = () => {
     setShowCommentReactions(true);
@@ -260,7 +256,9 @@ const CommentCard = ({ comment, user, postId }) => {
         )}
         {comment.user._id === user._id && (
           <button
-            onClick={() => deleteComment(postId, comment._id)}
+            onClick={() =>
+              deleteComment(postId, comment._id, setIsDeletingComment)
+            }
             className="flex  dark:hover:bg-darkHover flex-1 py-1 items-center gap-2 justify-center text-black/50 dark:text-white/50 hover:text-red-500 transition-colors"
           >
             {isDeletingComment ? (
@@ -515,7 +513,7 @@ const PostClient = ({ id }) => {
                   />
                 </svg>
               }
-              count={post?.comments?.length || 0}
+              count={postComments.length || 0}
               label="comments"
             />
 

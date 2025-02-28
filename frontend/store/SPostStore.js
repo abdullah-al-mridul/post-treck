@@ -27,7 +27,7 @@ const useSinglePostStore = create((set, get) => ({
   postComments: [],
   currentCommentReaction: {},
   isNewCommenting: false,
-  isDeletingComment: false,
+
   getPost: async (postId, user) => {
     set({ loading: true });
     try {
@@ -153,8 +153,8 @@ const useSinglePostStore = create((set, get) => ({
       set({ isNewCommenting: false });
     }
   },
-  deleteComment: async (postId, commentId) => {
-    set({ isDeletingComment: true });
+  deleteComment: async (postId, commentId, setIsDeletingComment) => {
+    setIsDeletingComment(true);
     try {
       await useApi().delete(`/posts/${postId}/comment/${commentId}`);
       set({
@@ -165,7 +165,7 @@ const useSinglePostStore = create((set, get) => ({
     } catch (error) {
       set({ error: error.message });
     } finally {
-      set({ isDeletingComment: false });
+      setIsDeletingComment(false);
     }
   },
 }));

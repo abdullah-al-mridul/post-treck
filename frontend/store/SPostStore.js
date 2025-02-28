@@ -116,6 +116,26 @@ const useSinglePostStore = create((set, get) => ({
       setIsReacting(false);
     }
   },
+  editComment: async (postId, commentId, content, setIsCommentUpdating) => {
+    setIsCommentUpdating(true);
+    try {
+      const { data } = await useApi().put(
+        `/posts/${postId}/comment/${commentId}`,
+        { content }
+      );
+      set({
+        postComments: get().postComments.map((comment) =>
+          comment._id === commentId
+            ? { ...comment, content: data.comment.content }
+            : comment
+        ),
+      });
+    } catch (error) {
+      set({ error: error.message });
+    } finally {
+      setIsCommentUpdating(false);
+    }
+  },
 }));
 
 export default useSinglePostStore;

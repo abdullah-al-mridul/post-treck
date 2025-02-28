@@ -17,6 +17,7 @@ const useSinglePostStore = create((set, get) => ({
   currentUserReaction: null,
   isReacting: false,
   reactors: [],
+  postComments: [],
   getPost: async (postId, user) => {
     set({ loading: true });
     try {
@@ -25,6 +26,7 @@ const useSinglePostStore = create((set, get) => ({
       set({
         currentUserReaction: findUserReaction(data.post.reactions, user._id),
       });
+      set({ postComments: data.post.comments });
     } catch (error) {
       set({ error: error.message });
       console.log(error);

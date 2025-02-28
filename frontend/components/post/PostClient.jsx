@@ -10,14 +10,7 @@ import Spinner from "../ui/Spinner";
 import useAuthStore from "@/store/authStore";
 import { useRouter } from "next/navigation";
 import ReactionDrawer from "../ui/ReactionDrawer";
-import {
-  Delete,
-  Edit,
-  Heart,
-  MessageCircle,
-  ThumbsUp,
-  Trash,
-} from "lucide-react";
+import { Edit, Heart, MessageCircle, Trash } from "lucide-react";
 
 const ReactionButton = ({
   icon,

@@ -67,8 +67,13 @@ const ReactionButton = ({
 };
 const CommentCard = ({ comment, user, postId }) => {
   const [showCommentReactions, setShowCommentReactions] = useState(false);
-  const { currentCommentReaction, reactToComment, editComment } =
-    useSinglePostStore();
+  const {
+    currentCommentReaction,
+    reactToComment,
+    editComment,
+    deleteComment,
+    isDeletingComment,
+  } = useSinglePostStore();
   const [isReacting, setIsReacting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isCommentUpdating, setIsCommentUpdating] = useState(false);
@@ -254,9 +259,33 @@ const CommentCard = ({ comment, user, postId }) => {
           </button>
         )}
         {comment.user._id === user._id && (
-          <button className="flex  dark:hover:bg-darkHover flex-1 py-1 items-center gap-2 justify-center text-black/50 dark:text-white/50 hover:text-red-500 transition-colors">
-            <Trash className="w-4 h-4" />
-            <span>Delete</span>
+          <button
+            onClick={() => deleteComment(postId, comment._id)}
+            className="flex  dark:hover:bg-darkHover flex-1 py-1 items-center gap-2 justify-center text-black/50 dark:text-white/50 hover:text-red-500 transition-colors"
+          >
+            {isDeletingComment ? (
+              <div className="h-full">
+                <div className="w-5 h-5 relative">
+                  <motion.div
+                    className="absolute inset-0 rounded-full border-2 border-black dark:border-darkBorder !border-t-darkBorder/50"
+                    animate={{ rotate: [0, 360] }}
+                    style={{
+                      scale: 0.8,
+                    }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  ></motion.div>
+                </div>
+              </div>
+            ) : (
+              <>
+                <Trash className="w-4 h-4" />
+                <span>Delete</span>
+              </>
+            )}
           </button>
         )}
       </div>
@@ -264,40 +293,6 @@ const CommentCard = ({ comment, user, postId }) => {
   );
 };
 const PostClient = ({ id }) => {
-  // Dummy data based on the example response
-  //   const post = {
-  //     reactions: {
-  //       like: [],
-  //       love: ["67a429b215d7dcc39befe0cd"],
-  //       haha: [],
-  //       wow: [],
-  //       sad: [],
-  //       angry: [],
-  //     },
-  //     _id: "67bdee50b4d6800d0d18df86",
-  //     user: {
-  //       _id: "67bd81ddb4d6800d0d189061",
-  //       name: "User 5",
-  //       email: "user5@mail.com",
-  //       profilePic: "default-avatar.png",
-  //       role: "moderator",
-  //     },
-  //     caption: "new post",
-  //     media: [],
-  //     reactionCount: 1,
-  //     hashtags: [],
-  //     mentions: [],
-  //     isRepost: false,
-  //     repostCount: 0,
-  //     isReported: false,
-  //     moderationStatus: "approved",
-  //     comments: [],
-  //     reports: [],
-  //     createdAt: "2025-02-25T16:22:40.677Z",
-  //     updatedAt: "2025-02-26T14:17:08.618Z",
-  //     moderatedAt: "2025-02-26T14:17:08.617Z",
-  //     moderatedBy: "67a429b215d7dcc39befe0cd",
-  //   };
   const {
     post,
     getPost,
@@ -306,6 +301,8 @@ const PostClient = ({ id }) => {
     reactToPost,
     isReacting,
     postComments,
+    addComment,
+    isNewCommenting,
   } = useSinglePostStore();
   const [newComment, setNewComment] = useState("");
   const [showReactions, setShowReactions] = useState(false);
@@ -340,6 +337,12 @@ const PostClient = ({ id }) => {
 
   const handleMouseLeave = () => {
     setShowReactions(false);
+  };
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    await addComment(post._id, newComment);
+    console.log(newComment, post._id);
+    setNewComment("");
   };
 
   return (
@@ -544,7 +547,7 @@ const PostClient = ({ id }) => {
               Comments
             </h2>
 
-            <form className="mb-8 flex gap-4">
+            <form onSubmit={handleCommentSubmit} className="mb-8 flex">
               <input
                 type="text"
                 value={newComment}
@@ -554,9 +557,26 @@ const PostClient = ({ id }) => {
               />
               <button
                 type="submit"
-                className="px-6 py-2 bg-black dark:bg-darkBorder text-white dark:text-zinc-100 font-medium hover:bg-black/80 dark:hover:bg-darkHover transition-colors"
+                disabled={isNewCommenting}
+                className="px-6 py-2 bg-black dark:bg-transparent border-2 border-l-0 border-darkBorder dark:disabled:hover:bg-transparent dark:hover:bg-darkHover text-white dark:text-zinc-100 font-medium hover:bg-black/80  transition-colors"
               >
-                Comment
+                {isNewCommenting ? (
+                  <div className="h-full">
+                    <div className="w-5 h-5 relative">
+                      <motion.div
+                        className="absolute inset-0 rounded-full border-2 border-black dark:border-darkBorder !border-t-darkBorder/50"
+                        animate={{ rotate: [0, 360] }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                      ></motion.div>
+                    </div>
+                  </div>
+                ) : (
+                  "Comment"
+                )}
               </button>
             </form>
 

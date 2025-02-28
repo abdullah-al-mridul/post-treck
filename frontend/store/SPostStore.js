@@ -26,6 +26,8 @@ const useSinglePostStore = create((set, get) => ({
   reactors: [],
   postComments: [],
   currentCommentReaction: {},
+  isNewCommenting: false,
+  isDeletingComment: false,
   getPost: async (postId, user) => {
     set({ loading: true });
     try {
@@ -134,6 +136,36 @@ const useSinglePostStore = create((set, get) => ({
       set({ error: error.message });
     } finally {
       setIsCommentUpdating(false);
+    }
+  },
+  addComment: async (postId, comment) => {
+    set({ isNewCommenting: true });
+    try {
+      const { data } = await useApi().post(`/posts/${postId}/comment`, {
+        content: comment,
+      });
+      set({
+        postComments: [...get().postComments, data.comment],
+      });
+    } catch (error) {
+      set({ error: error.message });
+    } finally {
+      set({ isNewCommenting: false });
+    }
+  },
+  deleteComment: async (postId, commentId) => {
+    set({ isDeletingComment: true });
+    try {
+      await useApi().delete(`/posts/${postId}/comment/${commentId}`);
+      set({
+        postComments: get().postComments.filter(
+          (comment) => comment._id !== commentId
+        ),
+      });
+    } catch (error) {
+      set({ error: error.message });
+    } finally {
+      set({ isDeletingComment: false });
     }
   },
 }));

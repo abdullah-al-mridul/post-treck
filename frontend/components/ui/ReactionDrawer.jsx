@@ -103,7 +103,7 @@ export default function ReactionDrawer({
   postId,
   currentReaction,
 }) {
-  const { addReaction, removeReaction } = usePostStore();
+  // const { addReaction, removeReaction } = usePostStore();
   const [hoveredEmoji, setHoveredEmoji] = useState(null);
 
   const handleReaction = (type) => {

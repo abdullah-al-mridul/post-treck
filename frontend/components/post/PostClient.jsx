@@ -1,5 +1,5 @@
 "use client";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { formatDate } from "@/utils/formatDate";
@@ -7,9 +7,10 @@ import VerificationBadge from "@/components/ui/VerificationBadge";
 import { useEffect, useState } from "react";
 import useSinglePostStore from "@/store/SPostStore";
 import Spinner from "../ui/Spinner";
-import ReactionDrawer from "@/components/ui/ReactionDrawer";
 import useAuthStore from "@/store/authStore";
 import { useRouter } from "next/navigation";
+import ReactionDrawer from "../ui/ReactionDrawer";
+
 const ReactionButton = ({
   icon,
   count,
@@ -56,7 +57,177 @@ const ReactionButton = ({
     </div>
   );
 };
+const CommentCard = ({ comment, user, postId }) => {
+  const [showCommentReactions, setShowCommentReactions] = useState(false);
+  const { currentCommentReaction, reactToComment } = useSinglePostStore();
+  const [isReacting, setIsReacting] = useState(false);
+  const handleCommentReactionHover = () => {
+    setShowCommentReactions(true);
+  };
 
+  const handleCommentReactionLeave = () => {
+    setShowCommentReactions(false);
+  };
+
+  const handleCommentReaction = async (commentId, type) => {
+    // Add your comment reaction logic here
+    console.log("Comment reaction:", commentId, type);
+    await reactToComment(postId, commentId, type, user, setIsReacting);
+  };
+  const totalReactions = Object.values(comment.reactions).reduce(
+    (sum, arr) => sum + arr.length,
+    0
+  );
+  useEffect(() => {
+    console.log("currentCommentReaction", currentCommentReaction);
+  }, [currentCommentReaction]);
+  return (
+    <motion.div
+      key={comment._id}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="p-6 border-2 border-black dark:border-darkBorder bg-white dark:bg-[#15202B]"
+    >
+      {/* Comment Header */}
+      <div className="flex items-center gap-4 mb-4">
+        <Link href={`/profile/${comment.user._id}`} className="block relative">
+          <Image
+            src={
+              comment.user.profilePic === "default-avatar.png"
+                ? "/default-avatar.png"
+                : comment.user.profilePic
+            }
+            alt={comment.user.name}
+            width={40}
+            height={40}
+            className="border-2 border-black dark:border-darkBorder"
+          />
+        </Link>
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/profile/${comment.user._id}`}
+              className="font-bold hover:underline dark:text-zinc-100"
+            >
+              {comment.user.name}
+            </Link>
+            {comment.user.role && (
+              <VerificationBadge role={comment.user.role} />
+            )}
+          </div>
+          <div className="text-sm text-black/50 dark:text-white/50">
+            {formatDate(comment.createdAt)}
+          </div>
+        </div>
+      </div>
+
+      {/* Comment Content */}
+      <div className="mb-4">
+        <p className="text-black/70 dark:text-white/70 leading-relaxed">
+          {comment.content}
+        </p>
+      </div>
+
+      {/* Comment Actions */}
+      <div className="flex items-center text-sm border border-darkBorder">
+        <div
+          onMouseEnter={() => handleCommentReactionHover(comment._id)}
+          onMouseLeave={() => handleCommentReactionLeave(comment._id)}
+          className="relative flex-1 py-1 h-full hover:bg-darkHover cursor-pointer"
+        >
+          <button className="flex items-center gap-2 text-black/50 dark:text-white/50 hover:text-black  mx-auto transition-colors">
+            {isReacting ? (
+              <div className="h-full">
+                <div className="w-5 h-5 relative">
+                  <motion.div
+                    className="absolute inset-0 rounded-full border-2 border-black dark:border-darkBorder !border-t-darkBorder/50"
+                    animate={{ rotate: [0, 360] }}
+                    style={{
+                      scale: 0.8,
+                    }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  ></motion.div>
+                </div>
+              </div>
+            ) : (
+              <>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="w-4 h-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                  />
+                </svg>
+                <span>{totalReactions || 0}</span>
+              </>
+            )}
+          </button>
+
+          <ReactionDrawer
+            isVisible={showCommentReactions}
+            onReact={(commentId, type) =>
+              handleCommentReaction(commentId, type)
+            }
+            className="z-50"
+            onMouseEnter={() => handleCommentReactionHover(comment._id)}
+            onMouseLeave={() => handleCommentReactionLeave(comment._id)}
+            postId={comment._id}
+            currentReaction={currentCommentReaction[comment._id]}
+          />
+        </div>
+
+        <button className="flex flex-1 py-1 items-center gap-2 justify-center text-black/50 dark:text-white/50 hover:text-black dark:hover:bg-darkHover transition-colors">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+            className="w-4 h-4"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 0 1-.923 1.785A5.969 5.969 0 0 0 6 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337Z"
+            />
+          </svg>
+          <span>{comment.replies?.length || 0}</span>
+        </button>
+
+        {comment.user._id === user._id && (
+          <button className="flex flex-1 py-1 items-center dark:hover:bg-darkHover gap-2 justify-center text-black/50 dark:text-white/50 hover:text-red-500 transition-colors">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-4 h-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+              />
+            </svg>
+            <span>Delete</span>
+          </button>
+        )}
+      </div>
+    </motion.div>
+  );
+};
 const PostClient = ({ id }) => {
   // Dummy data based on the example response
   //   const post = {
@@ -104,6 +275,7 @@ const PostClient = ({ id }) => {
   const [newComment, setNewComment] = useState("");
   const [showReactions, setShowReactions] = useState(false);
   const { user } = useAuthStore();
+
   useEffect(() => {
     console.log(currentUserReaction);
   }, [currentUserReaction]);
@@ -360,112 +532,12 @@ const PostClient = ({ id }) => {
             ) : (
               <div className="space-y-6">
                 {postComments.map((comment) => (
-                  <motion.div
+                  <CommentCard
                     key={comment._id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="p-6 border-2 border-black dark:border-darkBorder bg-white dark:bg-[#15202B]"
-                  >
-                    {/* Comment Header */}
-                    <div className="flex items-center gap-4 mb-4">
-                      <Link
-                        href={`/profile/${comment.user._id}`}
-                        className="block relative"
-                      >
-                        <Image
-                          src={
-                            comment.user.profilePic === "default-avatar.png"
-                              ? "/default-avatar.png"
-                              : comment.user.profilePic
-                          }
-                          alt={comment.user.name}
-                          width={40}
-                          height={40}
-                          className="border-2 border-black dark:border-darkBorder"
-                        />
-                      </Link>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <Link
-                            href={`/profile/${comment.user._id}`}
-                            className="font-bold hover:underline dark:text-zinc-100"
-                          >
-                            {comment.user.name}
-                          </Link>
-                          {comment.user.role && (
-                            <VerificationBadge role={comment.user.role} />
-                          )}
-                        </div>
-                        <div className="text-sm text-black/50 dark:text-white/50">
-                          {formatDate(comment.createdAt)}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Comment Content */}
-                    <div className="mb-4">
-                      <p className="text-black/70 dark:text-white/70 leading-relaxed">
-                        {comment.content}
-                      </p>
-                    </div>
-
-                    {/* Comment Actions */}
-                    <div className="flex items-center gap-4 text-sm">
-                      <button className="flex items-center gap-2 text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white transition-colors">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={2}
-                          stroke="currentColor"
-                          className="w-4 h-4"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                          />
-                        </svg>
-                        <span>{comment.reactions?.length || 0}</span>
-                      </button>
-                      <button className="flex items-center gap-2 text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white transition-colors">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={2}
-                          stroke="currentColor"
-                          className="w-4 h-4"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 0 1-.923 1.785A5.969 5.969 0 0 0 6 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337Z"
-                          />
-                        </svg>
-                        <span>{comment.replies?.length || 0}</span>
-                      </button>
-                      {comment.user._id === user._id && (
-                        <button className="flex items-center gap-2 text-black/50 dark:text-white/50 hover:text-red-500 transition-colors ml-auto">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={2}
-                            stroke="currentColor"
-                            className="w-4 h-4"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                            />
-                          </svg>
-                          <span>Delete</span>
-                        </button>
-                      )}
-                    </div>
-                  </motion.div>
+                    comment={comment}
+                    postId={post._id}
+                    user={user}
+                  />
                 ))}
               </div>
             )}

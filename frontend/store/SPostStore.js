@@ -1,6 +1,13 @@
 import { create } from "zustand";
 import { useApi } from "@/hooks/useApi";
-
+const findCommentReaction = (comment, userId) => {
+  for (const [reactionType, users] of Object.entries(comment.reactions)) {
+    if (users.includes(userId)) {
+      return reactionType;
+    }
+  }
+  return null;
+};
 const findUserReaction = (reactions, userId) => {
   for (const [reactionType, users] of Object.entries(reactions)) {
     if (users.includes(userId)) {
@@ -18,6 +25,7 @@ const useSinglePostStore = create((set, get) => ({
   isReacting: false,
   reactors: [],
   postComments: [],
+  currentCommentReaction: {},
   getPost: async (postId, user) => {
     set({ loading: true });
     try {
@@ -27,6 +35,11 @@ const useSinglePostStore = create((set, get) => ({
         currentUserReaction: findUserReaction(data.post.reactions, user._id),
       });
       set({ postComments: data.post.comments });
+      const commentReactions = {};
+      data.post.comments.forEach((comment) => {
+        commentReactions[comment._id] = findCommentReaction(comment, user._id);
+      });
+      set({ currentCommentReaction: commentReactions });
     } catch (error) {
       set({ error: error.message });
       console.log(error);
@@ -67,6 +80,40 @@ const useSinglePostStore = create((set, get) => ({
       set({ error: error.message });
     } finally {
       set({ loading: false });
+    }
+  },
+  reactToComment: async (postId, commentId, type, user, setIsReacting) => {
+    setIsReacting(true);
+    try {
+      const previousReaction = get().currentCommentReaction[commentId];
+      const requestPayload = {};
+      const METHOD = previousReaction === type ? "unreact" : "react";
+      if (METHOD === "react") {
+        requestPayload.type = type;
+      }
+      const { data } = await useApi().post(
+        `/posts/${postId}/comment/${commentId}/${METHOD}`,
+        requestPayload
+      );
+
+      set({
+        currentCommentReaction: {
+          ...get().currentCommentReaction,
+          [commentId]: findUserReaction(data.reactions, user._id),
+        },
+      });
+      set({
+        postComments: get().postComments.map((comment) =>
+          comment._id === commentId
+            ? { ...comment, reactions: data.reactions }
+            : comment
+        ),
+      });
+      // console.log(get().postComments);
+    } catch (error) {
+      set({ error: error.message });
+    } finally {
+      setIsReacting(false);
     }
   },
 }));

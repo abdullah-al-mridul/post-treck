@@ -16,6 +16,7 @@ const useSinglePostStore = create((set, get) => ({
   error: null,
   currentUserReaction: null,
   isReacting: false,
+  reactors: [],
   getPost: async (postId, user) => {
     set({ loading: true });
     try {
@@ -53,6 +54,17 @@ const useSinglePostStore = create((set, get) => ({
       set({ error: error.message });
     } finally {
       set({ isReacting: false });
+    }
+  },
+  getReactors: async (postId) => {
+    set({ loading: true });
+    try {
+      const { data } = await useApi().get(`/posts/${postId}/reactors`);
+      set({ reactors: data.reactors });
+    } catch (error) {
+      set({ error: error.message });
+    } finally {
+      set({ loading: false });
     }
   },
 }));

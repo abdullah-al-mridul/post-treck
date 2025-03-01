@@ -269,6 +269,16 @@ const useSinglePostStore = create((set, get) => ({
       setIsAddingReply(false);
     }
   },
+  reportPost: async (postId, { reason, description }) => {
+    try {
+      await useApi().post(`/posts/${postId}/report`, {
+        reason,
+        description,
+      });
+    } catch (error) {
+      throw error;
+    }
+  },
 }));
 
 export default useSinglePostStore;

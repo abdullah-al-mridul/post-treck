@@ -1,5 +1,5 @@
 "use client";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { formatDate } from "@/utils/formatDate";
@@ -10,7 +10,14 @@ import Spinner from "../ui/Spinner";
 import useAuthStore from "@/store/authStore";
 import { useRouter } from "next/navigation";
 import ReactionDrawer from "../ui/ReactionDrawer";
-import { Edit, Heart, MessageCircle, Trash } from "lucide-react";
+import {
+  Edit,
+  Heart,
+  MessageCircle,
+  Trash,
+  Flag,
+  AlertCircle,
+} from "lucide-react";
 
 const ReactionButton = ({
   icon,
@@ -294,59 +301,59 @@ const CommentCard = ({ comment, user, postId }) => {
           </button>
         )}
       </div>
+      <div className="mt-6 mb-4">
+        <h3 className="text-xl font-bold dark:text-zinc-100">Replies</h3>
+      </div>
+
+      {/* Update Reply Input Form */}
+      <div className="mb-8">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            addReply(postId, comment._id, newReply, setIsAddingReply);
+            setNewReply("");
+          }}
+          className="flex"
+        >
+          <input
+            type="text"
+            value={newReply}
+            onChange={(e) => setNewReply(e.target.value)}
+            placeholder="Write a reply..."
+            className="flex-1 bg-transparent border border-black dark:border-darkBorder p-2 dark:text-zinc-100 focus:outline-none"
+          />
+          <button
+            type="submit"
+            disabled={isAddingReply}
+            className="px-6 py-2 bg-black dark:bg-transparent border border-l-0 border-black dark:border-darkBorder dark:disabled:hover:bg-transparent dark:hover:bg-darkHover text-white dark:text-zinc-100 font-medium hover:bg-black/80 transition-colors"
+          >
+            {isAddingReply ? (
+              <div className="h-full">
+                <div className="w-5 h-5 relative">
+                  <motion.div
+                    className="absolute inset-0 rounded-full border-2 border-black dark:border-darkBorder !border-t-darkBorder/50"
+                    animate={{ rotate: [0, 360] }}
+                    style={{
+                      scale: 0.8,
+                    }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  ></motion.div>
+                </div>
+              </div>
+            ) : (
+              "Reply"
+            )}
+          </button>
+        </form>
+      </div>
       {commentReplies[comment._id] &&
         commentReplies[comment._id].length > 0 && (
           <>
             {/* Add Replies Header */}
-            <div className="mt-6 mb-4">
-              <h3 className="text-xl font-bold dark:text-zinc-100">Replies</h3>
-            </div>
-
-            {/* Update Reply Input Form */}
-            <div className="mb-8">
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  addReply(postId, comment._id, newReply, setIsAddingReply);
-                  setNewReply("");
-                }}
-                className="flex"
-              >
-                <input
-                  type="text"
-                  value={newReply}
-                  onChange={(e) => setNewReply(e.target.value)}
-                  placeholder="Write a reply..."
-                  className="flex-1 bg-transparent border border-black dark:border-darkBorder p-2 dark:text-zinc-100 focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  disabled={isAddingReply}
-                  className="px-6 py-2 bg-black dark:bg-transparent border border-l-0 border-black dark:border-darkBorder dark:disabled:hover:bg-transparent dark:hover:bg-darkHover text-white dark:text-zinc-100 font-medium hover:bg-black/80 transition-colors"
-                >
-                  {isAddingReply ? (
-                    <div className="h-full">
-                      <div className="w-5 h-5 relative">
-                        <motion.div
-                          className="absolute inset-0 rounded-full border-2 border-black dark:border-darkBorder !border-t-darkBorder/50"
-                          animate={{ rotate: [0, 360] }}
-                          style={{
-                            scale: 0.8,
-                          }}
-                          transition={{
-                            duration: 1,
-                            repeat: Infinity,
-                            ease: "linear",
-                          }}
-                        ></motion.div>
-                      </div>
-                    </div>
-                  ) : (
-                    "Reply"
-                  )}
-                </button>
-              </form>
-            </div>
 
             {/* Replies List */}
             <div className="mt-4 space-y-4">
@@ -524,7 +531,154 @@ const CommentReplyCard = ({
     </motion.div>
   );
 };
+const ReportModal = ({ isOpen, onClose, onSubmit }) => {
+  const [reason, setReason] = useState("spam");
+  const [description, setDescription] = useState("");
 
+  const reportReasons = [
+    {
+      id: "spam",
+      label: "Spam",
+      description: "Repetitive or unwanted content",
+    },
+    {
+      id: "harassment",
+      label: "Harassment",
+      description: "Offensive or bullying behavior",
+    },
+    {
+      id: "inappropriate",
+      label: "Inappropriate",
+      description: "Content that violates community guidelines",
+    },
+    {
+      id: "violence",
+      label: "Violence",
+      description: "Threats or graphic violence",
+    },
+    {
+      id: "other",
+      label: "Other",
+      description: "Other reason not listed above",
+    },
+  ];
+
+  const handleSubmit = () => {
+    if (reason === "other" && !description.trim()) {
+      return; // Don't submit if "other" is selected but no description
+    }
+    onSubmit(reason, description);
+    onClose();
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/50 dark:bg-darkBorder/10 backdrop-blur-md z-[999]"
+          />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed left-[50%] top-[50%] -translate-x-[50%] -translate-y-[50%] w-[calc(100%-2rem)] max-w-md bg-white dark:bg-[#15202B] border-2 border-black dark:border-darkBorder p-6 z-[1000]"
+          >
+            <div className="flex items-start gap-4 mb-6">
+              <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
+              <div>
+                <h2 className="text-xl font-bold dark:text-zinc-100">
+                  Report Post
+                </h2>
+                <p className="text-black/50 dark:text-white/50">
+                  Select a reason for reporting this post
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-2 mb-6">
+              {reportReasons.map((reportReason) => (
+                <label
+                  key={reportReason.id}
+                  className={`block p-4 border-2 cursor-pointer transition-colors ${
+                    reason === reportReason.id
+                      ? "border-black dark:border-darkBorder bg-black/5 dark:bg-white/5"
+                      : "border-transparent hover:border-black dark:hover:border-darkBorder"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="report-reason"
+                      value={reportReason.id}
+                      checked={reason === reportReason.id}
+                      onChange={(e) => setReason(e.target.value)}
+                      className="sr-only"
+                    />
+                    <div
+                      className={`w-4 h-4 border-2 rounded-full ${
+                        reason === reportReason.id
+                          ? "border-black dark:border-darkBorder bg-black dark:bg-darkBorder"
+                          : "border-black/20 dark:border-white/20"
+                      }`}
+                    />
+                    <div>
+                      <p className="font-bold dark:text-zinc-100">
+                        {reportReason.label}
+                      </p>
+                      <p className="text-sm text-black/50 dark:text-white/50">
+                        {reportReason.description}
+                      </p>
+                    </div>
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            {/* Description field for "other" reason */}
+            <AnimatePresence>
+              {reason === "other" && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-6 overflow-hidden"
+                >
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Please describe the issue..."
+                    className="w-full bg-transparent border-2 border-black dark:border-darkBorder p-3 focus:outline-none dark:text-zinc-100 placeholder:text-black/50 dark:placeholder:text-white/50 min-h-[100px] resize-none"
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div className="flex gap-3">
+              <button
+                onClick={onClose}
+                className="flex-1 px-4 py-2 border-2 border-black dark:border-darkBorder font-bold hover:bg-black/5 dark:hover:bg-white/5 transition-colors dark:text-zinc-100"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={reason === "other" && !description.trim()}
+                className="flex-1 px-4 py-2 bg-red-500 text-white font-bold hover:bg-red-600 transition-colors disabled:opacity-50 disabled:hover:bg-red-500"
+              >
+                Report
+              </button>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
 const PostClient = ({ id }) => {
   const {
     post,
@@ -536,10 +690,15 @@ const PostClient = ({ id }) => {
     postComments,
     addComment,
     isNewCommenting,
+    deletePost,
+    reportPost,
   } = useSinglePostStore();
   const [newComment, setNewComment] = useState("");
   const [showReactions, setShowReactions] = useState(false);
   const { user } = useAuthStore();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isReporting, setIsReporting] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   useEffect(() => {
     console.log(currentUserReaction);
@@ -576,6 +735,33 @@ const PostClient = ({ id }) => {
     await addComment(post._id, newComment);
     console.log(newComment, post._id);
     setNewComment("");
+  };
+
+  const handleDeletePost = async () => {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      setIsDeleting(true);
+      try {
+        // Add deletePost to your store and implement the API call
+        await deletePost(post._id);
+        router.push("/"); // Redirect to home after deletion
+      } catch (error) {
+        console.error("Error deleting post:", error);
+      } finally {
+        setIsDeleting(false);
+      }
+    }
+  };
+
+  const handleReportPost = async (reason, description) => {
+    setIsReporting(true);
+    try {
+      // Add reportPost to your store and implement the API call
+      await reportPost(post._id, { reason, description });
+    } catch (error) {
+      console.error("Error reporting post:", error);
+    } finally {
+      setIsReporting(false);
+    }
   };
 
   return (
@@ -772,6 +958,69 @@ const PostClient = ({ id }) => {
               count={post?.repostCount || 0}
               label="reposts"
             />
+
+            {/* Add the new report/delete button */}
+            {post.user._id === user._id ? (
+              <div className="relative w-full cursor-pointer border-r dark:border-darkBorder dark:hover:bg-darkHover px-4 py-2">
+                <button
+                  onClick={handleDeletePost}
+                  disabled={isDeleting}
+                  className="group flex mx-auto items-center gap-2 text-red-500 transition-colors hover:text-red-600"
+                >
+                  {isDeleting ? (
+                    <div className="h-full">
+                      <div className="w-5 h-5 relative">
+                        <motion.div
+                          className="absolute inset-0 rounded-full border-2 border-red-500 !border-t-red-200"
+                          animate={{ rotate: [0, 360] }}
+                          style={{ scale: 0.8 }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            ease: "linear",
+                          }}
+                        ></motion.div>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <Trash className="w-6 h-6" />
+                      <span>Delete Post</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            ) : (
+              <div className="relative w-full cursor-pointer border-r dark:border-darkBorder dark:hover:bg-darkHover px-4 py-2">
+                <button
+                  onClick={() => setIsReportModalOpen(true)}
+                  disabled={isReporting}
+                  className="group flex mx-auto items-center gap-2 text-yellow-500 transition-colors hover:text-yellow-600"
+                >
+                  {isReporting ? (
+                    <div className="h-full">
+                      <div className="w-5 h-5 relative">
+                        <motion.div
+                          className="absolute inset-0 rounded-full border-2 border-yellow-500 !border-t-yellow-200"
+                          animate={{ rotate: [0, 360] }}
+                          style={{ scale: 0.8 }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            ease: "linear",
+                          }}
+                        ></motion.div>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <Flag className="w-6 h-6" />
+                      <span>Report Post</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Comments Section */}
@@ -832,6 +1081,11 @@ const PostClient = ({ id }) => {
           </div>
         </motion.article>
       </div>
+      <ReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        onSubmit={handleReportPost}
+      />
     </div>
   );
 };

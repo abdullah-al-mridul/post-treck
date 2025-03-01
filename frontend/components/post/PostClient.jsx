@@ -357,6 +357,7 @@ const CommentCard = ({ comment, user, postId }) => {
                   postId={postId}
                   reply={reply}
                   currentReaction={currentReplyReaction[reply._id]}
+                  authUser={user}
                 />
               ))}
             </div>
@@ -366,7 +367,13 @@ const CommentCard = ({ comment, user, postId }) => {
   );
 };
 
-const CommentReplyCard = ({ reply, commentId, postId, currentReaction }) => {
+const CommentReplyCard = ({
+  reply,
+  commentId,
+  postId,
+  currentReaction,
+  authUser,
+}) => {
   const { user, content, reactions, createdAt } = reply;
   const [showReplyReactions, setShowReplyReactions] = useState(false);
   const [isReacting, setIsReacting] = useState(false);
@@ -482,7 +489,7 @@ const CommentReplyCard = ({ reply, commentId, postId, currentReaction }) => {
             currentReaction={currentReaction}
           />
         </div>
-        {reply.user._id === user._id && (
+        {reply.user._id === authUser._id && (
           <button
             disabled={isDeletingReply}
             onClick={() =>

@@ -9,7 +9,15 @@ import Image from "next/image";
 import Link from "next/link";
 import useOnlineUsers from "@/store/onlineUsersStore";
 import useAuthStore from "@/store/authStore";
-import { Trash, AlertCircle } from "lucide-react";
+import {
+  Trash,
+  AlertCircle,
+  ArrowRight,
+  Heart,
+  ArrowUpRight,
+  MessageCircle,
+  Repeat,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const ReactionButton = ({
@@ -29,7 +37,7 @@ const ReactionButton = ({
     onClick={onClick}
     onMouseEnter={onHover}
   >
-    <button className="group flex items-center gap-2 text-black dark:text-zinc-100 transition-colors">
+    <button className="group flex items-center gap-2 mx-auto text-black dark:text-zinc-100 transition-colors">
       {icon}
       <span className=" transition-all">
         {count}
@@ -580,134 +588,117 @@ const PostCard = memo(
     };
 
     return (
-      <Link href={`/post/${post?._id}`}>
-        <motion.article
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="p-8 border-2 border-black hover:bg-darkBorder/10 dark:border-[#38444d] hover:translate-x-2 hover:-translate-y-2 hover:shadow-[8px_8px_0_0_#000] dark:hover:shadow-[8px_8px_0_0_rgba(56,68,77,0.4)] transition-all"
-        >
-          {/* Post Header */}
-          <div className="flex items-center gap-4 mb-6">
-            <div className="flex-1 flex items-center gap-4">
-              <div className="relative">
-                <Image
-                  width={48}
-                  height={48}
-                  placeholder="blur"
-                  blurDataURL={post?.user?.profilePic}
-                  src={
-                    post?.user?.profilePic === "default-avatar.png"
-                      ? "/default-avatar.png"
-                      : post?.user?.profilePic
-                  }
-                  alt={post?.user?.name}
-                  className="w-12 h-12 border-2 border-black dark:border-darkBorder"
-                />{" "}
-                {isOnline && (
-                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-[#15202B]" />
+      <motion.article
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="border-2 border-black hover:bg-darkBorder/10 dark:border-[#38444d] hover:translate-x-2 hover:-translate-y-2 hover:shadow-[4px_4px_0_0_#000] dark:hover:shadow-[4px_4px_0_0_rgba(56,68,77,0.4)] transition-all"
+      >
+        {/* Post Header */}
+        <div className="flex pt-8 px-8 items-center gap-4 mb-6">
+          <div className="flex-1 flex items-center gap-4">
+            <div className="relative">
+              <Image
+                width={48}
+                height={48}
+                placeholder="blur"
+                blurDataURL={post?.user?.profilePic}
+                src={
+                  post?.user?.profilePic === "default-avatar.png"
+                    ? "/default-avatar.png"
+                    : post?.user?.profilePic
+                }
+                alt={post?.user?.name}
+                className="w-12 h-12 border-2 border-black dark:border-darkBorder"
+              />{" "}
+              {isOnline && (
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-[#15202B]" />
+              )}
+            </div>
+            <div>
+              <h3 className="font-bold text-lg flex items-center">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    router.push(`/profile/${post?.user?._id}`);
+                  }}
+                  className="dark:text-zinc-100 relative before:absolute before:content-[''] before:h-[1px] before:transition-all before:bg-zinc-900 dark:before:bg-zinc-100 before:w-0 hover:before:w-full before:bottom-[2px] transition-colors"
+                >
+                  {post?.user?.name}
+                </button>
+                {post?.user?.role && (
+                  <VerificationBadge role={post?.user?.role} />
+                )}
+              </h3>
+              <div className="flex items-center gap-2 text-sm text-black/50 dark:text-white/50">
+                <time className="font-mono">{formatDate(post?.createdAt)}</time>
+                {post.isRepost && (
+                  <span className="flex items-center gap-1">
+                    • Reposted
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      className="w-4 h-4"
+                    >
+                      <path d="M2.785 5.215c-.694.833-1.115 1.806-1.115 2.785 0 3.314 3.582 6 8 6 4.418 0 8-2.686 8-6s-3.582-6-8-6c-2.92 0-5.473 1.175-6.885 2.785z" />
+                    </svg>
+                  </span>
                 )}
               </div>
-              <div>
-                <h3 className="font-bold text-lg flex items-center">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      router.push(`/profile/${post?.user?._id}`);
-                    }}
-                    className="dark:text-zinc-100 relative before:absolute before:content-[''] before:h-[1px] before:transition-all before:bg-zinc-900 dark:before:bg-zinc-100 before:w-0 hover:before:w-full before:bottom-[2px] transition-colors"
-                  >
-                    {post?.user?.name}
-                  </button>
-                  {post?.user?.role && (
-                    <VerificationBadge role={post?.user?.role} />
-                  )}
-                </h3>
-                <div className="flex items-center gap-2 text-sm text-black/50 dark:text-white/50">
-                  <time className="font-mono">
-                    {formatDate(post?.createdAt)}
-                  </time>
-                  {post.isRepost && (
-                    <span className="flex items-center gap-1">
-                      • Reposted
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        className="w-4 h-4"
-                      >
-                        <path d="M2.785 5.215c-.694.833-1.115 1.806-1.115 2.785 0 3.314 3.582 6 8 6 4.418 0 8-2.686 8-6s-3.582-6-8-6c-2.92 0-5.473 1.175-6.885 2.785z" />
-                      </svg>
-                    </span>
-                  )}
-                </div>
-              </div>
             </div>
-
-            {/* Add Menu Button */}
-
-            <PostMenu
-              postId={post?._id}
-              onReport={handleReport}
-              posterId={post.user._id}
-            />
           </div>
 
-          {/* Post Content */}
-          <div className="space-y-4">
-            {/* Caption */}
-            <p className="text-lg leading-relaxed dark:text-zinc-100">
-              {post?.caption}
-            </p>
+          {/* Add Menu Button */}
 
-            {/* Hashtags */}
-            {post?.hashtags?.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {post.hashtags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="text-blue-500 dark:text-blue-400 hover:underline cursor-pointer"
-                  >
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-            )}
+          <PostMenu
+            postId={post?._id}
+            onReport={handleReport}
+            posterId={post.user._id}
+          />
+        </div>
 
-            {/* Media */}
-            {post?.media && post.media.length > 0 && (
-              <div className="relative w-full aspect-square">
-                <Image
-                  fill
-                  sizes="100vh"
-                  placeholder="blur"
-                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRseHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/2wBDAR0XFx4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                  src={post.media[0]}
-                  alt="Post content"
-                  className="object-cover border border-black dark:border-darkBorder"
-                />
-              </div>
-            )}
-          </div>
+        {/* Post Content */}
+        <div className="space-y-4 px-8">
+          {/* Caption */}
+          <p className="text-lg leading-relaxed dark:text-zinc-100">
+            {post?.caption}
+          </p>
 
-          {/* Post Actions */}
-          <div className="flex border border-r-0 w-max dark:border-darkBorder mt-6 font-mono">
-            <ReactionButton
-              icon={
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-6 h-6 transition-all"
+          {/* Hashtags */}
+          {post?.hashtags?.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {post.hashtags.map((tag, index) => (
+                <span
+                  key={index}
+                  className="text-blue-500 dark:text-blue-400 hover:underline cursor-pointer"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                  />
-                </svg>
-              }
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Media */}
+          {post?.media && post.media.length > 0 && (
+            <div className="relative w-full aspect-square">
+              <Image
+                fill
+                sizes="100vh"
+                placeholder="blur"
+                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRseHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/2wBDAR0XFx4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                src={post.media[0]}
+                alt="Post content"
+                className="object-cover border border-black dark:border-darkBorder"
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Post Actions */}
+        <div className="px-8">
+          <div className="flex border border-r-0 w-full dark:border-darkBorder mt-6 font-mono">
+            <ReactionButton
+              icon={<Heart className="w-5 h-5" />}
               count={totalReactions}
               label="reactions"
               onHover={() => setShowReactions(true)}
@@ -719,53 +710,32 @@ const PostCard = memo(
             />
 
             <ReactionButton
-              icon={
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-6 h-6 transition-all"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 0 1-.923 1.785A5.969 5.969 0 0 0 6 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337Z"
-                  />
-                </svg>
-              }
+              icon={<MessageCircle className="w-5 h-5" />}
               count={post?.comments?.length || 0}
               label="comments"
               onClick={() => setShowComments(!showComments)}
             />
 
             <ReactionButton
-              icon={
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-6 h-6 transition-all"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"
-                  />
-                </svg>
-              }
+              icon={<Repeat className="w-5 h-5" />}
               count={post?.repostCount || 0}
               label="reposts"
             />
           </div>
-
-          {/* Comment Section */}
-          <CommentSection post={post} isVisible={showComments} />
-        </motion.article>
-      </Link>
+        </div>
+        <div
+          onClick={(e) => {
+            e.preventDefault();
+            router.push(`/post/${post._id}`);
+          }}
+          className="flex justify-center hover:bg-darkHover cursor-pointer dark:hover:bg-darkHover group border-t border-black dark:border-darkBorder p-2 mt-4"
+        >
+          <button className="text-sm font-medium text-black/50 dark:text-white/50 hover:text-black group-hover:dark:text-white/80 transition-colors flex items-center gap-1">
+            View full post
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      </motion.article>
     );
   },
   (prevProps, nextProps) => {

@@ -16,7 +16,14 @@ const findUserReaction = (reactions, userId) => {
   }
   return null;
 };
-
+const findReplyReaction = (reply, userId) => {
+  for (const [reactionType, users] of Object.entries(reply.reactions)) {
+    if (users.includes(userId)) {
+      return reactionType;
+    }
+  }
+  return null;
+};
 const useSinglePostStore = create((set, get) => ({
   post: null,
   loading: true,
@@ -27,7 +34,8 @@ const useSinglePostStore = create((set, get) => ({
   postComments: [],
   currentCommentReaction: {},
   isNewCommenting: false,
-
+  commentReplies: {},
+  currentReplyReaction: {},
   getPost: async (postId, user) => {
     set({ loading: true });
     try {
@@ -42,6 +50,18 @@ const useSinglePostStore = create((set, get) => ({
         commentReactions[comment._id] = findCommentReaction(comment, user._id);
       });
       set({ currentCommentReaction: commentReactions });
+      const commentReplies = {};
+      data.post.comments.forEach((comment) => {
+        commentReplies[comment._id] = comment.replies;
+      });
+      set({ commentReplies });
+      const replyReactions = {};
+      data.post.comments.forEach((comment) => {
+        comment.replies.forEach((reply) => {
+          replyReactions[reply._id] = findReplyReaction(reply, user._id);
+        });
+      });
+      set({ currentReplyReaction: replyReactions });
     } catch (error) {
       set({ error: error.message });
       console.log(error);
@@ -166,6 +186,48 @@ const useSinglePostStore = create((set, get) => ({
       set({ error: error.message });
     } finally {
       setIsDeletingComment(false);
+    }
+  },
+  reactToReply: async (
+    postId,
+    commentId,
+    replyId,
+    type,
+    user,
+    setIsReacting
+  ) => {
+    setIsReacting(true);
+    try {
+      const previousReaction = get().currentReplyReaction[replyId];
+      const requestPayload = {};
+      const METHOD = previousReaction === type ? "unreact" : "react";
+      if (METHOD === "react") {
+        requestPayload.type = type;
+      }
+      const { data } = await useApi().post(
+        `/posts/${postId}/comment/${commentId}/reply/${replyId}/${METHOD}`,
+        requestPayload
+      );
+      set({
+        currentReplyReaction: {
+          ...get().currentReplyReaction,
+          [replyId]: findUserReaction(data.reactions, user._id),
+        },
+      });
+      set({
+        commentReplies: {
+          ...get().commentReplies,
+          [commentId]: get().commentReplies[commentId].map((reply) =>
+            reply._id === replyId
+              ? { ...reply, reactions: data.reactions }
+              : reply
+          ),
+        },
+      });
+    } catch (error) {
+      set({ error: error.message });
+    } finally {
+      setIsReacting(false);
     }
   },
 }));

@@ -1,5 +1,5 @@
 "use client";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { formatDate } from "@/utils/formatDate";
@@ -60,8 +60,14 @@ const ReactionButton = ({
 };
 const CommentCard = ({ comment, user, postId }) => {
   const [showCommentReactions, setShowCommentReactions] = useState(false);
-  const { currentCommentReaction, reactToComment, editComment, deleteComment } =
-    useSinglePostStore();
+  const {
+    currentCommentReaction,
+    reactToComment,
+    editComment,
+    deleteComment,
+    commentReplies,
+    currentReplyReaction,
+  } = useSinglePostStore();
   const [isReacting, setIsReacting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isCommentUpdating, setIsCommentUpdating] = useState(false);
@@ -70,7 +76,9 @@ const CommentCard = ({ comment, user, postId }) => {
   const handleCommentReactionHover = () => {
     setShowCommentReactions(true);
   };
-
+  useEffect(() => {
+    console.log("commentReplies", commentReplies);
+  }, [commentReplies]);
   const handleCommentReactionLeave = () => {
     setShowCommentReactions(false);
   };
@@ -93,6 +101,9 @@ const CommentCard = ({ comment, user, postId }) => {
   useEffect(() => {
     console.log("currentCommentReaction", currentCommentReaction);
   }, [currentCommentReaction]);
+  useEffect(() => {
+    console.log("currentReplyReaction", currentReplyReaction);
+  }, [currentReplyReaction]);
   return (
     <motion.div
       key={comment._id}
@@ -280,9 +291,144 @@ const CommentCard = ({ comment, user, postId }) => {
           </button>
         )}
       </div>
+      {commentReplies[comment._id] &&
+        commentReplies[comment._id].length > 0 && (
+          <div className="mt-4 space-y-4">
+            {commentReplies[comment._id].map((reply) => (
+              <CommentReplyCard
+                key={reply._id}
+                commentId={comment._id}
+                postId={postId}
+                reply={reply}
+                currentReaction={currentReplyReaction[reply._id]}
+              />
+            ))}
+          </div>
+        )}
     </motion.div>
   );
 };
+
+const CommentReplyCard = ({ reply, commentId, postId, currentReaction }) => {
+  const { user, content, reactions, createdAt } = reply;
+  const [showReplyReactions, setShowReplyReactions] = useState(false);
+  const [isReacting, setIsReacting] = useState(false);
+  const { reactToReply } = useSinglePostStore();
+  const totalReactions = Object.values(reactions).reduce(
+    (sum, arr) => sum + arr.length,
+    0
+  );
+
+  const handleReplyReactionHover = () => {
+    setShowReplyReactions(true);
+  };
+
+  const handleReplyReactionLeave = () => {
+    setShowReplyReactions(false);
+  };
+  const handleReplyReaction = async (replyId, type) => {
+    await reactToReply(postId, commentId, replyId, type, user, setIsReacting);
+    // console.log(
+    //   "postId",
+    //   postId,
+    //   "commentId",
+    //   commentId,
+    //   "replyId",
+    //   replyId,
+    //   "type",
+    //   type
+    // );
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="ml-12 p-4 border-2 border-black dark:border-darkBorder bg-white dark:bg-[#15202B]"
+    >
+      {/* Reply Header */}
+      <div className="flex items-center gap-4 mb-4">
+        <Link href={`/profile/${user._id}`} className="block relative">
+          <Image
+            src={
+              user.profilePic === "default-avatar.png"
+                ? "/default-avatar.png"
+                : user.profilePic
+            }
+            alt={user.name}
+            width={32}
+            height={32}
+            className="border-2 border-black dark:border-darkBorder"
+          />
+        </Link>
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/profile/${user._id}`}
+              className="font-bold text-sm hover:underline dark:text-zinc-100"
+            >
+              {user.name}
+            </Link>
+          </div>
+          <div className="text-xs text-black/50 dark:text-white/50">
+            {formatDate(createdAt)}
+          </div>
+        </div>
+      </div>
+
+      {/* Reply Content */}
+      <div className="mb-4">
+        <p className="text-sm text-black/70 dark:text-white/70 leading-relaxed">
+          {content}
+        </p>
+      </div>
+
+      {/* Reply Actions */}
+      <div className="flex items-center text-xs border border-darkBorder">
+        <div
+          onMouseEnter={handleReplyReactionHover}
+          onMouseLeave={handleReplyReactionLeave}
+          className="relative border-r border-darkBorder flex-1 py-1 h-full hover:bg-darkHover cursor-pointer"
+        >
+          <button className="flex items-center gap-2 text-black/50 dark:text-white/50 hover:text-black mx-auto transition-colors">
+            {isReacting ? (
+              <div className="h-full">
+                <div className="w-4 h-4 relative">
+                  <motion.div
+                    className="absolute inset-0 rounded-full border-2 border-black dark:border-darkBorder !border-t-darkBorder/50"
+                    animate={{ rotate: [0, 360] }}
+                    style={{ scale: 0.8 }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  ></motion.div>
+                </div>
+              </div>
+            ) : (
+              <>
+                <Heart className="w-3 h-3" />
+                <span>{totalReactions || 0}</span>
+              </>
+            )}
+          </button>
+
+          <ReactionDrawer
+            isVisible={showReplyReactions}
+            onReact={(replyId, type) => handleReplyReaction(replyId, type)}
+            className="z-50"
+            onMouseEnter={handleReplyReactionHover}
+            onMouseLeave={handleReplyReactionLeave}
+            postId={reply._id}
+            currentReaction={currentReaction}
+          />
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
 const PostClient = ({ id }) => {
   const {
     post,

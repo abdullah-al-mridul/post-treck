@@ -67,12 +67,15 @@ const CommentCard = ({ comment, user, postId }) => {
     deleteComment,
     commentReplies,
     currentReplyReaction,
+    addReply,
   } = useSinglePostStore();
   const [isReacting, setIsReacting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isCommentUpdating, setIsCommentUpdating] = useState(false);
   const [isDeletingComment, setIsDeletingComment] = useState(false);
   const [newContent, setNewContent] = useState(comment.content);
+  const [newReply, setNewReply] = useState("");
+  const [isAddingReply, setIsAddingReply] = useState(false);
   const handleCommentReactionHover = () => {
     setShowCommentReactions(true);
   };
@@ -293,17 +296,71 @@ const CommentCard = ({ comment, user, postId }) => {
       </div>
       {commentReplies[comment._id] &&
         commentReplies[comment._id].length > 0 && (
-          <div className="mt-4 space-y-4">
-            {commentReplies[comment._id].map((reply) => (
-              <CommentReplyCard
-                key={reply._id}
-                commentId={comment._id}
-                postId={postId}
-                reply={reply}
-                currentReaction={currentReplyReaction[reply._id]}
-              />
-            ))}
-          </div>
+          <>
+            {/* Add Replies Header */}
+            <div className="mt-6 mb-4">
+              <h3 className="text-xl font-bold dark:text-zinc-100">Replies</h3>
+            </div>
+
+            {/* Update Reply Input Form */}
+            <div className="mb-8">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  addReply(postId, comment._id, newReply, setIsAddingReply);
+                  setNewReply("");
+                }}
+                className="flex"
+              >
+                <input
+                  type="text"
+                  value={newReply}
+                  onChange={(e) => setNewReply(e.target.value)}
+                  placeholder="Write a reply..."
+                  className="flex-1 bg-transparent border border-black dark:border-darkBorder p-2 dark:text-zinc-100 focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  disabled={isAddingReply}
+                  className="px-6 py-2 bg-black dark:bg-transparent border border-l-0 border-black dark:border-darkBorder dark:disabled:hover:bg-transparent dark:hover:bg-darkHover text-white dark:text-zinc-100 font-medium hover:bg-black/80 transition-colors"
+                >
+                  {isAddingReply ? (
+                    <div className="h-full">
+                      <div className="w-5 h-5 relative">
+                        <motion.div
+                          className="absolute inset-0 rounded-full border-2 border-black dark:border-darkBorder !border-t-darkBorder/50"
+                          animate={{ rotate: [0, 360] }}
+                          style={{
+                            scale: 0.8,
+                          }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            ease: "linear",
+                          }}
+                        ></motion.div>
+                      </div>
+                    </div>
+                  ) : (
+                    "Reply"
+                  )}
+                </button>
+              </form>
+            </div>
+
+            {/* Replies List */}
+            <div className="mt-4 space-y-4">
+              {commentReplies[comment._id].map((reply) => (
+                <CommentReplyCard
+                  key={reply._id}
+                  commentId={comment._id}
+                  postId={postId}
+                  reply={reply}
+                  currentReaction={currentReplyReaction[reply._id]}
+                />
+              ))}
+            </div>
+          </>
         )}
     </motion.div>
   );
@@ -313,7 +370,8 @@ const CommentReplyCard = ({ reply, commentId, postId, currentReaction }) => {
   const { user, content, reactions, createdAt } = reply;
   const [showReplyReactions, setShowReplyReactions] = useState(false);
   const [isReacting, setIsReacting] = useState(false);
-  const { reactToReply } = useSinglePostStore();
+  const [isDeletingReply, setIsDeletingReply] = useState(false);
+  const { reactToReply, deleteReply } = useSinglePostStore();
   const totalReactions = Object.values(reactions).reduce(
     (sum, arr) => sum + arr.length,
     0
@@ -344,7 +402,7 @@ const CommentReplyCard = ({ reply, commentId, postId, currentReaction }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="ml-12 p-4 border-2 border-black dark:border-darkBorder bg-white dark:bg-[#15202B]"
+      className=" p-4 border-2 border-black dark:border-darkBorder bg-white dark:bg-[#15202B]"
     >
       {/* Reply Header */}
       <div className="flex items-center gap-4 mb-4">
@@ -424,6 +482,37 @@ const CommentReplyCard = ({ reply, commentId, postId, currentReaction }) => {
             currentReaction={currentReaction}
           />
         </div>
+        {reply.user._id === user._id && (
+          <button
+            disabled={isDeletingReply}
+            onClick={() =>
+              deleteReply(postId, commentId, reply._id, setIsDeletingReply)
+            }
+            className="flex flex-1 py-1 border-r-0 border-l-0 border-darkBorder items-center dark:hover:bg-darkHover gap-2 justify-center text-black/50 dark:text-white/50 hover:text-red-500 transition-colors"
+          >
+            {isDeletingReply ? (
+              <div className="h-full">
+                <div className="w-4 h-4 relative">
+                  <motion.div
+                    className="absolute inset-0 rounded-full border-2 border-black dark:border-darkBorder !border-t-darkBorder/50"
+                    animate={{ rotate: [0, 360] }}
+                    style={{ scale: 0.8 }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  ></motion.div>
+                </div>
+              </div>
+            ) : (
+              <>
+                <Trash className="w-4 h-4" />
+                <span>Delete</span>
+              </>
+            )}
+          </button>
+        )}
       </div>
     </motion.div>
   );

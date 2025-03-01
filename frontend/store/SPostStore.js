@@ -230,6 +230,45 @@ const useSinglePostStore = create((set, get) => ({
       setIsReacting(false);
     }
   },
+  deleteReply: async (postId, commentId, replyId, setIsDeletingReply) => {
+    setIsDeletingReply(true);
+    try {
+      await useApi().delete(
+        `/posts/${postId}/comment/${commentId}/reply/${replyId}`
+      );
+      set({
+        commentReplies: {
+          ...get().commentReplies,
+          [commentId]: get().commentReplies[commentId].filter(
+            (reply) => reply._id !== replyId
+          ),
+        },
+      });
+    } catch (error) {
+      set({ error: error.message });
+    } finally {
+      setIsDeletingReply(false);
+    }
+  },
+  addReply: async (postId, commentId, reply, setIsAddingReply) => {
+    setIsAddingReply(true);
+    try {
+      const { data } = await useApi().post(
+        `/posts/${postId}/comment/${commentId}/reply`,
+        { content: reply }
+      );
+      set({
+        commentReplies: {
+          ...get().commentReplies,
+          [commentId]: [...get().commentReplies[commentId], data.reply],
+        },
+      });
+    } catch (error) {
+      set({ error: error.message });
+    } finally {
+      setIsAddingReply(false);
+    }
+  },
 }));
 
 export default useSinglePostStore;

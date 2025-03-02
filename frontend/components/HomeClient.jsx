@@ -64,18 +64,18 @@ export default function HomeClient() {
     try {
       setIsPosting(true);
 
-      // FormData দিয়ে multiple images পাঠাবো
       const formData = new FormData();
       formData.append("caption", newPost);
-      selectedImages.forEach((image) => formData.append("images", image));
-
+      selectedImages.forEach((image) => formData.append("media", image));
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
       const result = await createPost(formData);
 
       if (result) {
         setNewPost("");
         setSelectedImages([]);
         setImagePreviews([]);
-        await getFeedPosts();
       }
     } catch (error) {
       console.error("Error creating post:", error);
@@ -165,7 +165,7 @@ export default function HomeClient() {
             </div>
           </div>
 
-          <form onSubmit={handleCreatePost} className="p-4 space-y-4">
+          <form onSubmit={handleCreatePost} className="p-4 space-y-2">
             <textarea
               value={newPost}
               onChange={(e) => setNewPost(e.target.value)}

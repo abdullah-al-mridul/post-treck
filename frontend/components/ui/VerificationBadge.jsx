@@ -40,7 +40,7 @@ export default function VerificationBadge({ role }) {
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="currentColor"
-          className={`w-6 h-6 ${badgeInfo.color} inline-block ml-2`}
+          className={`w-[18px] h-[18px] ${badgeInfo.color} inline-block ml-2`}
         >
           <path
             fillRule="evenodd"

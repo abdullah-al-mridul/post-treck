@@ -17,6 +17,7 @@ const usePostStore = create((set, get) => ({
   error: null,
   currentUserReactions: {},
   isReacting: {},
+  isPostDeleting: {},
   // Add reaction to post
   addReaction: async (postId, type, currentReaction) => {
     set((state) => ({
@@ -93,27 +94,14 @@ const usePostStore = create((set, get) => ({
     }
   },
   // Modified createPost to handle image with better error handling
-  createPost: async (postData) => {
+  createPost: async (formData) => {
     try {
-      const formData = new FormData();
-      formData.append("caption", postData.caption);
-
-      if (postData.image) {
-        formData.append("media", postData.image);
-        console.log("Image being sent:", postData.image);
-      }
-
-      // Log the entire FormData
-      for (let pair of formData.entries()) {
-        console.log(pair[0], pair[1]);
-      }
-
       const { data } = await useApi().post("/posts", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-
+      set({ posts: [data.post, ...get().posts] });
       return data;
     } catch (error) {
       console.error("Full error details:", error.response?.data);
@@ -138,6 +126,29 @@ const usePostStore = create((set, get) => ({
       }
     } catch (err) {
       console.log(err);
+    }
+  },
+  deletePost: async (postId) => {
+    set((state) => ({
+      isPostDeleting: {
+        ...state.isPostDeleting,
+        [postId]: true,
+      },
+    }));
+    try {
+      await useApi().delete(`/posts/${postId}`);
+      set((state) => ({
+        posts: state.posts.filter((post) => post._id !== postId),
+      }));
+    } catch (err) {
+      console.log(err);
+    } finally {
+      set((state) => ({
+        isPostDeleting: {
+          ...state.isPostDeleting,
+          [postId]: false,
+        },
+      }));
     }
   },
 }));

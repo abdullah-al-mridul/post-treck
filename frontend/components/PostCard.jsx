@@ -223,13 +223,17 @@ const ReportModal = ({ isOpen, onClose, onSubmit }) => {
 };
 
 // Add PostMenu component
-const PostMenu = ({ postId, onReport, posterId }) => {
+const PostMenu = ({ postId, onReport, posterId, onDelete, isDeleting }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const { user } = useAuthStore();
 
   const handleReport = (reason, description = "") => {
     onReport(postId, reason, description);
+  };
+
+  const handleDeletePost = (postId) => {
+    onDelete(postId);
   };
 
   return (
@@ -290,12 +294,26 @@ const PostMenu = ({ postId, onReport, posterId }) => {
               {user?._id === posterId && (
                 <button
                   onClick={() => {
-                    onReport();
-                    setIsOpen(false);
+                    handleDeletePost(postId);
                   }}
+                  disabled={isDeleting}
                   className="w-full px-4 py-2 text-left dark:hover:bg-[#2B353F] hover:bg-black/5 transition-colors flex items-center gap-2 text-red-500"
                 >
-                  <Trash className="w-5 h-5" />
+                  {isDeleting ? (
+                    <div className="w-5 h-5 relative">
+                      <motion.div
+                        className="absolute inset-0 rounded-full border-2 border-black dark:border-darkBorder !border-t-darkBorder/50"
+                        animate={{ rotate: [0, 360] }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                      ></motion.div>
+                    </div>
+                  ) : (
+                    <Trash className="w-5 h-5" />
+                  )}
                   Delete Post
                 </button>
               )}
@@ -318,8 +336,14 @@ const PostCard = memo(
     const [showReactions, setShowReactions] = useState(false);
     const router = useRouter();
 
-    const { addReaction, reportPost, currentUserReactions, isReacting } =
-      usePostStore();
+    const {
+      addReaction,
+      reportPost,
+      currentUserReactions,
+      isReacting,
+      deletePost,
+      isPostDeleting,
+    } = usePostStore();
     const { onlineUsers } = useOnlineUsers();
 
     const isOnline = onlineUsers.indexOf(post.user._id) > -1;
@@ -333,7 +357,9 @@ const PostCard = memo(
     const handleReaction = async (type, currentReaction) => {
       addReaction(post._id, type, currentReaction);
     };
-
+    const handleDeletePost = (postId) => {
+      deletePost(postId);
+    };
     const handleReport = (postId, reason, desc) => {
       reportPost(postId, reason, desc);
     };
@@ -405,6 +431,8 @@ const PostCard = memo(
             postId={post?._id}
             onReport={handleReport}
             posterId={post.user._id}
+            onDelete={handleDeletePost}
+            isDeleting={isPostDeleting[post?._id]}
           />
         </div>
 

@@ -23,7 +23,7 @@ export default function HomeClient() {
 
   //get feed posts
   useEffect(() => {
-    getFeedPosts();
+    getFeedPosts(user._id);
   }, []);
 
   // Handle image selection with validation
@@ -83,7 +83,51 @@ export default function HomeClient() {
   };
 
   //if loading, show spinner
-  if (loading) return <Spinner />;
+  // if (loading) return <Spinner />;
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-24 pb-12 px-4 animate-pulse">
+        <div className="max-w-2xl mx-auto space-y-8">
+          {/* Create Post Section Skeleton */}
+          <div className="bg-white dark:bg-[#15202B] border-2 border-gray-200 dark:border-gray-700">
+            <div className="border-b-2 border-gray-200 dark:border-gray-700 p-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700"></div>
+                <div className="flex-1">
+                  <div className="w-32 h-6 bg-gray-200 dark:bg-gray-700 mb-2"></div>
+                  <div className="w-24 h-4 bg-gray-200 dark:bg-gray-700"></div>
+                </div>
+              </div>
+            </div>
+            <div className="p-4">
+              <div className="w-full h-32 bg-gray-200 dark:bg-gray-700"></div>
+            </div>
+          </div>
+
+          {/* Posts Skeleton */}
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="bg-white dark:bg-[#15202B] border-2 border-gray-200 dark:border-gray-700 p-6"
+            >
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700"></div>
+                <div className="flex-1">
+                  <div className="w-48 h-6 bg-gray-200 dark:bg-gray-700 mb-2"></div>
+                  <div className="w-24 h-4 bg-gray-200 dark:bg-gray-700"></div>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="w-full h-4 bg-gray-200 dark:bg-gray-700"></div>
+                <div className="w-3/4 h-4 bg-gray-200 dark:bg-gray-700"></div>
+                <div className="w-full h-64 bg-gray-200 dark:bg-gray-700"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   //if error, show error message
   if (error) {

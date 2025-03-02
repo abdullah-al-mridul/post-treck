@@ -34,7 +34,6 @@ const ReactionButton = ({
   <div
     className="relative w-full cursor-pointer border-r dark:border-darkBorder dark:hover:bg-darkHover px-4 py-2"
     onMouseLeave={onMouseLeave}
-    onClick={onClick}
     onMouseEnter={onHover}
   >
     <button className="group flex items-center gap-2 mx-auto text-black dark:text-zinc-100 transition-colors">
@@ -46,7 +45,7 @@ const ReactionButton = ({
     </button>
     <ReactionDrawer
       isVisible={showDrawer}
-      onReact={(type) => onClick(type)}
+      onReact={(_, type) => onClick(type, currentReaction)}
       className="z-50"
       onMouseEnter={onHover}
       onMouseLeave={onMouseLeave}
@@ -476,111 +475,27 @@ const PostMenu = ({ postId, onReport, posterId }) => {
 const PostCard = memo(
   ({ post }) => {
     const [showReactions, setShowReactions] = useState(false);
-    const [showComments, setShowComments] = useState(false);
-    const [localPost, setLocalPost] = useState(post);
     const router = useRouter();
 
-    const {
-      addReaction,
-      reportPost,
-      removeReaction,
-      getPostReactions,
-      addComment,
-    } = usePostStore();
+    const { addReaction, reportPost, removeReaction, currentUserReactions } =
+      usePostStore();
     const { onlineUsers } = useOnlineUsers();
 
     const isOnline = onlineUsers.indexOf(post.user._id) > -1;
 
     // Fetch post reactions when component mounts
-    useEffect(() => {
-      const fetchPostReactions = async () => {
-        try {
-          const data = await getPostReactions(post._id);
-          setLocalPost((prev) => ({
-            ...prev,
-            reactions: data.reactions,
-            userReaction: data.userReaction,
-          }));
-        } catch (error) {
-          console.error("Error fetching reactions:", error);
-        }
-      };
 
-      fetchPostReactions();
-    }, [post._id, getPostReactions]);
-
-    const totalReactions = Object.values(localPost?.reactions || {}).reduce(
+    const totalReactions = Object.values(post?.reactions || {}).reduce(
       (sum, reactions) => sum + reactions.length,
       0
     );
 
     const handleMouseLeave = () => setShowReactions(false);
-
-    const handleReaction = async (type) => {
-      try {
-        const prevUserReaction = localPost.userReaction;
-        const prevState = localPost; // Store previous state for error recovery
-
-        // Optimistic update
-        if (type === prevUserReaction) {
-          // Removing reaction
-          setLocalPost((prev) => ({
-            ...prev,
-            reactions: {
-              ...prev.reactions,
-              [type]:
-                prev.reactions[type]?.filter(
-                  (userId) => userId !== prev.user._id
-                ) || [],
-            },
-            userReaction: null,
-            reactionCount:
-              (prev.reactionCount || 0) > 0 ? prev.reactionCount - 1 : 0,
-          }));
-
-          await removeReaction(localPost._id);
-        } else {
-          // Adding/changing reaction
-          setLocalPost((prev) => ({
-            ...prev,
-            reactions: {
-              ...prev.reactions,
-              ...(prevUserReaction && {
-                [prevUserReaction]:
-                  prev.reactions[prevUserReaction]?.filter(
-                    (userId) => userId !== prev.user._id
-                  ) || [],
-              }),
-              [type]: [...(prev.reactions[type] || []), prev.user._id],
-            },
-            userReaction: type,
-            reactionCount: prevUserReaction
-              ? prev.reactionCount || 0 // If changing reaction, count stays same
-              : (prev.reactionCount || 0) + 1, // If new reaction, increase count
-          }));
-
-          await addReaction(localPost._id, type);
-        }
-
-        // Fetch fresh data after operation to ensure UI is in sync
-        const data = await getPostReactions(localPost._id);
-        setLocalPost((prev) => ({
-          ...prev,
-          reactions: data.reactions,
-          userReaction: data.userReaction,
-          reactionCount: Object.values(data.reactions).reduce(
-            (sum, reactions) => sum + reactions.length,
-            0
-          ),
-        }));
-
-        setShowReactions(false);
-      } catch (error) {
-        // Revert to previous state on error
-        setLocalPost(prevState);
-        console.error("Error handling reaction:", error);
-        alert(error.message || "Failed to update reaction");
-      }
+    useEffect(() => {
+      console.log(currentUserReactions);
+    }, [currentUserReactions]);
+    const handleReaction = async (type, currentReaction) => {
+      addReaction(post._id, type, currentReaction);
     };
 
     const handleReport = (postId, reason, desc) => {
@@ -705,8 +620,8 @@ const PostCard = memo(
               onClick={handleReaction}
               showDrawer={showReactions}
               onMouseLeave={handleMouseLeave}
-              postId={localPost._id}
-              currentReaction={localPost.userReaction}
+              postId={post._id}
+              currentReaction={currentUserReactions[post._id]}
             />
 
             <ReactionButton

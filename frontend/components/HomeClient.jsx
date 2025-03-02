@@ -5,7 +5,7 @@ import PostCard from "@/components/PostCard";
 import usePostStore from "@/store/postStore";
 import useAuthStore from "@/store/authStore";
 import Spinner from "@/components/ui/Spinner";
-import { Image } from "lucide-react";
+import { Image, Plus, X } from "lucide-react";
 
 export default function HomeClient() {
   //get posts, loading, error and getFeedPosts from post store
@@ -16,8 +16,9 @@ export default function HomeClient() {
   const [newPost, setNewPost] = useState("");
   const [isPosting, setIsPosting] = useState(false);
   // Add new state for image
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
+
   // Add ref for image input
   const imageInputRef = useRef(null);
 
@@ -28,50 +29,52 @@ export default function HomeClient() {
 
   // Handle image selection with validation
   const handleImageSelect = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Check file size (e.g., 5MB limit)
-      if (file.size > 5 * 1024 * 1024) {
-        alert("Image size should be less than 5MB");
-        return;
-      }
+    const files = Array.from(e.target.files);
 
-      // Check file type
-      if (!file.type.startsWith("image/")) {
-        alert("Please select an image file");
-        return;
-      }
-
-      setSelectedImage(file);
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreview(previewUrl);
+    if (selectedImages.length + files.length > 10) {
+      alert("You can upload a maximum of 10 images.");
+      return;
     }
+
+    const validImages = files.filter(
+      (file) => file.type.startsWith("image/") && file.size <= 5 * 1024 * 1024
+    );
+
+    if (validImages.length !== files.length) {
+      alert("Some files are not images or exceed 5MB limit.");
+    }
+
+    setSelectedImages((prev) => [...prev, ...validImages]);
+    setImagePreviews((prev) => [
+      ...prev,
+      ...validImages.map((file) => URL.createObjectURL(file)),
+    ]);
   };
 
   // Clear image selection
-  const clearImage = () => {
-    setSelectedImage(null);
-    setImagePreview(null);
-    if (imageInputRef.current) {
-      imageInputRef.current.value = "";
-    }
+  const removeImage = (index) => {
+    setSelectedImages((prev) => prev.filter((_, i) => i !== index));
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Modified handleCreatePost with better error handling
   const handleCreatePost = async (e) => {
     e.preventDefault();
-    if (!newPost.trim() && !selectedImage) return;
+    if (!newPost.trim() && selectedImages.length === 0) return;
 
     try {
       setIsPosting(true);
-      const result = await createPost({
-        caption: newPost,
-        image: selectedImage,
-      });
+
+      // FormData দিয়ে multiple images পাঠাবো
+      const formData = new FormData();
+      formData.append("caption", newPost);
+      selectedImages.forEach((image) => formData.append("images", image));
+
+      const result = await createPost(formData);
 
       if (result) {
         setNewPost("");
-        clearImage();
+        setSelectedImages([]);
+        setImagePreviews([]);
         await getFeedPosts();
       }
     } catch (error) {
@@ -172,36 +175,27 @@ export default function HomeClient() {
             />
 
             {/* Image Preview */}
-            {imagePreview && (
-              <div className="relative">
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="max-h-64 w-auto border-4 border-black dark:border-darkBorder"
-                />
-                <button
-                  type="button"
-                  onClick={clearImage}
-                  className="absolute top-2 right-2 p-1 bg-black/50 hover:bg-black text-white dark:text-zinc-100 dark:bg-darkBorder/50 transition-colors dark:hover:bg-darkBorder/60"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
+            <div className="flex flex-wrap gap-2">
+              {imagePreviews.map((preview, index) => (
+                <div key={index} className="relative">
+                  <img
+                    src={preview}
+                    alt={`Preview ${index}`}
+                    className="h-24 w-auto border-2 border-black dark:border-darkBorder"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    className="absolute top-0 right-0 bg-red-500 dark:bg-darkBorder text-white p-1"
                   >
-                    <path
-                      fillRule="evenodd"
-                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </div>
-            )}
+                    <X className="text-white dark:text-zinc-100 h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
 
             <div className="flex justify-between items-center">
-              <div className="flex gap-2">
+              <div className="flex gap-2 w-full mr-4">
                 <input
                   type="file"
                   ref={imageInputRef}
@@ -212,21 +206,26 @@ export default function HomeClient() {
                 <button
                   type="button"
                   onClick={() => imageInputRef.current?.click()}
-                  className="p-2 border-2 border-black dark:border-darkBorder hover:bg-black hover:text-white dark:hover:bg-[#38444d36] dark:hover:text-black transition-colors"
+                  className="p-2 border-2 w-full flex border-dashed items-center justify-center border-black dark:border-darkBorder hover:bg-black hover:text-white dark:hover:bg-[#38444d36] dark:hover:text-black transition-colors"
                 >
-                  <Image className=" text-black dark:text-darkBorder" />
+                  {selectedImages.length > 0 ? (
+                    <div className="flex items-center gap-2">
+                      <Plus className=" text-black dark:text-darkBorder" />
+                      <p className="text-black/50 dark:text-darkBorder text-sm">
+                        ({selectedImages.length}/10)
+                      </p>
+                    </div>
+                  ) : (
+                    <Image className=" text-black dark:text-darkBorder" />
+                  )}
                 </button>
-                {/* <button
-                  type="button"
-                  className="p-2 border-2 border-black dark:border-darkBorder hover:bg-black hover:text-white dark:hover:bg-[#38444d36] dark:hover:text-black transition-colors"
-                >
-                  🎥
-                </button> */}
               </div>
 
               <button
                 type="submit"
-                disabled={isPosting || (!newPost.trim() && !selectedImage)}
+                disabled={
+                  isPosting || (!newPost.trim() && selectedImages.length === 0)
+                }
                 className="px-8 py-2 bg-black text-white dark:bg-darkBorder dark:text-zinc-100 font-bold border-4 border-black dark:border-darkBorder hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
               >
                 {isPosting ? (

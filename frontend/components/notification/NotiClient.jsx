@@ -4,12 +4,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bell, Check, MessageSquare, Heart, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { formatDate } from "@/utils/formatDate";
+import { useNotificationStore } from "@/store/notificationStore";
 
 const NotificationCard = ({ notification, onDelete, onMarkAsRead }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isMarkingRead, setIsMarkingRead] = useState(false);
+
+  // Early return if notification is invalid
+  if (!notification || !notification.sender) {
+    return null;
+  }
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -80,7 +86,11 @@ const NotificationCard = ({ notification, onDelete, onMarkAsRead }) => {
                 )}
               </div>
               <Link
-                href={`/post/${notification.post._id}`}
+                href={
+                  notification.post?._id
+                    ? `/post/${notification.post._id}`
+                    : "#"
+                }
                 className="text-sm dark:text-zinc-100 hover:underline block mb-2"
               >
                 {notification.message}
@@ -91,9 +101,11 @@ const NotificationCard = ({ notification, onDelete, onMarkAsRead }) => {
             </div>
 
             {/* Post Thumbnail if exists */}
-            {notification.post.media && notification.post.media.length > 0 && (
+            {notification.post?.media && notification.post.media.length > 0 && (
               <Link
-                href={`/post/${notification.post._id}`}
+                href={
+                  notification.post._id ? `/post/${notification.post._id}` : "#"
+                }
                 className="flex-shrink-0 group-hover:scale-105 transition-transform"
               >
                 <Image
@@ -167,68 +179,22 @@ const NotificationCard = ({ notification, onDelete, onMarkAsRead }) => {
 };
 
 const NotiClient = () => {
-  const [notifications, setNotifications] = useState([
-    {
-      _id: "67bd8207b4d6800d0d189169",
-      recipient: "67a429b215d7dcc39befe0cd",
-      sender: {
-        _id: "67bd81ddb4d6800d0d189061",
-        name: "User 5",
-        profilePic: "default-avatar.png",
-      },
-      type: "comment",
-      post: {
-        _id: "67b041f18be3958651ea233d",
-        caption: "",
-        media: [
-          "https://res.cloudinary.com/de6lxconb/image/upload/v1739604465/post-treck/posts/cmyqndvzovqxr3zmfd0j.jpg",
-        ],
-      },
-      read: false,
-      message: "User 5 commented on your post",
-      createdAt: "2025-02-25T08:40:39.003Z",
-      updatedAt: "2025-02-25T08:40:39.003Z",
-      __v: 0,
-    },
-    {
-      _id: "67bd8201b4d6800d0d1890f0",
-      recipient: "67a429b215d7dcc39befe0cd",
-      sender: {
-        _id: "67bd81ddb4d6800d0d189061",
-        name: "User 5",
-        profilePic: "default-avatar.png",
-      },
-      type: "post_like",
-      post: {
-        _id: "67b041f18be3958651ea233d",
-        caption: "",
-        media: [
-          "https://res.cloudinary.com/de6lxconb/image/upload/v1739604465/post-treck/posts/cmyqndvzovqxr3zmfd0j.jpg",
-        ],
-      },
-      read: false,
-      message: "User 5 reacted to your post",
-      createdAt: "2025-02-25T08:40:33.325Z",
-      updatedAt: "2025-02-25T08:40:33.325Z",
-      __v: 0,
-    },
-  ]);
+  const { notifications, loading, getNotifications } = useNotificationStore();
 
   const handleDelete = async (notificationId) => {
     // Add your delete logic here
-    setNotifications(notifications.filter((n) => n._id !== notificationId));
   };
 
   const handleMarkAsRead = async (notificationId) => {
     // Add your mark as read logic here
-    setNotifications(
-      notifications.map((n) =>
-        n._id === notificationId ? { ...n, read: true } : n
-      )
-    );
   };
-
-  if (true) {
+  useEffect(() => {
+    getNotifications();
+  }, []);
+  useEffect(() => {
+    console.log(notifications);
+  }, [notifications]);
+  if (loading) {
     return (
       <div className="min-h-screen pt-24 px-4">
         <div className="max-w-2xl mx-auto">

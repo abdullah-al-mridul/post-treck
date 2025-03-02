@@ -42,8 +42,56 @@ export const createPost = async (req, res) => {
 // Get Feed Posts
 export const getFeedPosts = async (req, res) => {
   try {
-    // Get all posts instead of just following
-    const posts = await Post.find()
+    const user = req.user;
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10; // posts per page
+    const skip = (page - 1) * limit;
+
+    // Get user's following list
+    const userFollowing = await User.findById(user._id).select("following");
+
+    // Get user's interactions (posts they've reacted to or commented on)
+    const userInteractions = await Post.find({
+      $or: [
+        { "reactions.like": user._id },
+        { "reactions.love": user._id },
+        { "reactions.haha": user._id },
+        { "reactions.wow": user._id },
+        { "reactions.sad": user._id },
+        { "reactions.angry": user._id },
+        { "comments.user": user._id },
+      ],
+    }).select("_id");
+
+    const interactedPostIds = userInteractions.map((post) => post._id);
+
+    // Get mutual friends/suggested connections
+    const mutualConnections = await User.find({
+      $and: [
+        { _id: { $ne: user._id } },
+        { _id: { $nin: userFollowing.following } },
+        { followers: { $in: userFollowing.following } },
+      ],
+    }).select("_id");
+
+    // Base query for both following/mutual and suggested posts
+    const baseQuery = {
+      $and: [
+        {
+          $or: [
+            { user: { $in: userFollowing.following } },
+            { user: { $in: mutualConnections } },
+          ],
+        },
+        { _id: { $nin: interactedPostIds } },
+      ],
+    };
+
+    // Get total count for pagination
+    const totalPosts = await Post.countDocuments(baseQuery);
+
+    // Get posts from following and mutual connections with pagination
+    const posts = await Post.find(baseQuery)
       .populate("user", "name email profilePic role")
       .populate({
         path: "comments.user",
@@ -57,24 +105,79 @@ export const getFeedPosts = async (req, res) => {
         path: "reactions.like reactions.love reactions.haha reactions.wow reactions.sad reactions.angry",
         select: "name profilePic",
       })
-      .sort({ createdAt: -1 }); // Latest first
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-    // Add user's reaction to each post
-    const postsWithReactionInfo = posts.map((post) => {
+    // Add user's reaction and connection type to each post
+    let postsWithReactionInfo = posts.map((post) => {
       const userReaction = Object.entries(post.reactions).find(
         ([type, users]) =>
-          users.some((userId) => userId.toString() === req.user._id.toString())
+          users.some((userId) => userId.toString() === user._id.toString())
       );
 
       return {
         ...post.toObject(),
         userReaction: userReaction ? userReaction[0] : null,
+        connectionType: userFollowing.following.includes(post.user._id)
+          ? "following"
+          : "mutual",
       };
     });
+
+    // If we have fewer than limit posts, get suggested posts to fill the page
+    if (postsWithReactionInfo.length < limit) {
+      const remainingSlots = limit - postsWithReactionInfo.length;
+      const suggestedPosts = await Post.find({
+        $and: [
+          { user: { $nin: [...userFollowing.following, user._id] } },
+          { _id: { $nin: interactedPostIds } },
+        ],
+      })
+        .populate("user", "name email profilePic role")
+        .populate({
+          path: "comments.user",
+          select: "name email profilePic role",
+        })
+        .populate({
+          path: "comments.replies.user",
+          select: "name email profilePic role",
+        })
+        .populate({
+          path: "reactions.like reactions.love reactions.haha reactions.wow reactions.sad reactions.angry",
+          select: "name profilePic",
+        })
+        .limit(remainingSlots)
+        .sort({ reactions: -1 });
+
+      const suggestedPostsWithInfo = suggestedPosts.map((post) => ({
+        ...post.toObject(),
+        userReaction: null,
+        connectionType: "suggested",
+      }));
+
+      postsWithReactionInfo = [
+        ...postsWithReactionInfo,
+        ...suggestedPostsWithInfo,
+      ];
+    }
+
+    // Calculate pagination info
+    const totalPages = Math.ceil(totalPosts / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
 
     res.status(200).json({
       success: true,
       posts: postsWithReactionInfo,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalPosts,
+        hasNextPage,
+        hasPrevPage,
+        postsPerPage: limit,
+      },
     });
   } catch (error) {
     res.status(500).json({

@@ -154,7 +154,6 @@ const useAdminStore = create((set, get) => ({
     }
   },
   getTeam: async () => {
-    set({ loading: true });
     try {
       const { data } = await useApi().get("/users/staff");
       set({ team: data.staffUsers });
@@ -203,6 +202,19 @@ const useAdminStore = create((set, get) => ({
           delete: false,
         },
       });
+    }
+  },
+  getDashboard: async () => {
+    set({ loading: true });
+    try {
+      const { data: statsData } = await useApi().get("/admin/stats");
+      set({ stats: statsData.stats });
+      const { data: teamData } = await useApi().get("/users/staff");
+      set({ team: teamData.staffUsers });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      set({ loading: false });
     }
   },
 }));

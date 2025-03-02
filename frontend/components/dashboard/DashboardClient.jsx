@@ -10,19 +10,128 @@ import Link from "next/link";
 
 const DashboardClient = () => {
   const { user } = useAuthStore();
-  const { stats, loading, getStates, getTeam, team } = useAdminStore();
+  const { stats, loading, team, getDashboard } = useAdminStore();
   useEffect(() => {
-    getStates();
-    getTeam();
+    getDashboard();
   }, []);
+
   if (loading) {
     return (
-      <div className="min-h-screen pt-24 flex items-center justify-center">
-        <Spinner />
+      <div className="min-h-screen pt-24 px-4">
+        <div className="max-w-7xl mx-auto">
+          {/* Header Skeleton */}
+          <div className="mb-12">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 border-2 border-black/20 dark:border-white/20 animate-pulse" />
+              <div className="h-10 w-64 bg-black/10 dark:bg-white/10 rounded animate-pulse" />
+            </div>
+            <div className="h-5 w-96 bg-black/10 dark:bg-white/10 rounded animate-pulse" />
+          </div>
+
+          {/* Stats Grid Skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                className="border-2 border-black/20 dark:border-darkBorder p-6 bg-white dark:bg-[#15202B] animate-pulse"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="space-y-2">
+                    <div className="h-4 w-24 bg-black/10 dark:bg-white/10 rounded" />
+                    <div className="h-8 w-16 bg-black/10 dark:bg-white/10 rounded" />
+                  </div>
+                  <div className="w-8 h-8 bg-black/10 dark:bg-white/10 rounded" />
+                </div>
+                <div className="h-4 w-48 bg-black/10 dark:bg-white/10 rounded" />
+              </div>
+            ))}
+          </div>
+
+          {/* Navigation Buttons Skeleton */}
+          <div className="mt-12 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[1, 2].map((i) => (
+              <div
+                key={i}
+                className="border-2 border-black/20 dark:border-darkBorder p-6 bg-white dark:bg-[#15202B] animate-pulse"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-black/10 dark:bg-white/10 rounded" />
+                    <div className="space-y-2">
+                      <div className="h-6 w-32 bg-black/10 dark:bg-white/10 rounded" />
+                      <div className="h-4 w-48 bg-black/10 dark:bg-white/10 rounded" />
+                    </div>
+                  </div>
+                  <div className="w-6 h-6 bg-black/10 dark:bg-white/10 rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Team Section Skeleton */}
+          <div className="mt-12">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-10 h-10 bg-black/10 dark:bg-white/10 rounded" />
+              <div className="space-y-2">
+                <div className="h-6 w-32 bg-black/10 dark:bg-white/10 rounded" />
+                <div className="h-4 w-48 bg-black/10 dark:bg-white/10 rounded" />
+              </div>
+            </div>
+
+            {/* Admins Section Skeleton */}
+            <div className="mb-8">
+              <div className="h-6 w-32 bg-black/10 dark:bg-white/10 rounded mb-4" />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {[1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="border-2 border-black/20 dark:border-darkBorder p-4 bg-white dark:bg-[#15202B] animate-pulse"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-black/10 dark:bg-white/10 rounded" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-5 w-32 bg-black/10 dark:bg-white/10 rounded" />
+                        <div className="h-4 w-48 bg-black/10 dark:bg-white/10 rounded" />
+                      </div>
+                      <div className="text-right space-y-1">
+                        <div className="h-4 w-20 bg-black/10 dark:bg-white/10 rounded" />
+                        <div className="h-4 w-24 bg-black/10 dark:bg-white/10 rounded" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Moderators Section Skeleton */}
+            <div>
+              <div className="h-6 w-32 bg-black/10 dark:bg-white/10 rounded mb-4" />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {[1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="border-2 border-black/20 dark:border-darkBorder p-4 bg-white dark:bg-[#15202B] animate-pulse"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-black/10 dark:bg-white/10 rounded" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-5 w-32 bg-black/10 dark:bg-white/10 rounded" />
+                        <div className="h-4 w-48 bg-black/10 dark:bg-white/10 rounded" />
+                      </div>
+                      <div className="text-right space-y-1">
+                        <div className="h-4 w-20 bg-black/10 dark:bg-white/10 rounded" />
+                        <div className="h-4 w-24 bg-black/10 dark:bg-white/10 rounded" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
-
   if (user?.role !== "admin" && user?.role !== "moderator") {
     return (
       <div className="min-h-screen pt-24 px-4">
@@ -193,6 +302,7 @@ const DashboardClient = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {team
                     .filter((mod) => mod.role === "moderator")
+
                     .map((mod, index) => {
                       return (
                         <motion.div

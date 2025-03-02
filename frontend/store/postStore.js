@@ -16,8 +16,15 @@ const usePostStore = create((set, get) => ({
   loading: false,
   error: null,
   currentUserReactions: {},
+  isReacting: {},
   // Add reaction to post
   addReaction: async (postId, type, currentReaction) => {
+    set((state) => ({
+      isReacting: {
+        ...state.isReacting,
+        [postId]: true,
+      },
+    }));
     try {
       if (!postId) throw new Error("Post ID is required");
       // set({ loading: true, error: null });
@@ -53,6 +60,13 @@ const usePostStore = create((set, get) => ({
         loading: false,
       });
       throw error;
+    } finally {
+      set((state) => ({
+        isReacting: {
+          ...state.isReacting,
+          [postId]: false,
+        },
+      }));
     }
   },
   // Get feed posts

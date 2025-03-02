@@ -1020,7 +1020,10 @@ const PostClient = ({ id }) => {
           </div>
 
           {/* Comments Section */}
-          <div className=" border-black dark:border-darkBorder p-8">
+          <div
+            id="comments"
+            className=" border-black dark:border-darkBorder p-8"
+          >
             <h2 className="text-xl font-bold mb-6 dark:text-zinc-100">
               Comments
             </h2>

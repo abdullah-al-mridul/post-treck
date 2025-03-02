@@ -6,7 +6,6 @@ import ReactionDrawer from "@/components/ui/ReactionDrawer";
 import VerificationBadge from "@/components/ui/VerificationBadge";
 import usePostStore from "@/store/postStore";
 import Image from "next/image";
-import Link from "next/link";
 import useOnlineUsers from "@/store/onlineUsersStore";
 import useAuthStore from "@/store/authStore";
 import {
@@ -30,18 +29,36 @@ const ReactionButton = ({
   onMouseLeave,
   postId,
   currentReaction,
+  isReacting,
 }) => (
   <div
     className="relative w-full cursor-pointer border-r dark:border-darkBorder dark:hover:bg-darkHover px-4 py-2"
     onMouseLeave={onMouseLeave}
+    onClick={label !== "reactions" ? onClick : undefined}
     onMouseEnter={onHover}
   >
     <button className="group flex items-center gap-2 mx-auto text-black dark:text-zinc-100 transition-colors">
-      {icon}
-      <span className=" transition-all">
-        {count}
-        <span className="sr-only">{label}</span>
-      </span>
+      {isReacting ? (
+        <div className="w-5 h-5 relative">
+          <motion.div
+            className="absolute inset-0 rounded-full border-2 border-black dark:border-darkBorder !border-t-darkBorder/50"
+            animate={{ rotate: [0, 360] }}
+            transition={{
+              duration: 1,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          ></motion.div>
+        </div>
+      ) : (
+        <>
+          {icon}
+          <span className=" transition-all">
+            {count}
+            <span className="sr-only">{label}</span>
+          </span>
+        </>
+      )}
     </button>
     <ReactionDrawer
       isVisible={showDrawer}
@@ -54,182 +71,6 @@ const ReactionButton = ({
     />
   </div>
 );
-const getBadgeInfo = (role) => {
-  if (!role) return null;
-
-  switch (role) {
-    case "admin":
-      return {
-        title: "Admin",
-        description: "Full access to manage and moderate the platform",
-        color: "text-blue-500",
-      };
-    case "moderator":
-      return {
-        title: "Moderator",
-        description: "Helps maintain community guidelines and content quality",
-        color: "text-black dark:text-white",
-      };
-    default:
-      return null;
-  }
-};
-function CommentVerificationBadge({ role }) {
-  const badgeInfo = getBadgeInfo(role);
-  if (!badgeInfo) return null;
-
-  return (
-    <div className="relative inline-flex items-center justify-center">
-      <div className="">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className={`w-6 h-6 ${badgeInfo.color} inline-block `}
-        >
-          <path
-            fillRule="evenodd"
-            d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </div>
-    </div>
-  );
-}
-// New Comment Section Component
-const CommentSection = ({ post, isVisible }) => {
-  const [newComment, setNewComment] = useState("");
-  const { addComment } = usePostStore();
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!newComment.trim()) return;
-
-    try {
-      await addComment(post._id, newComment.trim());
-      setNewComment("");
-    } catch (error) {
-      console.error("Error adding comment:", error);
-      alert(error.message || "Failed to add comment");
-    }
-  };
-
-  return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: "auto", opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="overflow-hidden"
-        >
-          <div className="border-t-4 border-black dark:border-darkBorder mt-6 pt-6">
-            {/* Comment Form */}
-            <form onSubmit={handleSubmit} className="flex gap-4 mb-6">
-              <input
-                type="text"
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Write a comment..."
-                className="flex-1 bg-transparent border-2 border-black dark:border-darkBorder dark:text-zinc-100 p-2 focus:outline-none"
-              />
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                type="submit"
-                className="px-4 py-2 bg-black dark:bg-darkBorder text-white dark:text-zinc-100 font-medium hover:bg-black/80 dark:hover:bg-darkHover transition-colors"
-              >
-                Comment
-              </motion.button>
-            </form>
-
-            {/* Comments List */}
-            <div className="space-y-4">
-              {post?.comments?.length > 0 ? (
-                post.comments.map((comment) => (
-                  <motion.div
-                    key={comment._id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex gap-4"
-                  >
-                    <img
-                      src={
-                        comment.user?.profilePic === "default-avatar.png"
-                          ? "/default-avatar.png"
-                          : comment.user?.profilePic
-                      }
-                      alt={comment.user?.name}
-                      className="w-10 h-10 border-2 border-black dark:border-darkBorder"
-                    />
-
-                    <div className="flex-1">
-                      <div className="bg-black/5 dark:bg-white/5 p-3">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-bold dark:text-zinc-100">
-                            {comment.user?.name}
-                          </h4>
-                          <CommentVerificationBadge role={comment.user?.role} />
-                        </div>
-                        <p className="dark:text-zinc-100">{comment.content}</p>
-                      </div>
-                      <div className="flex gap-4 mt-2 text-sm text-black/50 dark:text-white/50">
-                        <button className="hover:text-blue-500 transition-colors">
-                          Like
-                        </button>
-                        <button className="hover:text-blue-500 transition-colors">
-                          Reply
-                        </button>
-                        <span>{formatDate(comment.createdAt)}</span>
-                      </div>
-                      {comment.replies.length > 0 && (
-                        <div className="flex flex-col gap-2">
-                          {comment.replies.map((reply) => (
-                            <div
-                              id={reply._id}
-                              className="flex gap-4 flex-col mt-2 text-sm text-black/50 dark:text-white/50"
-                            >
-                              <div className="bg-black/5 dark:bg-white/5 p-3">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h4 className="font-bold">
-                                    {reply.user?.name}
-                                  </h4>
-                                  <CommentVerificationBadge
-                                    role={reply.user?.role}
-                                  />
-                                </div>
-                                <p>{reply.content}</p>
-                              </div>
-                              <div>
-                                <button className="hover:text-blue-500 transition-colors">
-                                  Like
-                                </button>
-                                {/* <button className="hover:text-blue-500 transition-colors">
-                                Reply
-                              </button> */}
-                                <span>{formatDate(reply.createdAt)}</span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                ))
-              ) : (
-                <p className="text-center text-black/50 dark:text-white/50">
-                  No comments yet. Be the first to comment!
-                </p>
-              )}
-            </div>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-};
 
 // Add this component before PostCard
 const ReportModal = ({ isOpen, onClose, onSubmit }) => {
@@ -477,13 +318,11 @@ const PostCard = memo(
     const [showReactions, setShowReactions] = useState(false);
     const router = useRouter();
 
-    const { addReaction, reportPost, removeReaction, currentUserReactions } =
+    const { addReaction, reportPost, currentUserReactions, isReacting } =
       usePostStore();
     const { onlineUsers } = useOnlineUsers();
 
     const isOnline = onlineUsers.indexOf(post.user._id) > -1;
-
-    // Fetch post reactions when component mounts
 
     const totalReactions = Object.values(post?.reactions || {}).reduce(
       (sum, reactions) => sum + reactions.length,
@@ -491,9 +330,6 @@ const PostCard = memo(
     );
 
     const handleMouseLeave = () => setShowReactions(false);
-    useEffect(() => {
-      console.log(currentUserReactions);
-    }, [currentUserReactions]);
     const handleReaction = async (type, currentReaction) => {
       addReaction(post._id, type, currentReaction);
     };
@@ -622,13 +458,16 @@ const PostCard = memo(
               onMouseLeave={handleMouseLeave}
               postId={post._id}
               currentReaction={currentUserReactions[post._id]}
+              isReacting={isReacting[post._id]}
             />
 
             <ReactionButton
               icon={<MessageCircle className="w-5 h-5" />}
               count={post?.comments?.length || 0}
               label="comments"
-              onClick={() => setShowComments(!showComments)}
+              onClick={() => {
+                router.push(`/post/${post._id}#comments`);
+              }}
             />
 
             <ReactionButton

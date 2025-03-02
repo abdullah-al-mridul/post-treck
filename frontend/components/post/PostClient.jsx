@@ -6,7 +6,6 @@ import { formatDate } from "@/utils/formatDate";
 import VerificationBadge from "@/components/ui/VerificationBadge";
 import { useEffect, useState } from "react";
 import useSinglePostStore from "@/store/SPostStore";
-import Spinner from "../ui/Spinner";
 import useAuthStore from "@/store/authStore";
 import { useRouter } from "next/navigation";
 import ReactionDrawer from "../ui/ReactionDrawer";

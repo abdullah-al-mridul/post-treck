@@ -87,9 +87,7 @@ const CommentCard = ({ comment, user, postId }) => {
   const handleCommentReactionHover = () => {
     setShowCommentReactions(true);
   };
-  useEffect(() => {
-    console.log("commentReplies", commentReplies);
-  }, [commentReplies]);
+
   const handleCommentReactionLeave = () => {
     setShowCommentReactions(false);
   };
@@ -109,12 +107,7 @@ const CommentCard = ({ comment, user, postId }) => {
     await editComment(postId, comment._id, newContent, setIsCommentUpdating);
     setIsEditing(false);
   };
-  useEffect(() => {
-    console.log("currentCommentReaction", currentCommentReaction);
-  }, [currentCommentReaction]);
-  useEffect(() => {
-    console.log("currentReplyReaction", currentReplyReaction);
-  }, [currentReplyReaction]);
+
   return (
     <motion.div
       key={comment._id}
@@ -741,20 +734,9 @@ const PostClient = ({ id }) => {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   useEffect(() => {
-    console.log(currentUserReaction);
-  }, [currentUserReaction]);
-  useEffect(() => {
     getPost(id, user);
   }, [id]);
 
-  // useEffect(() => {
-  //   if (post) {
-  //     setpost(post);
-  //   }
-  // }, [post]);
-  useEffect(() => {
-    console.log(post);
-  }, [post]);
   // if (loading || !post) return <Spinner />;
   if (loading || !post) return <PostSkeleton />;
 

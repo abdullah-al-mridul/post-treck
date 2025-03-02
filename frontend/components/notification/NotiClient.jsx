@@ -34,17 +34,17 @@ const NotificationCard = ({ notification, onDelete, onMarkAsRead }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className={`p-4 border-2 border-black dark:border-darkBorder ${
+      className={`group p-6 border-2 border-black dark:border-darkBorder hover:translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#000] dark:hover:shadow-[4px_4px_0_0_rgba(56,68,77,0.4)] transition-all ${
         !notification.read
           ? "bg-black/5 dark:bg-white/5"
           : "bg-white dark:bg-[#15202B]"
       }`}
     >
-      <div className="flex items-start gap-4">
+      <div className="flex items-start gap-6">
         {/* Sender Profile Picture */}
         <Link
           href={`/profile/${notification.sender._id}`}
-          className="flex-shrink-0"
+          className="flex-shrink-0 relative group-hover:scale-105 transition-transform"
         >
           <Image
             src={
@@ -53,46 +53,55 @@ const NotificationCard = ({ notification, onDelete, onMarkAsRead }) => {
                 : notification.sender.profilePic
             }
             alt={notification.sender.name}
-            width={40}
-            height={40}
+            width={48}
+            height={48}
             className="border-2 border-black dark:border-darkBorder"
           />
+          {!notification.read && (
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full border-2 border-black dark:border-darkBorder" />
+          )}
         </Link>
 
         {/* Notification Content */}
         <div className="flex-grow">
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start justify-between gap-6">
             <div>
+              <div className="flex items-center gap-2 mb-1">
+                <Link
+                  href={`/profile/${notification.sender._id}`}
+                  className="font-bold text-sm hover:underline dark:text-zinc-100"
+                >
+                  {notification.sender.name}
+                </Link>
+                {notification.type === "comment" ? (
+                  <MessageSquare className="w-4 h-4 text-blue-500" />
+                ) : (
+                  <Heart className="w-4 h-4 text-red-500" />
+                )}
+              </div>
               <Link
                 href={`/post/${notification.post._id}`}
-                className="text-sm dark:text-zinc-100 hover:underline"
+                className="text-sm dark:text-zinc-100 hover:underline block mb-2"
               >
                 {notification.message}
               </Link>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs text-black/50 dark:text-white/50">
-                  {formatDate(notification.createdAt)} ago
-                </span>
-                {notification.type === "comment" ? (
-                  <MessageSquare className="w-3 h-3 text-blue-500" />
-                ) : (
-                  <Heart className="w-3 h-3 text-red-500" />
-                )}
-              </div>
+              <span className="text-xs text-black/50 dark:text-white/50">
+                {formatDate(notification.createdAt)}
+              </span>
             </div>
 
             {/* Post Thumbnail if exists */}
             {notification.post.media && notification.post.media.length > 0 && (
               <Link
                 href={`/post/${notification.post._id}`}
-                className="flex-shrink-0"
+                className="flex-shrink-0 group-hover:scale-105 transition-transform"
               >
                 <Image
                   src={notification.post.media[0]}
                   alt="Post thumbnail"
-                  width={60}
-                  height={60}
-                  className="border border-black dark:border-darkBorder object-cover"
+                  width={80}
+                  height={80}
+                  className="border-2 border-black dark:border-darkBorder object-cover"
                 />
               </Link>
             )}
@@ -101,12 +110,12 @@ const NotificationCard = ({ notification, onDelete, onMarkAsRead }) => {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center gap-2 mt-4">
+      <div className="flex items-center gap-2 mt-6">
         {!notification.read && (
           <button
             onClick={handleMarkAsRead}
             disabled={isMarkingRead}
-            className="flex items-center gap-2 px-3 py-1.5 text-xs border border-black dark:border-darkBorder hover:bg-black/5 dark:hover:bg-white/5 transition-colors dark:text-zinc-100"
+            className="flex items-center gap-2 px-4 py-2 text-xs border-2 border-black dark:border-darkBorder hover:translate-x-1 hover:-translate-y-1 hover:shadow-[2px_2px_0_0_#000] dark:hover:shadow-[2px_2px_0_0_rgba(56,68,77,0.4)] transition-all dark:text-zinc-100 bg-white dark:bg-[#15202B]"
           >
             {isMarkingRead ? (
               <div className="w-4 h-4 relative">
@@ -131,7 +140,7 @@ const NotificationCard = ({ notification, onDelete, onMarkAsRead }) => {
         <button
           onClick={handleDelete}
           disabled={isDeleting}
-          className="flex items-center gap-2 px-3 py-1.5 text-xs border border-black dark:border-darkBorder hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 text-xs border-2 border-black dark:border-darkBorder hover:translate-x-1 hover:-translate-y-1 hover:shadow-[2px_2px_0_0_#000] dark:hover:shadow-[2px_2px_0_0_rgba(56,68,77,0.4)] transition-all text-red-500 bg-white dark:bg-[#15202B]"
         >
           {isDeleting ? (
             <div className="w-4 h-4 relative">
@@ -219,27 +228,79 @@ const NotiClient = () => {
     );
   };
 
+  if (true) {
+    return (
+      <div className="min-h-screen pt-24 px-4">
+        <div className="max-w-2xl mx-auto">
+          {/* Header Skeleton */}
+          <div className="flex items-center gap-4 mb-12 border-2 border-black dark:border-darkBorder p-6 bg-white dark:bg-[#15202B] animate-pulse">
+            <div className="w-8 h-8 bg-black/10 dark:bg-white/10 rounded-full" />
+            <div>
+              <div className="h-7 w-32 bg-black/10 dark:bg-white/10 rounded mb-2" />
+              <div className="h-4 w-48 bg-black/10 dark:bg-white/10 rounded" />
+            </div>
+          </div>
+
+          {/* Notification Skeletons */}
+          <div className="space-y-6">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="p-6 border-2 border-black dark:border-darkBorder bg-white dark:bg-[#15202B] animate-pulse"
+              >
+                <div className="flex items-start gap-6">
+                  <div className="w-12 h-12 bg-black/10 dark:bg-white/10 rounded flex-shrink-0" />
+                  <div className="flex-grow">
+                    <div className="flex items-start justify-between gap-6">
+                      <div className="w-full">
+                        <div className="h-5 w-32 bg-black/10 dark:bg-white/10 rounded mb-2" />
+                        <div className="h-4 w-full bg-black/10 dark:bg-white/10 rounded mb-3" />
+                        <div className="h-4 w-24 bg-black/10 dark:bg-white/10 rounded" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen pt-24 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-8">
-          <Bell className="w-6 h-6 dark:text-zinc-100" />
-          <h1 className="text-2xl font-bold dark:text-zinc-100">
-            Notifications
-          </h1>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-4 mb-12 border-2 border-black dark:border-darkBorder p-6 bg-white dark:bg-[#15202B]"
+        >
+          <Bell className="w-8 h-8 dark:text-zinc-100" />
+          <div>
+            <h1 className="text-2xl font-bold dark:text-zinc-100">
+              Notifications
+            </h1>
+            <p className="text-sm text-black/50 dark:text-white/50">
+              Stay updated with your latest activities
+            </p>
+          </div>
+        </motion.div>
 
         {/* Notifications List */}
-        <div className="space-y-4">
+        <div className="space-y-6">
           <AnimatePresence>
             {notifications.length === 0 ? (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-center py-8 text-black/50 dark:text-white/50"
+                className="text-center py-12 border-2 border-black dark:border-darkBorder bg-white dark:bg-[#15202B]"
               >
-                No notifications yet
+                <Bell className="w-12 h-12 mx-auto mb-4 text-black/20 dark:text-white/20" />
+                <p className="text-black/50 dark:text-white/50">
+                  No notifications yet
+                </p>
               </motion.div>
             ) : (
               notifications.map((notification) => (

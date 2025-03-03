@@ -33,6 +33,9 @@ mongoose
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // Routes
+server.get("/", (req, res) => {
+  res.send("Api of Post Treck App");
+});
 server.use("/api/auth", authRoutes);
 server.use("/api/users", userRoutes);
 server.use("/api/posts", postRoutes);

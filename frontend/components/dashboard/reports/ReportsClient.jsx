@@ -295,7 +295,7 @@ const ReportsClient = () => {
                   {/* Action Buttons */}
                   <div className="flex mt-6">
                     <button
-                      onClick={() => takeReportAction(report._id, "delete")}
+                      onClick={() => takeReportAction(report._id, "reject")}
                       disabled={
                         takingReportAction.delete || takingReportAction.approve
                       }

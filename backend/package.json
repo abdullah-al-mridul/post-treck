@@ -4,7 +4,8 @@
   "description": "Backend for the project 'POST-TRECK'",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",

@@ -178,7 +178,7 @@ const useAdminStore = create((set, get) => ({
     set({
       takingReportAction: {
         approve: action === "approve",
-        delete: action === "delete",
+        delete: action === "reject",
       },
     });
     try {

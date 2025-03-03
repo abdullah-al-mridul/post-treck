@@ -51,13 +51,15 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
       ))}
 
       {/* Ellipsis */}
-      {currentPage + 2 < totalPages && <span className="px-3 py-2">...</span>}
+      {currentPage + 2 < totalPages && (
+        <span className="px-3 py-2 text-black dark:text-zinc-100">...</span>
+      )}
 
       {/* Last Page */}
       {currentPage + 2 < totalPages && (
         <button
           onClick={() => onPageChange(totalPages)}
-          className="px-3 py-2 border rounded bg-gray-800 text-white"
+          className="px-3 py-2 border-2 border-black dark:border-darkBorder disabled:opacity-50 dark:text-zinc-100"
         >
           {totalPages}
         </button>
@@ -80,9 +82,7 @@ export default function HomeClient() {
   const { posts, loading, error, getFeedPosts, createPost, pagination } =
     usePostStore();
   //get user from auth store
-  useEffect(() => {
-    console.log(pagination);
-  }, [pagination]);
+
   const { user } = useAuthStore();
   //declare new post and is posting state
   const [newPost, setNewPost] = useState("");

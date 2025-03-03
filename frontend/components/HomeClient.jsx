@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import PostCard from "@/components/PostCard";
 import usePostStore from "@/store/postStore";
 import useAuthStore from "@/store/authStore";
-import { Image, Plus, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Image, Plus, X } from "lucide-react";
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const maxVisiblePages = 5; // মাঝখানে কয়টা পেজ দেখাবে
 
@@ -32,7 +32,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         disabled={currentPage === 1}
         className="px-3 py-2 border-2 border-black dark:border-darkBorder disabled:opacity-50 dark:text-zinc-100"
       >
-        &lt;
+        <ArrowLeft className="w-4 h-6" />
       </button>
 
       {/* Page Numbers */}
@@ -69,7 +69,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         disabled={currentPage === totalPages}
         className="px-3 py-2 border-2 border-black dark:border-darkBorder disabled:opacity-50 dark:text-zinc-100"
       >
-        &gt;
+        <ArrowRight className="w-4 h-6" />
       </button>
     </div>
   );

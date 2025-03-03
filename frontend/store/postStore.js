@@ -18,6 +18,7 @@ const usePostStore = create((set, get) => ({
   currentUserReactions: {},
   isReacting: {},
   isPostDeleting: {},
+  pagination: {},
   // Add reaction to post
   addReaction: async (postId, type, currentReaction) => {
     set((state) => ({
@@ -71,13 +72,13 @@ const usePostStore = create((set, get) => ({
     }
   },
   // Get feed posts
-  getFeedPosts: async (userId) => {
+  getFeedPosts: async (userId, pageNumber) => {
     const currentState = get();
-    if (currentState.loading || currentState.posts.length > 0) return;
+    if (currentState.loading) return;
 
     try {
       set({ loading: true, error: null });
-      const { data } = await useApi().get("/posts/feed");
+      const { data } = await useApi().get(`/posts/feed?page=${pageNumber}`);
 
       set({ posts: data.posts, loading: false });
       set({
@@ -86,6 +87,7 @@ const usePostStore = create((set, get) => ({
           return acc;
         }, {}),
       });
+      set({ pagination: data.pagination });
     } catch (error) {
       set({
         error: error.response?.data?.message || "Failed to fetch posts",

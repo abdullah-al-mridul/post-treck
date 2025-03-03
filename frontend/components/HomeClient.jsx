@@ -4,20 +4,85 @@ import { motion } from "framer-motion";
 import PostCard from "@/components/PostCard";
 import usePostStore from "@/store/postStore";
 import useAuthStore from "@/store/authStore";
-import Spinner from "@/components/ui/Spinner";
 import { Image, Plus, X } from "lucide-react";
+const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+  const maxVisiblePages = 5; // মাঝখানে কয়টা পেজ দেখাবে
+
+  const getPages = () => {
+    let pages = [];
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  };
+
+  return (
+    <div className="flex items-center justify-center space-x-2 mt-5">
+      {/* Previous Button */}
+      <button
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="px-3 py-2 border-2 border-black dark:border-darkBorder disabled:opacity-50 dark:text-zinc-100"
+      >
+        &lt;
+      </button>
+
+      {/* Page Numbers */}
+      {getPages().map((page) => (
+        <button
+          key={page}
+          onClick={() => onPageChange(page)}
+          className={`px-3 py-2 border-2 border-black dark:border-darkBorder ${
+            currentPage === page
+              ? "bg-white text-black dark:bg-darkBorder dark:text-zinc-100"
+              : "bg-gray-800 text-white dark:bg-transparent dark:text-zinc-100"
+          }`}
+        >
+          {page}
+        </button>
+      ))}
+
+      {/* Ellipsis */}
+      {currentPage + 2 < totalPages && <span className="px-3 py-2">...</span>}
+
+      {/* Last Page */}
+      {currentPage + 2 < totalPages && (
+        <button
+          onClick={() => onPageChange(totalPages)}
+          className="px-3 py-2 border rounded bg-gray-800 text-white"
+        >
+          {totalPages}
+        </button>
+      )}
+
+      {/* Next Button */}
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="px-3 py-2 border-2 border-black dark:border-darkBorder disabled:opacity-50 dark:text-zinc-100"
+      >
+        &gt;
+      </button>
+    </div>
+  );
+};
 
 export default function HomeClient() {
   //get posts, loading, error and getFeedPosts from post store
-  const { posts, loading, error, getFeedPosts, createPost } = usePostStore();
+  const { posts, loading, error, getFeedPosts, createPost, pagination } =
+    usePostStore();
   //get user from auth store
-  const pagination = {
-    currentPage: 1,
-    totalPages: 1,
-    totalPosts: 1,
-    hasPrevPage: false,
-    hasNextPage: false,
-  };
+  useEffect(() => {
+    console.log(pagination);
+  }, [pagination]);
   const { user } = useAuthStore();
   //declare new post and is posting state
   const [newPost, setNewPost] = useState("");
@@ -31,7 +96,7 @@ export default function HomeClient() {
 
   //get feed posts
   useEffect(() => {
-    getFeedPosts(user._id);
+    getFeedPosts(user._id, 1);
   }, []);
 
   // Handle image selection with validation
@@ -283,61 +348,13 @@ export default function HomeClient() {
             </p>
           </div>
         )}
-        <div className="mt-8 flex items-center justify-center gap-4">
-          <button
-            disabled={!pagination?.hasPrevPage}
-            className="px-4 py-2 bg-black text-white dark:bg-darkBorder dark:text-zinc-100 font-bold border-4 border-black dark:border-darkBorder hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
-          >
-            Previous
-          </button>
-
-          <div className="flex items-center gap-4">
-            <button
-              disabled={pagination?.currentPage === 1}
-              className="w-8 h-8 flex items-center justify-center bg-black text-white dark:bg-darkBorder dark:text-zinc-100 font-bold border-4 border-black dark:border-darkBorder hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
-            >
-              1
-            </button>
-            <button
-              disabled={pagination?.currentPage === 2}
-              className="w-8 h-8 flex items-center justify-center bg-black text-white dark:bg-darkBorder dark:text-zinc-100 font-bold border-4 border-black dark:border-darkBorder hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
-            >
-              2
-            </button>
-            <button
-              disabled={pagination?.currentPage === 3}
-              className="w-8 h-8 flex items-center justify-center bg-black text-white dark:bg-darkBorder dark:text-zinc-100 font-bold border-4 border-black dark:border-darkBorder hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
-            >
-              3
-            </button>
-            <button
-              disabled={pagination?.currentPage === 4}
-              className="w-8 h-8 flex items-center justify-center bg-black text-white dark:bg-darkBorder dark:text-zinc-100 font-bold border-4 border-black dark:border-darkBorder hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
-            >
-              4
-            </button>
-            <button
-              disabled={pagination?.currentPage === 5}
-              className="w-8 h-8 flex items-center justify-center bg-black text-white dark:bg-darkBorder dark:text-zinc-100 font-bold border-4 border-black dark:border-darkBorder hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
-            >
-              5
-            </button>
-            <span className="text-black/50 dark:text-white/50">...</span>
-            <button
-              disabled={pagination?.currentPage === 10}
-              className="w-8 h-8 flex items-center justify-center bg-black text-white dark:bg-darkBorder dark:text-zinc-100 font-bold border-4 border-black dark:border-darkBorder hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
-            >
-              10
-            </button>
-          </div>
-
-          <button
-            disabled={!pagination?.hasNextPage}
-            className="px-4 py-2 bg-black text-white dark:bg-darkBorder dark:text-zinc-100 font-bold border-4 border-black dark:border-darkBorder hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
-          >
-            Next
-          </button>
-        </div>
+        <Pagination
+          currentPage={pagination?.currentPage}
+          totalPages={pagination?.totalPages}
+          onPageChange={(page) => {
+            getFeedPosts(user._id, page);
+          }}
+        />
       </div>
     </div>
   );

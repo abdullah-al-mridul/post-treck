@@ -11,6 +11,13 @@ export default function HomeClient() {
   //get posts, loading, error and getFeedPosts from post store
   const { posts, loading, error, getFeedPosts, createPost } = usePostStore();
   //get user from auth store
+  const pagination = {
+    currentPage: 1,
+    totalPages: 1,
+    totalPosts: 1,
+    hasPrevPage: false,
+    hasNextPage: false,
+  };
   const { user } = useAuthStore();
   //declare new post and is posting state
   const [newPost, setNewPost] = useState("");
@@ -276,6 +283,61 @@ export default function HomeClient() {
             </p>
           </div>
         )}
+        <div className="mt-8 flex items-center justify-center gap-4">
+          <button
+            disabled={!pagination?.hasPrevPage}
+            className="px-4 py-2 bg-black text-white dark:bg-darkBorder dark:text-zinc-100 font-bold border-4 border-black dark:border-darkBorder hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
+          >
+            Previous
+          </button>
+
+          <div className="flex items-center gap-4">
+            <button
+              disabled={pagination?.currentPage === 1}
+              className="w-8 h-8 flex items-center justify-center bg-black text-white dark:bg-darkBorder dark:text-zinc-100 font-bold border-4 border-black dark:border-darkBorder hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
+            >
+              1
+            </button>
+            <button
+              disabled={pagination?.currentPage === 2}
+              className="w-8 h-8 flex items-center justify-center bg-black text-white dark:bg-darkBorder dark:text-zinc-100 font-bold border-4 border-black dark:border-darkBorder hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
+            >
+              2
+            </button>
+            <button
+              disabled={pagination?.currentPage === 3}
+              className="w-8 h-8 flex items-center justify-center bg-black text-white dark:bg-darkBorder dark:text-zinc-100 font-bold border-4 border-black dark:border-darkBorder hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
+            >
+              3
+            </button>
+            <button
+              disabled={pagination?.currentPage === 4}
+              className="w-8 h-8 flex items-center justify-center bg-black text-white dark:bg-darkBorder dark:text-zinc-100 font-bold border-4 border-black dark:border-darkBorder hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
+            >
+              4
+            </button>
+            <button
+              disabled={pagination?.currentPage === 5}
+              className="w-8 h-8 flex items-center justify-center bg-black text-white dark:bg-darkBorder dark:text-zinc-100 font-bold border-4 border-black dark:border-darkBorder hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
+            >
+              5
+            </button>
+            <span className="text-black/50 dark:text-white/50">...</span>
+            <button
+              disabled={pagination?.currentPage === 10}
+              className="w-8 h-8 flex items-center justify-center bg-black text-white dark:bg-darkBorder dark:text-zinc-100 font-bold border-4 border-black dark:border-darkBorder hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
+            >
+              10
+            </button>
+          </div>
+
+          <button
+            disabled={!pagination?.hasNextPage}
+            className="px-4 py-2 bg-black text-white dark:bg-darkBorder dark:text-zinc-100 font-bold border-4 border-black dark:border-darkBorder hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

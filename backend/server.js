@@ -19,7 +19,8 @@ const server = express();
 // Middlewares
 server.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    // origin: process.env.CLIENT_URL,
+    origin: "*",
     credentials: true,
   })
 );

@@ -42,8 +42,6 @@ const socektConnection = (io) => {
     });
   });
 };
-
-// io অবজেক্টকে অন্য জায়গা থেকে ব্যবহার করার জন্য ফাংশন
 const emitMessage = (event, data) => {
   if (ioInstance) {
     ioInstance.emit(event, data);

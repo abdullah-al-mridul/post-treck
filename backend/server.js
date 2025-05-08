@@ -57,7 +57,7 @@ server.use((err, req, res, next) => {
 const httpServer = createServer(server);
 const io = new Server(httpServer, {
   cors: {
-    origin: "*",
+    origin: process.env.CLIENT_URL,
   },
 });
 socektConnection(io);

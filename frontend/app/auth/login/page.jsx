@@ -44,7 +44,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex bg-[#E7E9EA] dark:bg-[#0D0D0D] transition-colors">
       {/* Left Side - App Introduction */}
-      <div className="hidden lg:flex w-1/2 flex-col justify-between p-12  relative overflow-hidden">
+      <div className="hidden lg:flex w-1/2 flex-col justify-between p-12 border-r border-borderDark  relative overflow-hidden">
         {/* Background Pattern */}
         {/* <div className="absolute inset-0 opacity-10">
           <div
@@ -197,170 +197,174 @@ export default function Login() {
       </div>
 
       {/* Right Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center px-4 relative">
-        <ThemeToggle className="absolute top-4 right-4" />
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center relative">
+        {/* <ThemeToggle className="absolute top-4 right-4" /> */}
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-md"
-        >
-          {/* Main Box */}
-          <div className="border-4 border-black dark:border-white p-8 relative">
-            {/* Corner Decorations */}
-            <div className="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-black dark:border-white -translate-x-4 -translate-y-4" />
-            <div className="absolute top-0 right-0 w-4 h-4 border-t-4 border-r-4 border-black dark:border-white translate-x-4 -translate-y-4" />
-            <div className="absolute bottom-0 left-0 w-4 h-4 border-b-4 border-l-4 border-black dark:border-white -translate-x-4 translate-y-4" />
-            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-4 border-r-4 border-black dark:border-white translate-x-4 translate-y-4" />
-
+        <div className=" border w-full border-r-0 border-l-0 border-borderDark">
+          <div className=" border mx-auto max-w-xl border-t-0 border-b-0 border-borderDark py-20">
             <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: "100%" }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-              className="mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="w-full max-w-md mx-auto"
             >
-              <h2 className="text-4xl text-nowrap font-bold text-black dark:text-white uppercase tracking-tight">
-                Sign In
-              </h2>
-              <div className="w-full h-2 bg-black dark:bg-white mt-4" />
-            </motion.div>
+              {/* Main Box */}
+              <div className="border-2 border-black dark:border-borderDark relative">
+                {/* Corner Decorations */}
+                <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-black dark:border-borderPinkLight -translate-x-4 -translate-y-4" />
+                <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-black dark:border-borderPinkLight translate-x-4 -translate-y-4" />
+                <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-black dark:border-borderPinkLight -translate-x-4 translate-y-4" />
+                <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-black dark:border-borderPinkLight translate-x-4 translate-y-4" />
 
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              {error && (
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="p-4 bg-red-100 border-2 border-red-500 text-red-500 font-mono dark:bg-red-900/20"
+                  initial={{ width: 0 }}
+                  animate={{ width: "100%" }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                  className="mb-8 bg-borderPinkLight/10 px-8 py-4"
                 >
-                  <span className="font-bold">Error: </span>
-                  {error}
+                  <h2 className="text-4xl text-nowrap font-medium text-black dark:text-white tracking-wide uppercase ">
+                    Sign In
+                  </h2>
+                  {/* <div className="w-full h-[1px] bg-black dark:bg-borderPinkLight mt-4" /> */}
                 </motion.div>
-              )}
 
-              <div className="space-y-4">
-                <motion.div
-                  initial={{ x: -50, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.6 }}
-                  className="relative group"
-                >
-                  <label className="block text-sm font-bold uppercase mb-2 dark:text-white">
-                    Email
-                  </label>
-                  <input
-                    name="email"
-                    type="email"
-                    className={`w-full p-3 border-2 ${
-                      formErrors.login.email
-                        ? "border-red-500"
-                        : "border-black dark:border-white"
-                    } bg-transparent dark:text-white outline-none font-mono 
-                    focus:translate-x-1 focus:-translate-y-1 focus:shadow-[4px_4px_0_0_#000] dark:focus:shadow-[4px_4px_0_0_#fff] 
+                <form className="space-y-6" onSubmit={handleSubmit}>
+                  <div className="px-8">
+                    {error && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="p-4 bg-red-100 border  border-borderBlueLight text-red-600 font-mono dark:bg-borderBlueLight/10"
+                      >
+                        <span className=" tracking-wider">Error: </span>
+                        {error}
+                      </motion.div>
+                    )}
+                  </div>
+
+                  <div className="space-y-4 px-8">
+                    <motion.div
+                      initial={{ x: -50, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.6 }}
+                      className="relative group"
+                    >
+                      <label className="block text-sm tracking-wider uppercase mb-2 dark:text-white">
+                        Email
+                      </label>
+                      <input
+                        name="email"
+                        type="email"
+                        className={`w-full p-3 border ${
+                          formErrors.login.email ? "" : "border-black "
+                        }  bg-transparent placeholder:tracking-wider dark:border-borderDark placeholder:font-manrope dark:text-white outline-none font-mono focus:shadow-[4px_4px_0_0_#000] dark:focus:shadow-[6px_6px_0_0_#8a05ff1a] 
                     transition-all duration-200`}
-                    placeholder="your@email.com"
-                    value={formData.login.email}
-                    onChange={handleChange}
-                  />
-                  {formErrors.login.email && (
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="mt-1 text-sm text-red-500 dark:text-red-400"
-                    >
-                      {formErrors.login.email}
-                    </motion.p>
-                  )}
-                </motion.div>
+                        placeholder="your@email.com"
+                        value={formData.login.email}
+                        onChange={handleChange}
+                      />
+                      {formErrors.login.email && (
+                        <motion.p
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="mt-2 text-sm text-red-600  tracking-wider"
+                        >
+                          {formErrors.login.email}
+                        </motion.p>
+                      )}
+                    </motion.div>
 
-                <motion.div
-                  initial={{ x: 50, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.7 }}
-                  className="relative group"
-                >
-                  <label className="block text-sm font-bold uppercase mb-2 dark:text-white">
-                    Password
-                  </label>
-                  <input
-                    name="password"
-                    type="password"
-                    className={`w-full p-3 border-2 ${
-                      formErrors.login.password
-                        ? "border-red-500"
-                        : "border-black dark:border-white"
-                    } bg-transparent dark:text-white outline-none font-mono 
-                    focus:translate-x-1 focus:-translate-y-1 focus:shadow-[4px_4px_0_0_#000] dark:focus:shadow-[4px_4px_0_0_#fff] 
+                    <motion.div
+                      initial={{ x: 50, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.7 }}
+                      className="relative group"
+                    >
+                      <label className="block text-sm tracking-wider uppercase mb-2 dark:text-white">
+                        Password
+                      </label>
+                      <input
+                        name="password"
+                        type="password"
+                        className={`w-full p-3 border ${
+                          formErrors.login.password ? "" : "border-black "
+                        }  bg-transparent placeholder:tracking-wider dark:border-borderDark placeholder:font-manrope dark:text-white outline-none font-mono focus:shadow-[4px_4px_0_0_#000] dark:focus:shadow-[6px_6px_0_0_#8a05ff1a] 
                     transition-all duration-200`}
-                    placeholder="••••••••"
-                    value={formData.login.password}
-                    onChange={handleChange}
-                  />
-                  {formErrors.login.password && (
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="mt-1 text-sm text-red-500 dark:text-red-400"
-                    >
-                      {formErrors.login.password}
-                    </motion.p>
-                  )}
-                </motion.div>
-              </div>
+                        placeholder="••••••••"
+                        value={formData.login.password}
+                        onChange={handleChange}
+                      />
+                      {formErrors.login.password && (
+                        <motion.p
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="mt-1 text-sm text-red-600"
+                        >
+                          {formErrors.login.password}
+                        </motion.p>
+                      )}
+                    </motion.div>
+                  </div>
 
-              <motion.button
-                type="submit"
-                disabled={isSubmitting}
-                whileHover={{ scale: 1 }}
-                whileTap={{ scale: 0.98 }}
-                className="group relative w-full p-4 font-bold uppercase disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {/* Content Layer */}
-                <span className="relative z-20 inline-flex items-center text-white dark:text-black">
-                  {isSubmitting ? "Signing in..." : "Sign in"}
-                  {!isSubmitting && (
-                    <motion.span
-                      className="ml-2 text-xl"
-                      animate={{ x: [0, 4, 0] }}
-                      transition={{
-                        duration: 1.5,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      }}
-                    >
-                      →
-                    </motion.span>
-                  )}
-                </span>
+                  <div className=" px-8 border border-r-0 border-l-0 border-borderDark">
+                    <div className=" border border-t-0 border-b-0 py-4 border-borderPinkLight">
+                      <motion.button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="group relative w-full p-4 font-medium uppercase disabled:opacity-50 disabled:cursor-not-allowed border border-r-0 border-l-0 border-borderPinkLight hover:bg-borderPinkLight/10 transition-colors"
+                      >
+                        {/* Content Layer */}
+                        <span className="relative z-20 inline-flex tracking-wider items-center text-white dark:text-white">
+                          {isSubmitting ? "Signing in..." : "Sign in"}
+                          {!isSubmitting && (
+                            <motion.span
+                              className="ml-2 text-xl"
+                              animate={{ x: [0, 4, 0] }}
+                              transition={{
+                                duration: 1.5,
+                                repeat: Infinity,
+                                ease: "easeInOut",
+                              }}
+                            >
+                              →
+                            </motion.span>
+                          )}
+                        </span>
 
-                {/* Button Layers */}
-                <div className="absolute inset-0 z-10 bg-black dark:bg-white" />
-                <div
-                  className="absolute inset-0 z-0 border-2 border-black dark:border-white bg-white dark:bg-black
+                        {/* Button Layers */}
+                        <div className="absolute inset-0 z-10 bg-black dark:bg-transparent" />
+                        {/* <div
+                    className="absolute inset-0 z-0 border-2 border-black dark:border-borderPinkLight bg-white dark:bg-black
                   translate-x-2 -translate-y-2 transition-transform duration-200
                   group-hover:translate-x-0 group-hover:translate-y-0"
-                />
-              </motion.button>
+                  /> */}
+                      </motion.button>
+                    </div>
+                  </div>
 
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.8 }}
-                className="text-center space-y-2"
-              >
-                <Link
-                  href="/auth/register"
-                  className="inline-block font-bold uppercase text-sm hover:underline dark:text-white group"
-                >
-                  Create New Account{" "}
-                  <span className="group-hover:translate-x-1 inline-block transition-transform">
-                    →
-                  </span>
-                </Link>
-              </motion.div>
-            </form>
+                  <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.8 }}
+                    className="text-center "
+                  >
+                    <div className=" mt-8 border-t border-borderDark ">
+                      <Link
+                        href="/auth/register"
+                        className="inline-block tracking-wider uppercase py-2 text-sm hover:bg-borderPinkLight/10 transition-colors dark:text-white group border border-t-0 border-b-0 px-7 border-borderDark"
+                      >
+                        Create New Account{" "}
+                        <span className="group-hover:translate-x-1 inline-block transition-transform">
+                          →
+                        </span>
+                      </Link>
+                    </div>
+                  </motion.div>
+                </form>
+              </div>
+            </motion.div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

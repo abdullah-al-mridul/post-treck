@@ -1,11 +1,12 @@
-import { Inter } from "next/font/google";
+import { Manrope } from "next/font/google";
 import "./globals.css";
 import RootLayoutClient from "./RootLayoutClient";
 import SecureRoute from "@/components/SecureRoute";
 import BanReasonModal from "@/components/dashboard/users/BanReasonModal";
 import RoleChangeModal from "@/components/dashboard/users/RoleChangeModal";
 
-const inter = Inter({ subsets: ["latin"] });
+// getting font files from google fonts
+const manrope = Manrope({ subsets: ["latin"] });
 
 //declare metadata
 export const metadata = {
@@ -17,7 +18,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={manrope.className}>
         <RootLayoutClient>
           {/* checking if user is logged in */}
           <SecureRoute>

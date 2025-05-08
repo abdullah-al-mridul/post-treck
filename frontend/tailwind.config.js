@@ -10,10 +10,15 @@ module.exports = {
     extend: {
       fontFamily: {
         roboto: ["var(--font-roboto)"],
+        manrope: ["manrope"],
       },
       colors: {
         darkBorder: "#38444d",
         darkHover: "#f7f9f91a",
+        borderDark: "#272727",
+        borderPinkLight: "#8A05FF",
+        borderRedLight: "#72001B",
+        borderBlueLight: "#002C6F",
       },
       keyframes: {
         "glitch-1": {

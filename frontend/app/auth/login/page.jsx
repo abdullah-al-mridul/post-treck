@@ -42,11 +42,11 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#E7E9EA] dark:bg-[#15202B] transition-colors">
+    <div className="min-h-screen flex bg-[#E7E9EA] dark:bg-[#0D0D0D] transition-colors">
       {/* Left Side - App Introduction */}
-      <div className="hidden lg:flex w-1/2 flex-col justify-between p-12 bg-[#15202B] dark:bg-[#E7E9EA] relative overflow-hidden">
+      <div className="hidden lg:flex w-1/2 flex-col justify-between p-12  relative overflow-hidden">
         {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
+        {/* <div className="absolute inset-0 opacity-10">
           <div
             className="absolute top-0 left-0 w-full h-full"
             style={{
@@ -67,10 +67,10 @@ export default function Login() {
               backgroundSize: "6px 6px",
             }}
           />
-        </div>
+        </div> */}
 
         {/* Dark mode version */}
-        <div className="absolute inset-0 opacity-10 dark:opacity-10">
+        {/* <div className="absolute inset-0 opacity-10 dark:opacity-10">
           <div
             className="absolute top-0 left-0 w-full h-full hidden dark:block"
             style={{
@@ -91,7 +91,7 @@ export default function Login() {
               backgroundSize: "6px 6px",
             }}
           />
-        </div>
+        </div> */}
 
         <div className="relative">
           {/* Logo Section */}

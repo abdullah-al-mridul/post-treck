@@ -39,14 +39,14 @@ export default function RootLayoutClient({ children }) {
   }, [theme]);
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-[#15202B]">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-LightBlack">
         {/* Loading Text */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="relative"
         >
-          <div className="text-4xl md:text-7xl font-black text-black dark:text-zinc-100 uppercase relative z-10 tracking-widest flex items-center gap-2">
+          <div className="text-4xl md:text-7xl font-black text-black dark:text-white/80 uppercase relative z-10 tracking-widest flex items-center gap-2">
             {letters.map((letter, i) => (
               <motion.span
                 key={i}
@@ -79,13 +79,13 @@ export default function RootLayoutClient({ children }) {
           </div>
 
           {/* Decorative Elements */}
-          <div className="absolute inset-0 border-4 border-black dark:border-zinc-100 -rotate-2 transition-transform duration-300 hover:rotate-0" />
-          <div className="absolute inset-0 border-4 border-black dark:border-zinc-100 rotate-2 transition-transform duration-300 hover:rotate-0" />
+          <div className="absolute inset-0 border-4 border-black dark:border-borderDark -rotate-2 transition-transform duration-300 hover:rotate-0" />
+          <div className="absolute inset-0 border-4 border-black dark:border-borderDark rotate-2 transition-transform duration-300 hover:rotate-0" />
         </motion.div>
         {/* Loading Bar */}
-        <div className="w-64 h-2 mt-12 relative overflow-hidden border-2 border-black dark:border-zinc-100">
+        <div className="w-64 h-2 mt-12 relative overflow-hidden border-2 border-black dark:border-borderDark">
           <motion.div
-            className="absolute inset-0 bg-black dark:bg-zinc-100"
+            className="absolute inset-0 bg-black dark:bg-borderDark"
             animate={{
               x: ["-100%", "100%"],
             }}
@@ -96,10 +96,10 @@ export default function RootLayoutClient({ children }) {
             }}
           />
         </div>
-        <div className="fixed top-4 left-4 w-12 h-12 border-t-4 border-l-4 border-black dark:border-zinc-100" />
-        <div className="fixed top-4 right-4 w-12 h-12 border-t-4 border-r-4 border-black dark:border-zinc-100" />
-        <div className="fixed bottom-4 left-4 w-12 h-12 border-b-4 border-l-4 border-black dark:border-zinc-100" />
-        <div className="fixed bottom-4 right-4 w-12 h-12 border-b-4 border-r-4 border-black dark:border-zinc-100" />
+        <div className="fixed top-4 left-4 w-12 h-12 border-t-4 border-l-4 border-black dark:border-borderDark" />
+        <div className="fixed top-4 right-4 w-12 h-12 border-t-4 border-r-4 border-black dark:border-borderDark" />
+        <div className="fixed bottom-4 left-4 w-12 h-12 border-b-4 border-l-4 border-black dark:border-borderDark" />
+        <div className="fixed bottom-4 right-4 w-12 h-12 border-b-4 border-r-4 border-black dark:border-borderDark  " />
       </div>
     );
   }

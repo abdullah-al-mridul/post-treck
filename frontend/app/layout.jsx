@@ -17,7 +17,7 @@ export const metadata = {
 //declare root layout
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body className={manrope.className}>
         <RootLayoutClient>
           {/* checking if user is logged in */}

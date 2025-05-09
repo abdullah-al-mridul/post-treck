@@ -1,16 +1,15 @@
 "use client";
 import { motion } from "framer-motion";
 import useThemeStore from "@/store/themeStore";
+import { useEffect } from "react";
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useThemeStore();
 
   return (
-    <motion.button
+    <button
       onClick={toggleTheme}
-      className="fixed top-4 right-4 p-2 border-2 border-black dark:border-white text-black dark:text-white"
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.9 }}
+      className="fixed top-0 border-r-0 border-t-0 right-0 p-2 border border-black dark:border-borderDark text-black dark:text-white/70 group"
     >
       {theme === "light" ? (
         <svg
@@ -19,7 +18,7 @@ export default function ThemeToggle() {
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="w-6 h-6"
+          className="w-6 h-6 group-hover:scale-110 group-active:scale-90 transition-transform duration-200"
         >
           <path
             strokeLinecap="square"
@@ -34,7 +33,7 @@ export default function ThemeToggle() {
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="w-6 h-6"
+          className="w-6 h-6 group-hover:scale-110 group-active:scale-90 transition-transform duration-200"
         >
           <path
             strokeLinecap="square"
@@ -43,6 +42,6 @@ export default function ThemeToggle() {
           />
         </svg>
       )}
-    </motion.button>
+    </button>
   );
 }

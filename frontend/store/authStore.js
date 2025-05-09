@@ -7,7 +7,7 @@ const validateField = (name, value) => {
     case "name":
       if (!value.trim()) return "Name is required";
       if (value.length < 2) return "Name must be at least 2 characters";
-      if (value.length > 50) return "Name must be less than 50 characters";
+      if (value.length > 25) return "Name must be less than 25 characters";
       return "";
 
     case "email":

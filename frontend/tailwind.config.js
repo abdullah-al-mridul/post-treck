@@ -19,6 +19,7 @@ module.exports = {
         borderPinkLight: "#8A05FF",
         borderRedLight: "#72001B",
         borderBlueLight: "#002C6F",
+        LightBlack: "#0d0d0d",
       },
       keyframes: {
         "glitch-1": {

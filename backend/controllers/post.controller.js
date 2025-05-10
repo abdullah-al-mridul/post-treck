@@ -44,7 +44,7 @@ export const getFeedPosts = async (req, res) => {
   try {
     const user = req.user;
     const page = parseInt(req.query.page) || 1;
-    const limit = 1; // posts per page
+    const limit = 5; // posts per page
     const skip = (page - 1) * limit;
 
     // Get user's following list

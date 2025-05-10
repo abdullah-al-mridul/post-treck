@@ -111,7 +111,7 @@ export default function RootLayoutClient({ children }) {
           <Sidebar />
         </>
       )}
-      <main className={user ? "lg:pl-64 pl-16" : ""}>{children}</main>
+      <main className={user ? "lg:pl-0 pl-16" : ""}>{children}</main>
     </div>
   );
 }

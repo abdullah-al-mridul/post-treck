@@ -37,7 +37,7 @@ const ReactionButton = ({
     onClick={label !== "reactions" ? onClick : undefined}
     onMouseEnter={onHover}
   >
-    <button className="group flex items-center gap-2 mx-auto text-black dark:text-zinc-100 transition-colors">
+    <button className="group flex items-center gap-2 mx-auto text-black dark:text-white/80 transition-colors">
       {isReacting ? (
         <div className="w-5 h-5 relative">
           <motion.div
@@ -454,7 +454,7 @@ const PostCard = memo(
             <div className="space-y-4 mx-8 border-r border-l border-borderDark py-6">
               <div className="  border-t border-b border-borderDark py-3">
                 {/* Caption */}
-                <p className="text-lg leading-relaxed dark:text-zinc-100 px-3">
+                <p className="text-lg leading-relaxed dark:text-white/80 px-3">
                   {post?.caption}
                 </p>
 
@@ -528,7 +528,7 @@ const PostCard = memo(
               }}
               className="flex justify-center hover:bg-darkHover cursor-pointer dark:hover:bg-borderPinkLight/10 group border border-black dark:border-borderDark p-2 mx-8 border-t-0 border-b-0"
             >
-              <button className="text-sm font-medium text-black/50 dark:text-white/50 hover:text-black group-hover:dark:text-white/80 transition-colors flex items-center gap-1">
+              <button className="text-sm font-medium text-black/50 dark:text-white/80 hover:text-black group-hover:dark:text-white/80 transition-colors flex items-center gap-1">
                 View full post
                 <ArrowRight className="w-4 h-4" />
               </button>

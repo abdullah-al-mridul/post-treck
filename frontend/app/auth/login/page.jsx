@@ -241,7 +241,7 @@ export default function Login() {
                         type="email"
                         className={`w-full p-3 border ${
                           formErrors.login.email ? "" : ""
-                        }  bg-transparent placeholder:tracking-wider border-borderDark placeholder:font-manrope dark:text-white outline-none focus:shadow-[4px_4px_0_0_#000] dark:focus:shadow-[6px_6px_0_0_#8a05ff1a] 
+                        }  bg-transparent placeholder:tracking-wider border-borderDark placeholder:font-manrope dark:text-white text-LightBlack outline-none focus:shadow-[6px_6px_0_0_#8a05ff1a] 
                     transition-all duration-200`}
                         placeholder="your@email.com"
                         value={formData.login.email}
@@ -272,7 +272,7 @@ export default function Login() {
                         type="password"
                         className={`w-full p-3 border ${
                           formErrors.login.password ? "" : ""
-                        }  bg-transparent placeholder:tracking-wider border-borderDark placeholder:font-manrope dark:text-white outline-none    focus:shadow-[4px_4px_0_0_#000] dark:focus:shadow-[6px_6px_0_0_#8a05ff1a] 
+                        }  bg-transparent placeholder:tracking-wider border-borderDark placeholder:font-manrope dark:text-white text-LightBlack outline-none focus:shadow-[6px_6px_0_0_#8a05ff1a] 
                     transition-all duration-200`}
                         placeholder="••••••••"
                         value={formData.login.password}

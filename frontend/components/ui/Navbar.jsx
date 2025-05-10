@@ -6,10 +6,10 @@ import Link from "next/link";
 
 export function Navbar() {
   const { theme, toggleTheme } = useThemeStore();
-  const { user, logout } = useAuthStore();
+  const { logout } = useAuthStore();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 h-16 bg-white dark:bg-[#15202B]/50 backdrop-blur-2xl border-b-2 border-black dark:border-[#38444d] z-50">
+    <nav className="fixed top-0 left-0 right-0 h-16 bg-white dark:bg-LightBlack backdrop-blur-2xl border-b border-black dark:border-borderDark z-50">
       <div className="flex items-center justify-between h-full px-8">
         {/* Left side - Logo */}
         <Link

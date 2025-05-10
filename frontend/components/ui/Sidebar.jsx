@@ -50,8 +50,8 @@ export function Sidebar() {
   ];
 
   return (
-    <div className="fixed left-0 top-0 h-screen w-16 lg:hover:w-64 border-r-2 border-black dark:border-darkBorder bg-white dark:bg-[#15202B] lg:hover:pt-24 pt-16 lg:hover:px-2 px-0 transition-all duration-300 ease-in-out group overflow-hidden">
-      <nav className="space-y-2 border-0 lg:group-hover:border border-transparent lg:group-hover:border-darkBorder transition-all duration-300">
+    <div className="fixed left-0 top-0 h-screen w-16 lg:hover:w-64 border-r border-black dark:border-borderDark bg-white dark:bg-LightBlack lg:hover:pt-24 pt-16 lg:hover:px-2 px-0 transition-all duration-300 ease-in-out group overflow-hidden">
+      <nav className="space-y-2 border-0 lg:group-hover:border border-transparent lg:group-hover:border-borderDark transition-all duration-300">
         {/*rendering list*/}
         {navItems.map((item) => {
           const isActive = pathname === item.href;
@@ -62,7 +62,7 @@ export function Sidebar() {
                 className={`flex items-center lg:group-hover:gap-3 gap-0 p-3 transition-all duration-300 ${
                   isActive
                     ? "bg-black text-white dark:bg-darkHover dark:text-black font-bold"
-                    : "hover:bg-black/5 dark:hover:bg-white/5"
+                    : "hover:bg-black/5 dark:hover:bg-borderPinkLight/5"
                 }`}
               >
                 <div className="min-w-[24px] translate-x-1.5 lg:group-hover:translate-x-0 transition-all duration-300">

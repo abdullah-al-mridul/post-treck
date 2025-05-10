@@ -215,11 +215,11 @@ export default function HomeClient() {
 
   //if not loading and no error, show home page
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4">
-      <div className="max-w-2xl mx-auto space-y-8">
+    <div className="min-h-screen pt-16 pb-12 px-4">
+      <div className="max-w-2xl mx-auto">
         {/* Create Post Section */}
-        <div className="bg-white dark:bg-transparent dark:hover:bg-[#38444d1a] border-2 border-black dark:border-darkBorder hover:shadow-[8px_8px_0_0_#000] dark:hover:shadow-[8px_8px_0_0_rgba(56,68,77,0.4)] transition-all">
-          <div className="border-b-2 border-black dark:border-darkBorder p-4">
+        <div className="bg-white dark:bg-transparent dark:hover:bg-borderDark/10 border border-black dark:border-borderDark border-t-0 transition-all">
+          <div className="border-b border-black dark:border-borderDark p-4">
             <div className="flex items-center gap-4">
               <img
                 src={user?.profilePic || "/default-avatar.png"}
@@ -237,28 +237,31 @@ export default function HomeClient() {
             </div>
           </div>
 
-          <form onSubmit={handleCreatePost} className="p-4 space-y-2">
+          <form onSubmit={handleCreatePost} className="px-4  ">
             <textarea
               value={newPost}
+              style={{
+                verticalAlign: "top",
+              }}
               onChange={(e) => setNewPost(e.target.value)}
               placeholder="What's on your mind?"
-              className="w-full bg-transparent border-2 border-black dark:border-darkBorder dark:border-dashed p-4 rounded-none resize-none focus:outline-none min-h-[120px] placeholder:text-black/50 dark:placeholder:text-zinc-100 dark:text-zinc-100 font-medium"
+              className="w-full bg-transparent border border-t-0 border-black dark:border-borderDark  p-4 rounded-none resize-none focus:outline-none min-h-[120px] placeholder:text-black/50 dark:placeholder:text-zinc-100 dark:text-zinc-100 font-medium"
               rows={3}
             />
 
             {/* Image Preview */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 border-r border-l border-borderDark">
               {imagePreviews.map((preview, index) => (
                 <div key={index} className="relative">
                   <img
                     src={preview}
                     alt={`Preview ${index}`}
-                    className="h-24 w-auto border-2 border-black dark:border-darkBorder"
+                    className="h-24 w-auto border-2 border-black dark:border-borderDark"
                   />
                   <button
                     type="button"
                     onClick={() => removeImage(index)}
-                    className="absolute top-0 right-0 bg-red-500 dark:bg-darkBorder text-white p-1"
+                    className="absolute top-0 right-0 bg-red-500 dark:bg-borderDark text-white/50 p-1"
                   >
                     <X className="text-white dark:text-zinc-100 h-4 w-4" />
                   </button>
@@ -266,8 +269,13 @@ export default function HomeClient() {
               ))}
             </div>
 
-            <div className="flex justify-between items-center">
-              <div className="flex gap-2 w-full mr-4">
+            <div
+              style={{
+                borderTopWidth: imagePreviews.length > 0 ? "1px" : "0px",
+              }}
+              className="flex justify-between items-center border-r border-borderDark"
+            >
+              <div className="flex gap-2 w-full">
                 <input
                   type="file"
                   ref={imageInputRef}
@@ -278,17 +286,17 @@ export default function HomeClient() {
                 <button
                   type="button"
                   onClick={() => imageInputRef.current?.click()}
-                  className="p-2 border-2 w-full flex border-dashed items-center justify-center border-black dark:border-darkBorder hover:bg-black hover:text-white dark:hover:bg-[#38444d36] dark:hover:text-black transition-colors"
+                  className="p-2 border w-full flex  items-center justify-center border-black dark:border-borderDark hover:bg-black hover:text-white dark:hover:bg-borderDark/20 dark:hover:text-black transition-colors border-t-0 border-b-0"
                 >
                   {selectedImages.length > 0 ? (
                     <div className="flex items-center gap-2">
-                      <Plus className=" text-black dark:text-darkBorder" />
-                      <p className="text-black/50 dark:text-darkBorder text-sm">
+                      <Plus className=" text-black dark:text-white/50" />
+                      <p className="text-black/50 dark:text-white/50 text-sm">
                         ({selectedImages.length}/10)
                       </p>
                     </div>
                   ) : (
-                    <Image className=" text-black dark:text-darkBorder" />
+                    <Image className=" text-black dark:text-white/50  " />
                   )}
                 </button>
               </div>
@@ -298,7 +306,7 @@ export default function HomeClient() {
                 disabled={
                   isPosting || (!newPost.trim() && selectedImages.length === 0)
                 }
-                className="px-8 py-2 bg-black text-white dark:bg-darkBorder dark:text-zinc-100 font-bold border-4 border-black dark:border-darkBorder hover:translate-x-[-4px] hover:translate-y-[-4px] active:translate-x-[0px] active:translate-y-[0px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
+                className="px-8 py-2 bg-black text-white dark:bg-transparent  dark:text-white/50 font-bold border-black dark:border-borderDark  transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
               >
                 {isPosting ? (
                   <div className="flex items-center gap-2">
@@ -331,14 +339,9 @@ export default function HomeClient() {
         {/* Feed Posts */}
         {posts.length > 0 ? (
           posts.map((post) => (
-            <motion.div
-              key={post._id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
+            <div key={post._id}>
               <PostCard post={post} />
-            </motion.div>
+            </div>
           ))
         ) : (
           <div className="text-center py-8 border-4 border-black dark:border-white p-8">

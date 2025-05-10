@@ -51,15 +51,17 @@ export function Sidebar() {
 
   return (
     <div className="fixed left-0 top-0 h-screen w-16 lg:hover:w-64  border-r border-black dark:border-borderDark bg-white dark:bg-LightBlack lg:hover:pt-24 pt-16 lg:hover:px-2 px-0 transition-all duration-300 ease-in-out group overflow-hidden">
-      <nav className="space-y-2 border-0 lg:group-hover:border border-transparent lg:group-hover:border-borderDark transition-all duration-300">
+      <nav className="space-y-2 border-0 border-b border-b-borderDark lg:group-hover:border border-transparent lg:group-hover:border-borderDark transition-all duration-300">
         {/*rendering list*/}
-        {navItems.map((item) => {
+        {navItems.map((item, idx, allItems) => {
           const isActive = pathname === item.href;
 
           return (
             <Link key={item.href} href={item.href}>
-              <motion.div
-                className={`flex items-center lg:group-hover:gap-3 gap-0 p-3 transition-all duration-300 ${
+              <div
+                className={`flex ${
+                  idx === allItems.length - 1 ? "" : "border-b"
+                } items-center lg:group-hover:gap-3 gap-0 p-3 border-borderDark  transition-all duration-300 ${
                   isActive
                     ? "bg-black text-white dark:bg-borderDark dark:text-black font-bold"
                     : "hover:bg-black/5 dark:hover:bg-borderDark/20"
@@ -71,7 +73,7 @@ export function Sidebar() {
                 <span className="opacity-0 lg:group-hover:opacity-100 w-0 lg:group-hover:w-auto dark:text-zinc-100/70 transition-opacity duration-300 whitespace-nowrap">
                   {item.label}
                 </span>
-              </motion.div>
+              </div>
             </Link>
           );
         })}
@@ -100,7 +102,7 @@ export function Sidebar() {
         </div>
       </div>
       <footer className="absolute bottom-0 translate-y-full group-hover:translate-y-0 transition-none group-hover:transition-transform duration-300 delay-300 border-t left-0 border-borderDark text-white/70 p-2 text-sm">
-        © {new Date().getFullYear()} PostTrek —Share your thoughts
+        © {new Date().getFullYear()} PostTrek — Share your thoughts
         <span className="mx-2">•</span>
         Crafted with ❤️ by{" "}
         <a

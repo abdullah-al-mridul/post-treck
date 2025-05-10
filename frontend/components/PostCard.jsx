@@ -374,27 +374,37 @@ const PostCard = memo(
           <div className=" border border-borderDark bg-[#0D0D0D] group-hover:bg-borderDark/10 backdrop-blur-md transition-colors">
             {/* Post Header */}
             <div className="flex  border-t-0 border-borderDark p-3  items-center gap-4 border mx-8">
-              <div className="flex-1 flex items-center gap-4">
-                <div className="relative">
-                  <Image
-                    width={48}
-                    height={48}
-                    placeholder="blur"
-                    blurDataURL={post?.user?.profilePic}
-                    src={
-                      post?.user?.profilePic === "default-avatar.png"
-                        ? "/default-avatar.png"
-                        : post?.user?.profilePic
-                    }
-                    alt={post?.user?.name}
-                    className="w-12 h-12 border border-black dark:border-borderDark"
-                  />{" "}
+              <div className="flex-1 flex">
+                {" "}
+                {/* Removed items-stretch - not needed here */}
+                <div className="relative flex-shrink-0 border border-black dark:border-borderDark">
+                  {" "}
+                  {/* Added flex-shrink-0 to prevent image squishing */}
+                  {post?.user?.profilePic !== "default-avatar.png" ? (
+                    <Image
+                      width={48}
+                      height={48}
+                      placeholder="blur"
+                      blurDataURL={post?.user?.profilePic}
+                      src={
+                        post?.user?.profilePic === "default-avatar.png"
+                          ? "/default-avatar.png"
+                          : post?.user?.profilePic
+                      }
+                      alt={post?.user?.name}
+                      className="w-12 h-12 "
+                    />
+                  ) : (
+                    <div className=" w-12 h-12 dark:bg-[repeating-linear-gradient(45deg,_rgba(138,5,255,0.2)_0px,_rgba(138,5,255,0.2)_1px,_transparent_1px,_transparent_7px)]"></div>
+                  )}
                   {isOnline && (
                     <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-[#15202B]" />
                   )}
                 </div>
-                <div>
-                  <h3 className="font-bold text-lg flex items-center">
+                <div className="flex flex-col border border-l-0 border-borderDark px-4 justify-center">
+                  {" "}
+                  {/* Changed structure */}
+                  <h3 className="font-bold text-md flex items-center">
                     <button
                       onClick={(e) => {
                         e.preventDefault();

@@ -218,7 +218,7 @@ export default function HomeClient() {
     <div className="min-h-screen pt-16 pb-12 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Create Post Section */}
-        <div className="bg-white dark:bg-transparent dark:hover:bg-borderDark/10 border border-black dark:border-borderDark border-t-0 transition-all">
+        <div className="bg-white dark:bg-transparent group border border-black dark:border-borderDark border-t-0 transition-all">
           <div className="border-b border-black dark:border-borderDark p-4">
             <div className="flex items-center gap-4">
               <img
@@ -237,7 +237,10 @@ export default function HomeClient() {
             </div>
           </div>
 
-          <form onSubmit={handleCreatePost} className="px-4  ">
+          <form
+            onSubmit={handleCreatePost}
+            className="px-4 dark:bg-[repeating-linear-gradient(45deg,_rgba(39,39,39,0.2)_0px,_rgba(39,39,39,0.2)_1px,_transparent_1px,_transparent_6px)] "
+          >
             <textarea
               value={newPost}
               style={{
@@ -245,12 +248,12 @@ export default function HomeClient() {
               }}
               onChange={(e) => setNewPost(e.target.value)}
               placeholder="What's on your mind?"
-              className="w-full bg-transparent border border-t-0 border-black dark:border-borderDark  p-4 rounded-none resize-none focus:outline-none min-h-[120px] placeholder:text-black/50 dark:placeholder:text-zinc-100 dark:text-zinc-100 font-medium"
+              className="w-full bg-transparent border border-t-0 border-black dark:border-borderDark  p-4 rounded-none resize-none focus:outline-none min-h-[120px] placeholder:text-black/50 dark:placeholder:text-zinc-100 dark:text-zinc-100 font-medium dark:bg-[#0D0D0D]  group-hover:dark:bg-[#111111] transition-colors"
               rows={3}
             />
 
             {/* Image Preview */}
-            <div className="flex flex-wrap gap-2 border-r border-l border-borderDark">
+            <div className="flex flex-wrap gap-2 border-r border-l border-borderDark group-hover:dark:bg-[#111111] transition-colors dark:bg-[#0D0D0D]">
               {imagePreviews.map((preview, index) => (
                 <div key={index} className="relative">
                   <img
@@ -273,7 +276,7 @@ export default function HomeClient() {
               style={{
                 borderTopWidth: imagePreviews.length > 0 ? "1px" : "0px",
               }}
-              className="flex justify-between items-center border-r border-borderDark"
+              className="flex justify-between items-center border-r border-borderDark group-hover:dark:bg-[#111111] transition-colors dark:bg-[#0D0D0D]"
             >
               <div className="flex gap-2 w-full">
                 <input

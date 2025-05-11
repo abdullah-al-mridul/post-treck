@@ -272,10 +272,25 @@ const PostMenu = ({ postId, onReport, posterId, onDelete, isDeleting }) => {
 
             {/* Dropdown Menu */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#15202B] dark:border-darkBorder border-2 border-black shadow-lg z-50"
+              initial={{ opacity: 0, scale: 0.9, y: -10 }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                y: 0,
+                transition: {
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 15,
+                },
+              }}
+              exit={{
+                opacity: 0,
+                scale: 0.9,
+                y: -10,
+                transition: { duration: 0.2 },
+              }}
+              className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#0D0D0D] dark:border-borderDark border border-black shadow-lg z-50 
+            "
             >
               {user?._id !== posterId && (
                 <button
@@ -284,25 +299,27 @@ const PostMenu = ({ postId, onReport, posterId, onDelete, isDeleting }) => {
                     setIsOpen(false);
                   }}
                   className={`w-full ${
-                    user?._id === posterId ? "border-b-2" : "border-b-0"
-                  } border-darkBorder px-4 py-2 text-left hover:bg-black/5 transition-colors dark:hover:bg-[#2B353F] flex items-center gap-2 text-red-500`}
+                    user?._id === posterId ? "border-b" : "border-b-0"
+                  } px-4 py-2 text-left  transition-colors dark:border-borderDark flex items-center gap-2 text-red-500 dark:hover:bg-borderPinkLight/10`}
                 >
                   <AlertCircle className="w-5 h-5" />
                   Report Post
                 </button>
               )}
+              {/* user?._id === posterId */}
               {user?._id === posterId && (
                 <button
                   onClick={() => {
                     handleDeletePost(postId);
                   }}
                   disabled={isDeleting}
-                  className="w-full px-4 py-2 text-left dark:hover:bg-[#2B353F] hover:bg-black/5 transition-colors flex items-center gap-2 text-red-500"
+                  className="w-full px-4 py-2 text-left dark:hover:bg-borderPinkLight/10 hover:bg-black/5 transition-colors flex items-center gap-2 text-red-800 tracking-wider"
                 >
+                  {/* isDeleting */}
                   {isDeleting ? (
                     <div className="w-5 h-5 relative">
                       <motion.div
-                        className="absolute inset-0 rounded-full border-2 border-black dark:border-darkBorder !border-t-darkBorder/50"
+                        className="absolute inset-0 rounded-full border border-black dark:border-borderDark !border-t-borderDark/50"
                         animate={{ rotate: [0, 360] }}
                         transition={{
                           duration: 1,
@@ -410,7 +427,7 @@ const PostCard = memo(
                         e.preventDefault();
                         router.push(`/profile/${post?.user?._id}`);
                       }}
-                      className="dark:text-white/80 font-normal relative before:absolute before:content-[''] before:h-[1px] before:transition-all before:bg-zinc-900 dark:before:bg-white/80 before:w-0 hover:before:w-full before:bottom-[2px] transition-colors"
+                      className="dark:text-white/80 font-normal relative before:absolute before:content-[''] before:h-[1px] before:transition-all before:bg-zinc-900 dark:before:bg-white/80 before:w-0 hover:before:w-full before:bottom-[2px] transition-colors tracking-wider"
                     >
                       {post?.user?.name}
                     </button>
@@ -418,7 +435,7 @@ const PostCard = memo(
                       <VerificationBadge role={post?.user?.role} />
                     )}
                   </h3>
-                  <div className="flex items-center gap-2 text-sm text-black/50 dark:text-white/50">
+                  <div className="flex items-center gap-2 text-sm text-black/50 dark:text-white/50 tracking-wider">
                     <time className="font-mono">
                       {formatDate(post?.createdAt)}
                     </time>

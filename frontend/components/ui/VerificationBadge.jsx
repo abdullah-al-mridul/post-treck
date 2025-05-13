@@ -30,17 +30,17 @@ export default function VerificationBadge({ role }) {
   if (!badgeInfo) return null;
 
   return (
-    <div className="relative inline-flex items-center justify-center">
+    <div className=" inline-flex items-center justify-center absolute top-0 right-0">
       <div
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
-        className="cursor-help"
+        className="cursor-help border border-borderDark border-t-0 border-r-0 p-[3px] pt-0"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="currentColor"
-          className={`w-[18px] h-[18px] ${badgeInfo.color} inline-block ml-2`}
+          className={`w-[18px] h-[18px] ${badgeInfo.color} inline-block`}
         >
           {/* Circle background */}
           <circle
@@ -64,19 +64,37 @@ export default function VerificationBadge({ role }) {
       <AnimatePresence>
         {showTooltip && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 5, scale: 0.95 }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              transition: {
+                type: "spring",
+                damping: 20,
+                stiffness: 300,
+                mass: 0.5,
+              },
+            }}
+            exit={{
+              opacity: 0,
+              y: 5,
+              scale: 0.95,
+              transition: {
+                duration: 0.15,
+                ease: "easeIn",
+              },
+            }}
             className="absolute z-50 top-full mt-2"
           >
-            <div className="relative w-48 px-4 py-3 bg-white dark:bg-darkBorder/60 border-4 border-black backdrop-blur-lg dark:border-darkBorder shadow-lg">
+            <div className="relative w-48 px-4 py-3 bg-white dark:bg-[#0d0d0d] border border-black backdrop-blur-lg dark:border-borderDark shadow-lg">
               {/* Arrow */}
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[8px] border-b-black dark:border-b-darkBorder" />
+              <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[8px] border-b-black dark:border-b-borderDark tracking-wider" />
 
-              <h4 className="font-bold dark:text-zinc-100 mb-1">
+              <h4 className="font-medium dark:text-white/80 mb-1">
                 {badgeInfo.title}
               </h4>
-              <p className="text-sm text-black/70 dark:text-zinc-100">
+              <p className="text-sm text-black/70 dark:text-white/60 font-light">
                 {badgeInfo.description}
               </p>
             </div>

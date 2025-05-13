@@ -418,8 +418,7 @@ const PostCard = memo(
                     <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-[#15202B]" />
                   )}
                 </div>
-                <div className="flex flex-col border border-l-0 border-borderDark px-4 justify-center">
-                  {" "}
+                <div className="flex flex-col border border-l-0 border-borderDark px-4 pr-8 justify-center relative">
                   {/* Changed structure */}
                   <h3 className="font-bold text-md flex items-center">
                     <button

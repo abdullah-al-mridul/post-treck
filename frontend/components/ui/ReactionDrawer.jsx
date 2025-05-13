@@ -74,46 +74,58 @@ const emojiVariants = {
 };
 
 const containerVariants = {
-  hidden: { opacity: 0, scale: 0.95, y: 5 },
+  hidden: {
+    opacity: 0,
+    scale: 0.92,
+  },
   visible: {
     opacity: 1,
     scale: 1,
-    y: 0,
     transition: {
       type: "spring",
-      stiffness: 800,
-      damping: 30,
+      stiffness: 500, // more stiffness = faster bounce
+      damping: 18, // lower damping = more bounce
       mass: 0.5,
-      staggerChildren: 0.015,
+      staggerChildren: 0.05,
     },
   },
   exit: {
     opacity: 0,
-    scale: 0.95,
-    y: 5,
+    scale: 0.92,
     transition: {
       duration: 0.1,
+      ease: "easeInOut",
     },
   },
 };
 
 const tooltipVariants = {
-  hidden: { opacity: 0, y: 2 },
+  hidden: {
+    opacity: 0,
+    y: 4,
+    scale: 0.98,
+    pointerEvents: "none",
+  },
   visible: {
     opacity: 1,
     y: 0,
+    scale: 1,
+    pointerEvents: "auto",
     transition: {
       type: "spring",
-      stiffness: 800,
-      damping: 30,
-      mass: 0.5,
+      stiffness: 400,
+      damping: 28,
+      mass: 0.3,
     },
   },
   exit: {
     opacity: 0,
-    y: 2,
+    y: 4,
+    scale: 0.96,
+    pointerEvents: "none",
     transition: {
-      duration: 0.05,
+      duration: 0.08,
+      ease: "easeInOut",
     },
   },
 };
@@ -142,7 +154,7 @@ export default function ReactionDrawer({
           animate="visible"
           exit="exit"
           variants={containerVariants}
-          className={`absolute -top-16 left-0 bg-white dark:bg-[#15202B] border-2 border-black dark:border-darkBorder p-2 rounded-full shadow-lg flex gap-1 ${className}`}
+          className={`absolute -top-16 left-3 bg-white dark:bg-[#0d0d0d] border border-black dark:border-borderDark p-2 shadow-lg flex gap-1 ${className}`}
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
         >
@@ -165,8 +177,8 @@ export default function ReactionDrawer({
                 className={`relative w-10 h-10 rounded-full flex items-center justify-center text-2xl
                   ${
                     isActive
-                      ? "bg-black/5 dark:bg-white/5"
-                      : "hover:bg-black/5 dark:hover:bg-white/5"
+                      ? "bg-black/5 dark:bg-borderPinkLight/10"
+                      : "hover:bg-black/5 dark:hover:bg-borderPinkLight/10"
                   }
                 `}
               >
@@ -194,7 +206,7 @@ export default function ReactionDrawer({
                       initial="hidden"
                       animate="visible"
                       exit="exit"
-                      className="absolute -top-11 left-1/2 -translate-x-1/2 text-sm font-bold bg-black dark:bg-[#15202B] text-white dark:text-zinc-100 dark:border-darkBorder dark:border-2 px-3 py-1.5 rounded-md whitespace-nowrap shadow-lg"
+                      className="absolute -top-11 left-1/2 -translate-x-1/2 text-sm bg-black dark:bg-[#0d0d0d] text-white dark:text-white/80 dark:border-borderDark dark:border px-3 py-1.5  whitespace-nowrap shadow-lg tracking-wider font-light"
                     >
                       {reaction.name.charAt(0).toUpperCase() +
                         reaction.name.slice(1)}

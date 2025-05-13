@@ -8,9 +8,10 @@ const getBadgeInfo = (role) => {
   switch (role) {
     case "admin":
       return {
-        title: "Admin",
-        description: "Full access to manage and moderate the platform",
-        color: "text-blue-500",
+        title: "Founder",
+        description:
+          "Creator of the platform. Full control with absolute authority.",
+        color: "text-blue-600",
       };
     case "moderator":
       return {

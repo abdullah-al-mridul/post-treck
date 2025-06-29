@@ -161,21 +161,21 @@ export default function HomeClient() {
   // if (loading) return <Spinner />;
   if (loading) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-4 animate-pulse">
-        <div className="max-w-2xl mx-auto space-y-8">
+      <div className="min-h-screen pt-16 pb-12 px-4 animate-pulse">
+        <div className="max-w-2xl mx-auto space-y-8 border border-t-0 border-b-0 dark:border-borderDark">
           {/* Create Post Section Skeleton */}
-          <div className="bg-white dark:bg-[#15202B] border-2 border-gray-200 dark:border-gray-700">
-            <div className="border-b-2 border-gray-200 dark:border-gray-700 p-4">
+          <div className="bg-white dark:bg-transparent border border-gray-200 dark:border-borderDark border-t-0 border-r-0 border-l-0">
+            <div className="border-b border-gray-200 dark:border-borderDark p-4">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700"></div>
+                <div className="w-12 h-12 bg-gray-200 dark:bg-borderDark"></div>
                 <div className="flex-1">
-                  <div className="w-32 h-6 bg-gray-200 dark:bg-gray-700 mb-2"></div>
-                  <div className="w-24 h-4 bg-gray-200 dark:bg-gray-700"></div>
+                  <div className="w-32 h-6 bg-gray-200 dark:bg-borderDark mb-2"></div>
+                  <div className="w-24 h-4 bg-gray-200 dark:bg-borderDark"></div>
                 </div>
               </div>
             </div>
             <div className="p-4">
-              <div className="w-full h-32 bg-gray-200 dark:bg-gray-700"></div>
+              <div className="w-full h-32 bg-gray-200 dark:bg-borderDark"></div>
             </div>
           </div>
 
@@ -183,19 +183,19 @@ export default function HomeClient() {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="bg-white dark:bg-[#15202B] border-2 border-gray-200 dark:border-gray-700 p-6"
+              className="bg-white dark:bg-transparent border border-gray-200 dark:border-borderDark p-6 border-r-0 border-l-0"
             >
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700"></div>
+                <div className="w-12 h-12 bg-gray-200 dark:bg-borderDark"></div>
                 <div className="flex-1">
-                  <div className="w-48 h-6 bg-gray-200 dark:bg-gray-700 mb-2"></div>
-                  <div className="w-24 h-4 bg-gray-200 dark:bg-gray-700"></div>
+                  <div className="w-48 h-6 bg-gray-200 dark:bg-borderDark mb-2"></div>
+                  <div className="w-24 h-4 bg-gray-200 dark:bg-borderDark"></div>
                 </div>
               </div>
               <div className="space-y-4">
-                <div className="w-full h-4 bg-gray-200 dark:bg-gray-700"></div>
-                <div className="w-3/4 h-4 bg-gray-200 dark:bg-gray-700"></div>
-                <div className="w-full h-64 bg-gray-200 dark:bg-gray-700"></div>
+                <div className="w-full h-4 bg-gray-200 dark:bg-borderDark"></div>
+                <div className="w-3/4 h-4 bg-gray-200 dark:bg-borderDark"></div>
+                <div className="w-full h-64 bg-gray-200 dark:bg-borderDark"></div>
               </div>
             </div>
           ))}
